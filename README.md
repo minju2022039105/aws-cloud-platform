@@ -54,10 +54,11 @@
 
 ## 6. 운영 관점 (Monitoring & Logging)
 <img width="1894" height="905" alt="스크린샷 2026-03-23 233337" src="https://github.com/user-attachments/assets/6974779f-78aa-4cdc-ae7d-5d01d5e75d49" />
+
 * **실시간 가시성**: `SecurityAnalyzer` Lambda의 인바운드 로그 이벤트를 시각화하여 시스템 가동 상태 증명.
 * **Custom Metrics**: CloudWatch에 `AIOps/Security` 전용 공간을 생성하여 공격 유형별 지표를 기록.
 * **Athena Insight**: 비지도 학습 모델의 이상 탐지 결과(`anomaly=1`)를 Athena로 조회하여 실시간 위협 가시화.
-    * ![Athena Results](./images/스크린샷 2026-03-23 002934.png)
+    * ![Athena Results](./images/스크린샷 2026-03-23 002934.png) 올릴예정
 
 ---
 
