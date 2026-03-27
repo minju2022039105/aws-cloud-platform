@@ -1,0 +1,24 @@
+file,start_line,end_line,rule_id,severity,description,link,passed
+vpc/main.tf,49,74,aws-ec2-add-description-to-security-group,LOW,Security group explicitly uses the default description.,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/ec2/add-description-to-security-group/,false
+alb/main.tf,2,19,aws-ec2-add-description-to-security-group,LOW,Security group explicitly uses the default description.,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/ec2/add-description-to-security-group/,false
+vpc/main.tf,68,73,aws-ec2-add-description-to-security-group-rule,LOW,Security group rule does not have a description.,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/ec2/add-description-to-security-group-rule/,false
+vpc/main.tf,53,58,aws-ec2-add-description-to-security-group-rule,LOW,Security group rule does not have a description.,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/ec2/add-description-to-security-group-rule/,false
+alb/main.tf,6,11,aws-ec2-add-description-to-security-group-rule,LOW,Security group rule does not have a description.,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/ec2/add-description-to-security-group-rule/,false
+alb/main.tf,13,18,aws-ec2-add-description-to-security-group-rule,LOW,Security group rule does not have a description.,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/ec2/add-description-to-security-group-rule/,false
+main.tf,47,59,aws-ec2-enable-at-rest-encryption,HIGH,Root block device is not encrypted.,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/ec2/enable-at-rest-encryption/,false
+main.tf,47,59,aws-ec2-enforce-http-token-imds,HIGH,Instance does not require IMDS access to require a token,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/ec2/enforce-http-token-imds/,false
+vpc/main.tf,72,72,aws-ec2-no-public-egress-sgr,CRITICAL,Security group rule allows egress to multiple public internet addresses.,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/ec2/no-public-egress-sgr/,false
+alb/main.tf,17,17,aws-ec2-no-public-egress-sgr,CRITICAL,Security group rule allows egress to multiple public internet addresses.,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/ec2/no-public-egress-sgr/,false
+alb/main.tf,10,10,aws-ec2-no-public-ingress-sgr,CRITICAL,Security group rule allows ingress from public internet.,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/ec2/no-public-ingress-sgr/,false
+vpc/main.tf,22,22,aws-ec2-no-public-ip-subnet,HIGH,Subnet associates public IP address.,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/ec2/no-public-ip-subnet/,false
+vpc/main.tf,13,13,aws-ec2-no-public-ip-subnet,HIGH,Subnet associates public IP address.,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/ec2/no-public-ip-subnet/,false
+vpc/main.tf,1,6,aws-ec2-require-vpc-flow-logs-for-all-vpcs,MEDIUM,VPC Flow Logs is not enabled for VPC ,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/ec2/require-vpc-flow-logs-for-all-vpcs/,false
+alb/main.tf,24,24,aws-elb-alb-not-public,HIGH,Load balancer is exposed publicly.,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/elb/alb-not-public/,false
+alb/main.tf,22,28,aws-elb-drop-invalid-headers,HIGH,Application load balancer is not set to drop invalid headers.,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/elb/drop-invalid-headers/,false
+alb/main.tf,49,49,aws-elb-http-not-used,CRITICAL,Listener for application load balancer does not use HTTPS.,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/elb/http-not-used/,false
+iam/main.tf,26,26,aws-iam-no-policy-wildcards,HIGH,IAM policy document uses wildcarded action 'athena:*',https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/iam/no-policy-wildcards/,false
+iam/main.tf,26,26,aws-iam-no-policy-wildcards,HIGH,IAM policy document uses sensitive action 'lambda:InvokeFunction' on wildcarded resource '*',https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/iam/no-policy-wildcards/,false
+iam/main.tf,26,26,aws-iam-no-policy-wildcards,HIGH,IAM policy document uses sensitive action 'athena:*' on wildcarded resource '*',https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/iam/no-policy-wildcards/,false
+iam/main.tf,26,26,aws-iam-no-policy-wildcards,HIGH,IAM policy document uses wildcarded action 'athena:*',https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/iam/no-policy-wildcards/,false
+lambda.tf,32,42,aws-lambda-enable-tracing,LOW,Function does not have tracing enabled.,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/lambda/enable-tracing/,false
+lambda.tf,10,29,aws-lambda-enable-tracing,LOW,Function does not have tracing enabled.,https://aquasecurity.github.io/tfsec/v1.28.14/checks/aws/lambda/enable-tracing/,false

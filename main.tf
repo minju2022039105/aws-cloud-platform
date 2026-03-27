@@ -1,10 +1,6 @@
 # ==========================================
 # 1. 초기 설정 (Provider & Data Sources)
 # ==========================================
-provider "aws" {
-  region = "us-east-1"
-}
-
 # 최신 Ubuntu 24.04 AMI 검색
 data "aws_ami" "ubuntu" {
   most_recent = true
