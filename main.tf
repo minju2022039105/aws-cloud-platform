@@ -94,3 +94,56 @@ resource "aws_eip" "analysis_node_eip" {
 
   tags = { Name = "DevSecOps-Fixed-IP" }
 }
+
+# ==========================================
+# 6. EventBridge + SNS 메일 알림 테라폼 코드
+# ==========================================
+# 1. 알림을 보낼 SNS 주제(Topic) 생성
+resource "aws_sns_topic" "security_alerts" {
+  name = "devsecops-security-alerts"
+}
+
+# 2. 이메일 구독 설정 (민주님 메일 주소 입력)
+resource "aws_sns_topic_subscription" "email_subscription" {
+  topic_arn = aws_sns_topic.security_alerts.arn
+  protocol  = "email"
+  endpoint  = "민주님_메일_주소@example.com" # 여기에 실제 메일 주소를 적으세요!
+}
+
+# 3. EventBridge 규칙 생성 (예: WAF에서 차단 이벤트 발생 시)
+resource "aws_cloudwatch_event_rule" "waf_block_event" {
+  name        = "waf-block-detection"
+  description = "Capture WAF Block events and send notification"
+
+  event_pattern = jsonencode({
+    "source": ["aws.wafv2"],
+    "detail-type": ["WAF Configuration Change", "AWS API Call via CloudTrail"],
+    "detail": {
+      "eventName": ["UpdateWebACL", "DeleteWebACL"]
+    }
+  })
+}
+
+# 4. EventBridge 타겟을 SNS로 설정
+resource "aws_cloudwatch_event_target" "sns_target" {
+  rule      = aws_cloudwatch_event_rule.waf_block_event.name
+  target_id = "SendToSNS"
+  arn       = aws_sns_topic.security_alerts.arn
+}
+
+# 5. SNS 정책 설정 (EventBridge가 SNS에 메시지를 보낼 수 있게 허용)
+resource "aws_sns_topic_policy" "default" {
+  arn    = aws_sns_topic.security_alerts.arn
+  policy = data.aws_iam_policy_document.sns_topic_policy.json
+}
+
+data "aws_iam_policy_document" "sns_topic_policy" {
+  statement {
+    actions   = ["SNS:Publish"]
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+    resources = [aws_sns_topic.security_alerts.arn]
+  }
+}

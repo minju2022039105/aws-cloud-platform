@@ -62,7 +62,7 @@ resource "aws_security_group" "main_sg" {
     to_port     = 3000
     protocol    = "tcp"
     cidr_blocks = ["49.143.64.148/32"]
-    description = "Allow Grafana access"
+    description = "Allow Grafana access from my new IP"
   }
 
   egress {

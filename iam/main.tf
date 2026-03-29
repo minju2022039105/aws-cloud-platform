@@ -21,7 +21,7 @@ resource "aws_iam_role" "ec2_role" {
 
 resource "aws_iam_policy" "s3_access_policy" {
   name        = "devsecops-s3-access-policy"
-  description = "Allow EC2 and Lambda to access S3, KMS, Athena, CloudWatch and Invoke Lambda"
+  description = "Allow EC2 and Lambda to access S3, KMS, Athena, CloudWatch and WAF"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -36,7 +36,7 @@ resource "aws_iam_policy" "s3_access_policy" {
       },
       # (2) KMS 권한
       {
-        Action = ["kms:GenerateDataKey", "kms:Decrypt", "kms:DescribeKey"]
+        Action   = ["kms:GenerateDataKey", "kms:Decrypt", "kms:DescribeKey"]
         Effect   = "Allow"
         Resource = "arn:aws:kms:us-east-1:095035153545:key/f05a310f-3c92-4b81-af3d-a51050e17b46"
       },
@@ -53,11 +53,20 @@ resource "aws_iam_policy" "s3_access_policy" {
         Effect   = "Allow"
         Resource = "*"
       },
-      # (4) ⭐️ 핵심: Analyzer가 Preventer를 깨울 수 있는 권한 추가!
+      # (4) 람다 호출 권한
       {
         Action   = "lambda:InvokeFunction"
         Effect   = "Allow"
-        Resource = "*" # 보안상 "arn:aws:lambda:us-east-1:095035153545:function:SecurityPreventer" 로 적어주면 더 좋아요!
+        Resource = "*"
+      },
+      # 🔥 (5) 추가: WAF IP Set 수정 권한 
+      {
+        Action = [
+          "wafv2:GetIPSet",
+          "wafv2:UpdateIPSet"
+        ]
+        Effect   = "Allow"
+        Resource = "arn:aws:wafv2:us-east-1:095035153545:regional/ipset/devsecops-ai-block-list/266e5501-31b8-46ca-b3eb-3a58c28c51f7"
       }
     ]
   })
