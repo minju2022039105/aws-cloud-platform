@@ -22,7 +22,7 @@
 
 ## 3. 핵심 기술 역량 (Technical Highlights)
 
-### **🛡️ 전략적 보안 룰셋 설계 (WAF Priority)**
+### ** 전략적 보안 룰셋 설계 (WAF Priority)**
 비용 최적화와 탐지 정밀도를 위해 WAF 우선순위를 다음과 같이 체계적으로 설계했습니다.
 
 | 우선순위 | 규칙명 | 역할 및 엔지니어링 근거 |
@@ -32,7 +32,7 @@
 | **Priority 2-4** | **AWS Managed Rules** | **패턴 방어**: SQLi, XSS 등 알려진 패턴 공격을 AWS Managed 룰셋으로 정밀 방어합니다. |
 | **Priority 5** | **IP Reputation List** | **보수적 방어**: 이미 평판이 나쁜 IP들을 차단하여 전체적인 보안 안정성을 높입니다. |
 
-### **🏗️ Infrastructure as Code (Terraform)**
+### ** Infrastructure as Code (Terraform)**
 * **Full Automation**: VPC, EKS, WAF, Lambda 등 모든 리소스를 **Terraform 모듈**로 구성하여 인프라의 일관성을 유지합니다.
 * **Security Shift-Left**: 배포 전 **tfsec**을 활용하여 코드 레벨에서 23개의 보안 취약점(Critical 4건 포함)을 선제적으로 식별하고 개선했습니다.
 
