@@ -1,6 +1,6 @@
 # 1. 소스 코드 압축 (폴더 내 파일 변경 시 자동으로 해시값이 변함)
 data "archive_file" "lambda_zip" {
-  type        = "zip"
+  type = "zip"
   # 민주님의 실제 절대 경로로 지정하여 경로 오류를 방지합니다.
   source_dir  = "/home/march/aws-devsecops-platform/Security-AIOps-IsolationForest/lambda"
   output_path = "/home/march/aws-devsecops-platform/lambda_functions.zip"
@@ -8,12 +8,12 @@ data "archive_file" "lambda_zip" {
 
 # 2. SecurityAnalyzer (분석가 람다)
 resource "aws_lambda_function" "analyzer" {
-  filename         = data.archive_file.lambda_zip.output_path
-  function_name    = "SecurityAnalyzer"
-  role             = module.identity.ec2_role_arn
-  handler          = "lambda_security_analyzer.handler" 
-  runtime          = "python3.11"
-  timeout          = 30
+  filename      = data.archive_file.lambda_zip.output_path
+  function_name = "SecurityAnalyzer"
+  role    = module.identity.lambda_blocker_role_arn
+  handler = "lambda_security_analyzer.handler"  
+  runtime       = "python3.11"
+  timeout       = 30
 
   # ⭐️ 핵심: 파일 내용이 바뀌면 테라폼이 감지하여 재배포를 수행함
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
@@ -30,12 +30,12 @@ resource "aws_lambda_function" "analyzer" {
 
 # 3. SecurityPreventer (방어자 람다)
 resource "aws_lambda_function" "preventer" {
-  filename         = data.archive_file.lambda_zip.output_path
-  function_name    = "SecurityPreventer"
-  role             = module.identity.ec2_role_arn
-  handler          = "lambda_security_preventer.handler"
-  runtime          = "python3.11"
-  timeout          = 30 # 예방 로직 처리를 위해 넉넉히 설정
+  filename      = data.archive_file.lambda_zip.output_path
+  function_name = "SecurityPreventer"
+  role = module.identity.lambda_blocker_role_arn  
+  handler       = "lambda_security_preventer.handler"
+  runtime       = "python3.11"
+  timeout       = 30 # 예방 로직 처리를 위해 넉넉히 설정
 
   # ⭐️ 핵심: Preventer도 코드 변경 시 즉시 반영되도록 설정
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
@@ -48,7 +48,7 @@ resource "aws_lambda_permission" "allow_s3" {
   function_name = aws_lambda_function.analyzer.function_name
   principal     = "s3.amazonaws.com"
   # 실제 S3 버킷의 ARN으로 연결
-  source_arn    = "arn:aws:s3:::aws-waf-logs-minju-0417-project"
+  source_arn = "arn:aws:s3:::aws-waf-logs-minju-0417-project"
 }
 
 # 5. S3 이벤트 알림 설정 (파일 생성 시 람다 호출)

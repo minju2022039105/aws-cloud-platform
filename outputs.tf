@@ -15,19 +15,8 @@ output "fixed_public_ip" {
 }
 
 # ==========================================
-# 3. 보안 및 인증 정보 (IAM)
+# 3. (삭제) 보안 및 인증 정보 (IAM)
 # ==========================================
-output "admin_access_key" {
-  description = "IAM 관리자 Access Key ID"
-  value       = module.identity.admin_access_key
-}
-
-output "admin_secret_key" {
-  description = "IAM 관리자 Secret Access Key (보안상 숨김 처리)"
-  value       = module.identity.admin_secret_key
-  sensitive   = true
-}
-
 # ==========================================
 # 4. 인프라 연결 확인 (Debug)
 # ==========================================
@@ -42,8 +31,8 @@ output "ec2_profile_name" {
   description = "현재 EC2에 할당된 IAM 프로필 확인용"
   # ❌ aws_iam_instance_profile.ec2_profile.name (직접 참조 에러)
   # ✅ module.[모듈명].[output명] (정상 참조)
-  value       = module.identity.ec2_profile_name 
-}
+  value       = module.identity.ec2_instance_profile_name
+  }
 # ==========================================
 # 6. GitHub Actions OIDC 인증 정보 (추가)
 # ==========================================
