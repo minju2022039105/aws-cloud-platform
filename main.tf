@@ -51,10 +51,9 @@ resource "aws_instance" "security_node" {
 
   subnet_id              = module.network.public_subnet_id
   vpc_security_group_ids = [module.network.security_group_id]
-  
-  # ⭐️ 여기를 수정하세요! (문자열이 아니라 모듈의 결과값을 가져옵니다)
-  iam_instance_profile   = module.identity.ec2_profile_name 
 
+  # ⭐️ 여기를 수정하세요! (문자열이 아니라 모듈의 결과값을 가져옵니다)
+  iam_instance_profile = module.identity.ec2_instance_profile_name
   tags = { Name = "DevSecOps-Analysis-Node" }
 }
 
@@ -116,10 +115,10 @@ resource "aws_cloudwatch_event_rule" "waf_block_event" {
   description = "Capture WAF Block events and send notification"
 
   event_pattern = jsonencode({
-    "source": ["aws.wafv2"],
-    "detail-type": ["WAF Configuration Change", "AWS API Call via CloudTrail"],
-    "detail": {
-      "eventName": ["UpdateWebACL", "DeleteWebACL"]
+    "source" : ["aws.wafv2"],
+    "detail-type" : ["WAF Configuration Change", "AWS API Call via CloudTrail"],
+    "detail" : {
+      "eventName" : ["UpdateWebACL", "DeleteWebACL"]
     }
   })
 }
@@ -139,7 +138,7 @@ resource "aws_sns_topic_policy" "default" {
 
 data "aws_iam_policy_document" "sns_topic_policy" {
   statement {
-    actions   = ["SNS:Publish"]
+    actions = ["SNS:Publish"]
     principals {
       type        = "Service"
       identifiers = ["events.amazonaws.com"]

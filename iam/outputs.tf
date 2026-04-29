@@ -1,21 +1,19 @@
-output "admin_access_key" {
-  value = aws_iam_access_key.admin_key.id
-  # Access Key ID는 공개되어도 비교적 안전하지만, 관례상 같이 둡니다.
+output "ec2_ai_role_arn" {
+  value       = aws_iam_role.ec2_ai_role.arn
+  description = "ARN of EC2 AI Engine IAM Role"
 }
 
-output "admin_secret_key" {
-  value     = aws_iam_access_key.admin_key.secret
-  # ⭐️ 핵심: 이 옵션을 넣어야 터미널 화면에 비밀키가 안 뜹니다!
-  sensitive = true 
+output "lambda_blocker_role_arn" {
+  value       = aws_iam_role.lambda_blocker_role.arn
+  description = "ARN of Lambda Blocker IAM Role"
 }
 
-# iam 모듈 내부에서 정의
-output "ec2_profile_name" {
-  description = "EC2가 사용할 IAM 인스턴스 프로필 이름입니다."
+output "ec2_instance_profile_name" {
   value       = aws_iam_instance_profile.ec2_profile.name
+  description = "EC2 Instance Profile Name"
 }
 
-output "ec2_role_arn" {
-  description = "The ARN of the IAM role for EC2"
-  value       = aws_iam_role.ec2_role.arn
+output "github_actions_role_arn" {
+  value       = aws_iam_role.github_actions_role.arn
+  description = "ARN of GitHub Actions OIDC Role"
 }
