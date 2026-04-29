@@ -35,15 +35,17 @@ resource "aws_kms_key" "waf_s3_key" {
   })
 }
 
+# 2.1 KMS 공유 키 정의
 resource "aws_s3_bucket_server_side_encryption_configuration" "waf_logs_encryption" {
   bucket = aws_s3_bucket.waf_logs.id
 
   rule {
     apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.waf_s3_key.arn
+      # 기존 aws_kms_key.waf_s3_key.arn 대신 변수 처리
+      kms_master_key_id = var.shared_kms_key_arn 
       sse_algorithm     = "aws:kms"
     }
-    # [비용 최적화] S3 Bucket Key 활성화로 KMS 호출 비용 절감
+    # 비용 최적화 설정 유지
     bucket_key_enabled = true 
   }
 }

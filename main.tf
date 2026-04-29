@@ -29,6 +29,7 @@ module "identity" {
 # 보안 설정 (WAF & S3 Logging)
 module "security" {
   source = "./waf"
+  shared_kms_key_arn = aws_kms_key.shared_log_key.arn
 }
 
 # 부하 분산 및 WAF 연결 (ALB)
@@ -93,10 +94,20 @@ resource "aws_eip" "analysis_node_eip" {
 
   tags = { Name = "DevSecOps-Fixed-IP" }
 }
+# ==========================================
+# 5.1 모든 모듈이 함께 쓸 공유 키를 생성
+# ==========================================
+
+resource "aws_kms_key" "shared_log_key" {
+  description             = "Centralized Shared KMS Key for Security Logs"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true  # 멘토님 권장: 보안 표준화
+}
 
 # ==========================================
 # 6. EventBridge + SNS 메일 알림 테라폼 코드
 # ==========================================
+
 # 1. 알림을 보낼 SNS 주제(Topic) 생성
 resource "aws_sns_topic" "security_alerts" {
   name = "devsecops-security-alerts"
@@ -106,7 +117,7 @@ resource "aws_sns_topic" "security_alerts" {
 resource "aws_sns_topic_subscription" "email_subscription" {
   topic_arn = aws_sns_topic.security_alerts.arn
   protocol  = "email"
-  endpoint  = "민주님_메일_주소@example.com" # 여기에 실제 메일 주소를 적으세요!
+  endpoint  = "yapp9069@naver.com" 
 }
 
 # 3. EventBridge 규칙 생성 (예: WAF에서 차단 이벤트 발생 시)
