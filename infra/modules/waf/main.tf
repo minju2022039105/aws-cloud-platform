@@ -13,7 +13,7 @@ resource "aws_s3_bucket_public_access_block" "waf_logs_block" {
   restrict_public_buckets = true
 }
 
-# 2. KMS 암호화 및 비용 최적화 설정
+# 2.1. KMS 키 정책 정의 (WAF 로깅 권한 포함)
 resource "aws_kms_key" "waf_s3_key" {
   description             = "KMS key for WAF S3 bucket encryption"
   deletion_window_in_days = 7
@@ -22,30 +22,69 @@ resource "aws_kms_key" "waf_s3_key" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      # [Statement 1] 루트 및 관리자(민주님) 권한
       {
         Sid    = "Enable Admin Privilege"
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::095035153545:root" 
+          AWS = [
+            "arn:aws:iam::095035153545:root",
+            "arn:aws:iam::095035153545:user/system/devsecops-admin-user"
+          ]
         }
         Action   = "kms:*"
         Resource = "*"
+      },
+      # [Statement 2] WAF 로깅 서비스 허용 
+      {
+        Sid    = "Allow WAF Log Delivery to use the key"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action = [
+          "kms:GenerateDataKey*",
+          "kms:Decrypt"
+        ]
+        Resource = "*"
+      },
+      # [Statement 3] S3 서비스를 통한 접근 (기존 정책 유지)[cite: 1]
+      {
+        Sid    = "Allow S3 Access"
+        Effect = "Allow"
+        Principal = {
+          AWS = "*"
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "kms:ViaService"   = "s3.us-east-1.amazonaws.com",
+            "kms:CallerAccount" = "095035153545"
+          }
+        }
       }
     ]
   })
 }
 
-# 2.1 KMS 공유 키 정의
+# 2.2 S3 버킷 암호화 설정 (위에서 만든 키와 연결)
 resource "aws_s3_bucket_server_side_encryption_configuration" "waf_logs_encryption" {
   bucket = aws_s3_bucket.waf_logs.id
 
   rule {
     apply_server_side_encryption_by_default {
-      # 기존 aws_kms_key.waf_s3_key.arn 대신 변수 처리
-      kms_master_key_id = var.shared_kms_key_arn 
+      # 변수 대신 위에서 정의한 키의 ARN을 직접 참조하여 오류 방지
+      kms_master_key_id = aws_kms_key.waf_s3_key.arn 
       sse_algorithm     = "aws:kms"
     }
-    # 비용 최적화 설정 유지
+    # S3 Bucket Key 활성화로 KMS 호출 비용 최적화[cite: 1]
     bucket_key_enabled = true 
   }
 }
@@ -169,10 +208,24 @@ resource "aws_wafv2_web_acl" "main" {
   }
 }
 
-# 4. WAF 로깅 설정 (S3 연결)
+# WAF 로깅 설정 
 resource "aws_wafv2_web_acl_logging_configuration" "main" {
   resource_arn            = aws_wafv2_web_acl.main.arn
   log_destination_configs = [aws_s3_bucket.waf_logs.arn]
+
+  # 팁: 로그 필터링을 추가하면 필요한 데이터(공격 로그)만 골라 쌓을 수 있어요!
+  logging_filter {
+    default_behavior = "KEEP" # 기본적으로 모든 로그 유지
+    filter {
+      behavior = "KEEP"
+      condition {
+        action_condition {
+          action = "BLOCK" 
+        }
+      }
+      requirement = "MEETS_ANY"
+    }
+  }
 }
 
 # 5. AI 차단용 IP Set 생성

@@ -1,9 +1,8 @@
-# 1. 소스 코드 압축 (폴더 내 파일 변경 시 자동으로 해시값이 변함)
+# [확인] 소스 코드 압축 경로 (절대 경로이므로 유지해도 무방)
 data "archive_file" "lambda_zip" {
-  type = "zip"
-  # 민주님의 실제 절대 경로로 지정하여 경로 오류를 방지합니다.
+  type        = "zip"
   source_dir  = "/home/march/aws-devsecops-platform/Security-AIOps-IsolationForest/lambda"
-  output_path = "/home/march/aws-devsecops-platform/lambda_functions.zip"
+  output_path = "/home/march/aws-devsecops-platform/lambda_functions.zip" # 일단 루트에 두기로 한 설정 유지
 }
 
 # 2. SecurityAnalyzer (분석가 람다)
