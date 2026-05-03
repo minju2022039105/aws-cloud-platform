@@ -16,40 +16,66 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Configure AWS credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
+      # ── 배포 전: 러너 IP를 SG에 임시 추가 ────────────────────
+      - name: Get runner public IP
+        id: runner_ip
+        run: echo "ip=$(curl -s https://checkip.amazonaws.com)/32" >> $GITHUB_OUTPUT
+
+      - name: Get SG ID
+        id: sg
+        run: |
+          SG_ID=$(aws ec2 describe-security-groups \
+            --filters "Name=group-name,Values=devsecops-main-sg" \
+            --query "SecurityGroups[0].GroupId" \
+            --output text)
+          echo "id=$SG_ID" >> $GITHUB_OUTPUT
+
+      - name: Allow runner IP on port 22
+        run: |
+          aws ec2 authorize-security-group-ingress \
+            --group-id ${{ steps.sg.outputs.id }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.runner_ip.outputs.ip }}
+
+      # ── 배포 ─────────────────────────────────────────────────
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # 1. 경로 이동 및 코드 업데이트
             cd /home/ubuntu/Security-AIOps-IsolationForest/monitor
             git pull origin main
-            
-            # 2. 기존 프로세스 확실하게 종료 (이게 안 되면 포트 충돌 남)
+
             pkill -f monitor.py || true
             sleep 2
-            
-            # 3. [핵심] 가상환경 파이썬으로 '세션 독립' 실행
-            # setsid: 새로운 세션을 생성하여 부모의 종료 신호를 무시함
-            # & disown: 쉘의 작업 관리 목록에서 제거하여 세션 종료 시 영향 차단
+
             setsid /home/ubuntu/Security-AIOps-IsolationForest/venv/bin/python3 monitor.py > monitor.log 2>&1 &
             disown
-            
-            # 4. 강제로 성공 처리 (exit 0)
+
             sleep 3
-            echo "🚀 Deployment finished. Checking process..."
-            if ps -ef | grep -v grep | grep monitor.py > /dev/null
-            then
-                echo "✅ monitor.py is running successfully!"
+            echo "Deployment finished. Checking process..."
+            if ps -ef | grep -v grep | grep monitor.py > /dev/null; then
+                echo "monitor.py is running successfully."
                 exit 0
             else
-                echo "⚠️ Process not found, but forcing success for CI/CD flow."
+                echo "Process not found, but forcing success for CI/CD flow."
                 exit 0
             fi
+
+      # ── 배포 후: 러너 IP 즉시 제거 (실패해도 반드시 실행) ────
+      - name: Revoke runner IP from port 22
+        if: always()
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id ${{ steps.sg.outputs.id }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.runner_ip.outputs.ip }}
