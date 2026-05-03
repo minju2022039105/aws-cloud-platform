@@ -1,0 +1,20 @@
+=================================================================
+🔍 AI Security Threat Analysis Report (2026-05-01 16:06)
+=================================================================
+                                                                                                         request_uri                       type
+                                                                                                                   / Advanced Obfuscated Attack
+                                                                                                          /index.php Advanced Obfuscated Attack
+                                                                                                              /login           Admin Access Try
+                                                                            /lib/phpunit/src/Util/PHP/eval-stdin.php Advanced Obfuscated Attack
+                                                           /admin/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php           Admin Access Try
+                                                                                /lib/phpunit/Util/PHP/eval-stdin.php Advanced Obfuscated Attack
+/%63g%69%2d%3914/b%65tsie/%70ar%73erl.pl/<s%63ri%70t%3ea%6cer%74%28%27%56ul%6e%65%72%61%62%6ce'%29%3c/%73%63r%69pt>;                XSS Attempt
+                      /%7e%2f<s%63ri%70t%3e%61%6c%65r%74%28%27%56u%6cn%65%72a%62%6c%65')%3c%2fscr%69%70t>.%61%73%70x                XSS Attempt
+                                         /%73c%67%69-bin/%2ec%6f%62a%6c%74%2f%61le%72%74/%73%65r%76%69%63e%2e%63g%69 Advanced Obfuscated Attack
+                                                 /cg%69%2d%68om%65/.cob%61l%74/%61%6c%65rt/s%65rv%69c%65%2e%63%67%69 Advanced Obfuscated Attack
+                                                                                                       /%70m.%70h%70 Advanced Obfuscated Attack
+                                                   /%6f%70%65na%75%74ocl%61%73%73if%69e%64s%2f%66riendmail%2e%70%68p Advanced Obfuscated Attack
+/%6d%61%69lm%61%6e%2fl%69%73%74i%6efo/<%73cr%69p%74>%61l%65%72t%28%27%56%75%6c%6e%65%72abl%65%27)<%2fs%63ri%70%74%3e Advanced Obfuscated Attack
+                       /%3c%73%63r%69pt%3e%61l%65rt%28'Vu%6c%6ee%72%61b%6ce%27%29%3c%2f%73%63ript>%2e%73%68%74%6d%6c                XSS Attempt
+                                           /<%73cr%69%70%74>a%6cert(%27%56u%6cn%65r%61%62le')%3c/%73cri%70t>.j%73%70                XSS Attempt
+=================================================================
