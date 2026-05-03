@@ -1,10 +1,9 @@
 # ==========================================
 # 1. 초기 설정 (Provider & Data Sources)
 # ==========================================
-# 최신 Ubuntu 24.04 AMI 검색
 data "aws_ami" "ubuntu" {
   most_recent = true
-  owners      = ["099720109477"] # Canonical 공식 계정
+  owners      = ["099720109477"]
 
   filter {
     name   = "name"
@@ -13,38 +12,43 @@ data "aws_ami" "ubuntu" {
 }
 
 # ==========================================
-# 2. 인프라 모듈 (핵심 부품들)
+# 2. 인프라 모듈 (modules/ 경로 적용)
 # ==========================================
 
-# 네트워크 (VPC, Subnet, IGW)
+# infra/main.tf
+
+# 1. 네트워크 및 IAM (기존 vpc 모듈과 통합)
 module "network" {
-  source = "./vpc"
+  source = "./modules/vpc" 
+  
+  # [핵심] 여기에 변수 배달!
+  my_ip      = var.my_ip
+  account_id = var.account_id
 }
 
-# 계정 권한 (IAM)
-module "identity" {
-  source = "./iam"
-}
-
-# 보안 설정 (WAF & S3 Logging)
+# 2. 보안 설정 (WAF)
 module "security" {
-  source = "./waf"
+  source             = "./modules/waf"
   shared_kms_key_arn = aws_kms_key.shared_log_key.arn
+  # 만약 WAF에서도 내 IP만 허용하고 싶다면 여기에 추가
+  # my_ip            = var.my_ip 
 }
 
-# 부하 분산 및 WAF 연결 (ALB)
+# 3. 부하 분산 (ALB)
 module "alb" {
-  source         = "./alb"
+  source         = "./modules/alb"
   vpc_id         = module.network.vpc_id
   public_subnets = module.network.public_subnet_ids
   instance_id    = aws_instance.security_node.id
+  
+  # [핵심] ALB 보안 그룹에서도 내 IP만 허용하려면 배달!
+  my_ip          = var.my_ip
 }
 
 # ==========================================
-# 3. 개별 리소스 (EC2 & 보안 설정)
+# 3. 개별 리소스 (EC2)
 # ==========================================
 
-# 분석용 EC2 서버 인스턴스
 resource "aws_instance" "security_node" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t3.micro"
@@ -53,13 +57,14 @@ resource "aws_instance" "security_node" {
   subnet_id              = module.network.public_subnet_id
   vpc_security_group_ids = [module.network.security_group_id]
 
-  # ⭐️ 여기를 수정하세요! (문자열이 아니라 모듈의 결과값을 가져옵니다)
-  iam_instance_profile = module.identity.ec2_instance_profile_name
+  # IAM을 VPC로 통합했으므로 network 모듈의 결과값을 참조
+  iam_instance_profile = module.network.ec2_instance_profile_name
+  
   tags = { Name = "DevSecOps-Analysis-Node" }
 }
 
 # ==========================================
-# 4. 보안 접속 (SSH Key Pair)
+# 4. 보안 접속 및 공유 자원
 # ==========================================
 
 resource "tls_private_key" "rsa" {
@@ -77,54 +82,51 @@ resource "local_file" "private_key" {
   filename = "my-key.pem"
 }
 
+resource "aws_kms_key" "shared_log_key" {
+  description             = "Centralized Shared KMS Key for Security Logs"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+}
+
 # ==========================================
-# 5. 최종 연결 (WAF + ALB Association)
+# 5. 최종 연결 및 알림 설정
 # ==========================================
+
+# ALB → EC2 포트 80 허용 규칙 (vpc/alb 순환 참조 방지를 위해 루트 모듈에서 선언)
+resource "aws_security_group_rule" "allow_alb_to_ec2" {
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = module.network.security_group_id
+  source_security_group_id = module.alb.alb_sg_id
+  description              = "Allow HTTP traffic from ALB"
+}
 
 resource "aws_wafv2_web_acl_association" "main" {
   resource_arn = module.alb.alb_arn
   web_acl_arn  = module.security.web_acl_arn
 }
 
-# main.tf 파일 하단부 확인
-# 고정 IP (EIP) 할당
 resource "aws_eip" "analysis_node_eip" {
   instance = aws_instance.security_node.id
   domain   = "vpc"
-
-  tags = { Name = "DevSecOps-Fixed-IP" }
-}
-# ==========================================
-# 5.1 모든 모듈이 함께 쓸 공유 키를 생성
-# ==========================================
-
-resource "aws_kms_key" "shared_log_key" {
-  description             = "Centralized Shared KMS Key for Security Logs"
-  deletion_window_in_days = 7
-  enable_key_rotation     = true  # 멘토님 권장: 보안 표준화
+  tags     = { Name = "DevSecOps-Fixed-IP" }
 }
 
-# ==========================================
-# 6. EventBridge + SNS 메일 알림 테라폼 코드
-# ==========================================
-
-# 1. 알림을 보낼 SNS 주제(Topic) 생성
 resource "aws_sns_topic" "security_alerts" {
   name = "devsecops-security-alerts"
 }
 
-# 2. 이메일 구독 설정 (민주님 메일 주소 입력)
 resource "aws_sns_topic_subscription" "email_subscription" {
   topic_arn = aws_sns_topic.security_alerts.arn
   protocol  = "email"
   endpoint  = "yapp9069@naver.com" 
 }
 
-# 3. EventBridge 규칙 생성 (예: WAF에서 차단 이벤트 발생 시)
 resource "aws_cloudwatch_event_rule" "waf_block_event" {
   name        = "waf-block-detection"
   description = "Capture WAF Block events and send notification"
-
   event_pattern = jsonencode({
     "source" : ["aws.wafv2"],
     "detail-type" : ["WAF Configuration Change", "AWS API Call via CloudTrail"],
@@ -134,14 +136,12 @@ resource "aws_cloudwatch_event_rule" "waf_block_event" {
   })
 }
 
-# 4. EventBridge 타겟을 SNS로 설정
 resource "aws_cloudwatch_event_target" "sns_target" {
   rule      = aws_cloudwatch_event_rule.waf_block_event.name
   target_id = "SendToSNS"
   arn       = aws_sns_topic.security_alerts.arn
 }
 
-# 5. SNS 정책 설정 (EventBridge가 SNS에 메시지를 보낼 수 있게 허용)
 resource "aws_sns_topic_policy" "default" {
   arn    = aws_sns_topic.security_alerts.arn
   policy = data.aws_iam_policy_document.sns_topic_policy.json

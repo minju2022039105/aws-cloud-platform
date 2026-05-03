@@ -1,3 +1,7 @@
+# ==========================================
+# VPC & Networking
+# ==========================================
+
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
@@ -5,7 +9,6 @@ resource "aws_vpc" "main" {
   tags = { Name = "devsecops-vpc" }
 }
 
-# 첫 번째 퍼블릭 서브넷 (버지니아 1a)
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.1.0/24"
@@ -14,7 +17,6 @@ resource "aws_subnet" "public" {
   tags = { Name = "devsecops-public-1a" }
 }
 
-# 두 번째 퍼블릭 서브넷 (버지니아 1b)
 resource "aws_subnet" "public_2" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.2.0/24"
@@ -46,6 +48,7 @@ resource "aws_route_table_association" "public_2" {
   route_table_id = aws_route_table.public.id
 }
 
+# EC2 보안 그룹 (port 80 ALB→EC2 ingress는 루트 모듈의 aws_security_group_rule로 분리)
 resource "aws_security_group" "main_sg" {
   name   = "devsecops-main-sg"
   vpc_id = aws_vpc.main.id
@@ -75,4 +78,168 @@ resource "aws_security_group" "main_sg" {
 
 resource "aws_default_security_group" "default" {
   vpc_id = aws_vpc.main.id
+}
+
+# ==========================================
+# IAM (VPC 모듈에 통합)
+# ==========================================
+
+resource "aws_iam_role" "ec2_ai_role" {
+  name = "devsecops-ec2-ai-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
+      Principal = { Service = "ec2.amazonaws.com" }
+    }]
+  })
+}
+
+resource "aws_iam_role" "lambda_blocker_role" {
+  name = "devsecops-lambda-blocker-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
+      Principal = { Service = "lambda.amazonaws.com" }
+    }]
+  })
+}
+
+resource "aws_iam_policy" "ec2_ai_policy" {
+  name        = "devsecops-ec2-ai-policy"
+  description = "Least privilege policy for EC2 AI analysis engine"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "ReadWAFLogsFromS3"
+        Effect = "Allow"
+        Action = ["s3:GetObject", "s3:ListBucket", "s3:GetBucketLocation"]
+        Resource = [
+          "arn:aws:s3:::aws-waf-logs-minju-0417-project",
+          "arn:aws:s3:::aws-waf-logs-minju-0417-project/*"
+        ]
+      },
+      {
+        Sid      = "DecryptWAFLogBucketKey"
+        Effect   = "Allow"
+        Action   = ["kms:Decrypt", "kms:DescribeKey"]
+        Resource = "arn:aws:kms:us-east-1:095035153545:key/f05a310f-3c92-4b81-af3d-a51050e17b46"
+      },
+      {
+        Sid    = "RunAthenaQueries"
+        Effect = "Allow"
+        Action = [
+          "athena:StartQueryExecution",
+          "athena:GetQueryExecution",
+          "athena:GetQueryResults",
+          "athena:GetWorkGroup"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "ReadGlueCatalog"
+        Effect = "Allow"
+        Action = [
+          "glue:GetDatabase", "glue:GetDatabases",
+          "glue:GetTable", "glue:GetTables",
+          "glue:GetPartition", "glue:GetPartitions"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid      = "PutCustomMetrics"
+        Effect   = "Allow"
+        Action   = ["cloudwatch:PutMetricData"]
+        Resource = "*"
+      },
+      {
+        Sid    = "WriteCloudWatchLogs"
+        Effect = "Allow"
+        Action = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "lambda_blocker_policy" {
+  name        = "devsecops-lambda-blocker-policy"
+  description = "Least privilege policy for Lambda WAF IPSet blocker"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "ReadAIResultFromS3"
+        Effect   = "Allow"
+        Action   = ["s3:GetObject"]
+        Resource = "arn:aws:s3:::aws-waf-logs-minju-0417-project/results/*"
+      },
+      {
+        Sid    = "UpdateWAFIPSet"
+        Effect = "Allow"
+        Action = ["wafv2:GetIPSet", "wafv2:UpdateIPSet"]
+        Resource = "arn:aws:wafv2:us-east-1:095035153545:regional/ipset/devsecops-ai-block-list/266e5501-31b8-46ca-b3eb-3a58c28c51f7"
+      },
+      {
+        Sid    = "WriteLambdaLogs"
+        Effect = "Allow"
+        Action = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_ai_attach" {
+  role       = aws_iam_role.ec2_ai_role.name
+  policy_arn = aws_iam_policy.ec2_ai_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_blocker_attach" {
+  role       = aws_iam_role.lambda_blocker_role.name
+  policy_arn = aws_iam_policy.lambda_blocker_policy.arn
+}
+
+resource "aws_iam_instance_profile" "ec2_profile" {
+  name = "devsecops-ec2-profile"
+  role = aws_iam_role.ec2_ai_role.name
+}
+
+resource "aws_iam_openid_connect_provider" "github" {
+  url             = "https://token.actions.githubusercontent.com"
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = ["1c5877c10b42798e692138096e47c13459e984d7"]
+}
+
+resource "aws_iam_role" "github_actions_role" {
+  name = "github-actions-oidc-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRoleWithWebIdentity"
+      Effect = "Allow"
+      Principal = {
+        Federated = aws_iam_openid_connect_provider.github.arn
+      }
+      Condition = {
+        StringLike = {
+          "token.actions.githubusercontent.com:sub" = "repo:minju2022039105/aws-devsecops-platform:*"
+        }
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "github_actions_attach" {
+  role       = aws_iam_role.github_actions_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
 }

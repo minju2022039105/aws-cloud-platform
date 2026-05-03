@@ -9,7 +9,7 @@ data "archive_file" "lambda_zip" {
 resource "aws_lambda_function" "analyzer" {
   filename      = data.archive_file.lambda_zip.output_path
   function_name = "SecurityAnalyzer"
-  role    = module.identity.lambda_blocker_role_arn
+  role    = module.network.lambda_blocker_role_arn
   handler = "lambda_security_analyzer.handler"  
   runtime       = "python3.11"
   timeout       = 30
@@ -31,7 +31,7 @@ resource "aws_lambda_function" "analyzer" {
 resource "aws_lambda_function" "preventer" {
   filename      = data.archive_file.lambda_zip.output_path
   function_name = "SecurityPreventer"
-  role = module.identity.lambda_blocker_role_arn  
+  role = module.network.lambda_blocker_role_arn  
   handler       = "lambda_security_preventer.handler"
   runtime       = "python3.11"
   timeout       = 30 # 예방 로직 처리를 위해 넉넉히 설정
