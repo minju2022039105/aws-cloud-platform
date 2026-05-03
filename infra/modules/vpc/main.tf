@@ -239,7 +239,70 @@ resource "aws_iam_role" "github_actions_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "github_actions_attach" {
-  role       = aws_iam_role.github_actions_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
+# modules/vpc/main.tf
+
+resource "aws_iam_policy" "github_actions_minimal_policy" {
+  name        = "github-actions-minimal-policy"
+  description = "Super-refined minimal permissions for DevSecOps"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        # 기초 인프라 조회 및 VPC 관리
+        Effect   = "Allow"
+        Action   = [
+          "ec2:Describe*",
+          "ec2:CreateVpc",
+          "ec2:ModifyVpcAttribute",
+          "ec2:CreateSubnet",
+          "ec2:CreateSecurityGroup",
+          "ec2:AuthorizeSecurityGroupIngress",
+          "ec2:RevokeSecurityGroupIngress"
+        ]
+        Resource = "*"
+      },
+      {
+        # [핵심] 인스턴스 생성 시 t3.micro만 허용 (비용 폭탄 방지)
+        Effect   = "Allow"
+        Action   = ["ec2:RunInstances"]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "ec2:InstanceType" = ["t3.micro"]
+          }
+        }
+      },
+      {
+        # 정지/삭제 시 특정 태그가 달린 리소스만 제어 허용
+        Effect   = "Allow"
+        Action   = ["ec2:TerminateInstances", "ec2:StopInstances", "ec2:StartInstances"]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "aws:ResourceTag/Project" = "devsecops-platform"
+          }
+        }
+      },
+      {
+        # ALB 세부 권한 (Wildcard 제거 버전)
+        Effect   = "Allow"
+        Action   = [
+          "elasticloadbalancing:CreateLoadBalancer",
+          "elasticloadbalancing:DeleteLoadBalancer",
+          "elasticloadbalancing:DescribeLoadBalancers",
+          "elasticloadbalancing:CreateTargetGroup",
+          "elasticloadbalancing:DeleteTargetGroup",
+          "elasticloadbalancing:DescribeTargetGroups",
+          "elasticloadbalancing:RegisterTargets",
+          "elasticloadbalancing:DeregisterTargets",
+          "elasticloadbalancing:CreateListener",
+          "elasticloadbalancing:DeleteListener",
+          "elasticloadbalancing:DescribeListeners",
+          "elasticloadbalancing:AddTags"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
 }
