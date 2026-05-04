@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "waf_logs" {
-  bucket        = "aws-waf-logs-minju-0417-project"
+  bucket        = var.s3_bucket_name
   force_destroy = true
 }
 
@@ -28,8 +28,8 @@ resource "aws_kms_key" "waf_s3_key" {
         Effect = "Allow"
         Principal = {
           AWS = [
-            "arn:aws:iam::095035153545:root",
-            "arn:aws:iam::095035153545:user/system/devsecops-admin-user"
+            "arn:aws:iam::${var.account_id}:root",
+            "arn:aws:iam::${var.account_id}:user/system/devsecops-admin-user"
           ]
         }
         Action   = "kms:*"
@@ -65,8 +65,8 @@ resource "aws_kms_key" "waf_s3_key" {
         Resource = "*"
         Condition = {
           StringEquals = {
-            "kms:ViaService"   = "s3.us-east-1.amazonaws.com",
-            "kms:CallerAccount" = "095035153545"
+            "kms:ViaService"    = "s3.us-east-1.amazonaws.com",
+            "kms:CallerAccount" = var.account_id
           }
         }
       }

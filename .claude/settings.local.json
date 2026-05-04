@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(wsl *)"
+      "Bash(wsl *)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }

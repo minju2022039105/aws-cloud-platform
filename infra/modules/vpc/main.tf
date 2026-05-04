@@ -57,15 +57,15 @@ resource "aws_security_group" "main_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["49.143.64.148/32"]
+    cidr_blocks = var.my_ip
   }
 
   ingress {
     from_port   = 3000
     to_port     = 3000
     protocol    = "tcp"
-    cidr_blocks = ["49.143.64.148/32"]
-    description = "Allow Grafana access from my new IP"
+    cidr_blocks = var.my_ip
+    description = "Allow Grafana access from admin IP"
   }
 
   egress {
@@ -122,15 +122,15 @@ resource "aws_iam_policy" "ec2_ai_policy" {
         Effect = "Allow"
         Action = ["s3:GetObject", "s3:ListBucket", "s3:GetBucketLocation"]
         Resource = [
-          "arn:aws:s3:::aws-waf-logs-minju-0417-project",
-          "arn:aws:s3:::aws-waf-logs-minju-0417-project/*"
+          "arn:aws:s3:::${var.s3_bucket_name}",
+          "arn:aws:s3:::${var.s3_bucket_name}/*"
         ]
       },
       {
         Sid      = "DecryptWAFLogBucketKey"
         Effect   = "Allow"
         Action   = ["kms:Decrypt", "kms:DescribeKey"]
-        Resource = "arn:aws:kms:us-east-1:095035153545:key/f05a310f-3c92-4b81-af3d-a51050e17b46"
+        Resource = var.kms_key_arn
       },
       {
         Sid    = "RunAthenaQueries"
@@ -180,13 +180,13 @@ resource "aws_iam_policy" "lambda_blocker_policy" {
         Sid      = "ReadAIResultFromS3"
         Effect   = "Allow"
         Action   = ["s3:GetObject"]
-        Resource = "arn:aws:s3:::aws-waf-logs-minju-0417-project/results/*"
+        Resource = "arn:aws:s3:::${var.s3_bucket_name}/results/*"
       },
       {
         Sid    = "UpdateWAFIPSet"
         Effect = "Allow"
         Action = ["wafv2:GetIPSet", "wafv2:UpdateIPSet"]
-        Resource = "arn:aws:wafv2:us-east-1:095035153545:regional/ipset/devsecops-ai-block-list/266e5501-31b8-46ca-b3eb-3a58c28c51f7"
+        Resource = var.waf_ipset_arn
       },
       {
         Sid    = "WriteLambdaLogs"

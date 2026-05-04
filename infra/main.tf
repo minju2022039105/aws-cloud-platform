@@ -19,19 +19,21 @@ data "aws_ami" "ubuntu" {
 
 # 1. 네트워크 및 IAM (기존 vpc 모듈과 통합)
 module "network" {
-  source = "./modules/vpc" 
-  
-  # [핵심] 여기에 변수 배달!
-  my_ip      = var.my_ip
-  account_id = var.account_id
+  source = "./modules/vpc"
+
+  my_ip          = var.my_ip
+  account_id     = var.account_id
+  s3_bucket_name = var.s3_bucket_name
+  kms_key_arn    = var.kms_key_arn
+  waf_ipset_arn  = var.waf_ipset_arn
 }
 
 # 2. 보안 설정 (WAF)
 module "security" {
   source             = "./modules/waf"
   shared_kms_key_arn = aws_kms_key.shared_log_key.arn
-  # 만약 WAF에서도 내 IP만 허용하고 싶다면 여기에 추가
-  # my_ip            = var.my_ip 
+  s3_bucket_name     = var.s3_bucket_name
+  account_id         = var.account_id
 }
 
 # 3. 부하 분산 (ALB)
@@ -51,7 +53,7 @@ module "alb" {
 
 resource "aws_instance" "security_node" {
   ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.micro"
+  instance_type = var.instance_type
   key_name      = aws_key_pair.deployer.key_name
 
   subnet_id              = module.network.public_subnet_id
