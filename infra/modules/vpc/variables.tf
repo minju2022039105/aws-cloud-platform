@@ -11,3 +11,18 @@ variable "account_id" {
   type        = string
   description = "루트에서 넘겨받을 AWS 계정 ID"
 }
+
+variable "s3_bucket_name" {
+  type        = string
+  description = "WAF 로그 / AI 분석 결과 버킷명"
+}
+
+variable "kms_key_arn" {
+  type        = string
+  description = "WAF 로그 복호화용 KMS 키 ARN"
+}
+
+variable "waf_ipset_arn" {
+  type        = string
+  description = "Lambda가 업데이트하는 WAF IP Set ARN"
+}

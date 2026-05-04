@@ -21,7 +21,7 @@ resource "aws_lambda_function" "analyzer" {
     variables = {
       ATHENA_DB     = "monitoring_db"
       ATHENA_TABLE  = "aiops_results"
-      ATHENA_OUTPUT = "s3://aws-waf-logs-minju-0417-project/athena-results/"
+      ATHENA_OUTPUT = "s3://${var.s3_bucket_name}/athena-results/"
       PREVENTER_FN  = "SecurityPreventer"
     }
   }
@@ -47,12 +47,12 @@ resource "aws_lambda_permission" "allow_s3" {
   function_name = aws_lambda_function.analyzer.function_name
   principal     = "s3.amazonaws.com"
   # 실제 S3 버킷의 ARN으로 연결
-  source_arn = "arn:aws:s3:::aws-waf-logs-minju-0417-project"
+  source_arn = "arn:aws:s3:::${var.s3_bucket_name}"
 }
 
 # 5. S3 이벤트 알림 설정 (파일 생성 시 람다 호출)
 resource "aws_s3_bucket_notification" "bucket_notification" {
-  bucket = "aws-waf-logs-minju-0417-project"
+  bucket = var.s3_bucket_name
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.analyzer.arn
