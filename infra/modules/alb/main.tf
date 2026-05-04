@@ -24,7 +24,9 @@ resource "aws_lb" "main" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = var.public_subnets # 변수로 받아올 거예요
+  subnets            = var.public_subnets
+  # AWS-0052: HTTP 헤더 인젝션 및 요청 스머글링 공격 차단
+  drop_invalid_header_fields = true
 }
 
 # 3. 대상 그룹 (EC2를 바라봄)

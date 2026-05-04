@@ -1,0 +1,26 @@
+# =============================================================
+# Trivy Misconfig Ignore List — aws-devsecops-platform
+# 각 항목은 "취약점이 아니라 의도된 설계"임을 문서화한 것입니다.
+# =============================================================
+
+# [AVD-AWS-0053] ALB가 인터넷에 노출됨 (internal = false)
+# 설계 의도: 이 ALB는 외부 사용자 트래픽을 수신하는 퍼블릭 엔드포인트.
+#            WAF Web ACL이 앞단에서 Geo-Blocking + AI 기반 IP 차단을 수행.
+AVD-AWS-0053
+
+# [AVD-AWS-0054] ALB 리스너가 HTTP (포트 80) 사용 중
+# 설계 의도: ACM 인증서 발급 후 HTTPS 리스너 전환 예정 (TODO 항목).
+#            현재 포폴 데모 환경으로 HTTP 운영 중. 프로덕션 전환 시 제거할 것.
+AVD-AWS-0054
+
+# [AVD-AWS-0104] SG egress 규칙이 0.0.0.0/0 허용 (ALB SG, EC2 SG)
+# 설계 의도:
+#   - ALB SG: ALB가 EC2 인스턴스(동적 IP)로 트래픽을 전달해야 함.
+#   - EC2 SG: EC2가 AWS API(CloudWatch, S3, Athena), apt 패키지 등에 접근해야 함.
+#   VPC Flow Logs + CloudTrail로 아웃바운드 트래픽 전량 감사 중.
+AVD-AWS-0104
+
+# [AVD-AWS-0164] 퍼블릭 서브넷이 공인 IP 자동 할당 (map_public_ip_on_launch = true)
+# 설계 의도: 퍼블릭 서브넷에 위치한 EC2가 외부 통신을 위해 공인 IP 필요.
+#            EIP(고정 IP)로 추가 바인딩하여 IP 고정화 완료.
+AVD-AWS-0164

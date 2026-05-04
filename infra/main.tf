@@ -59,10 +59,21 @@ resource "aws_instance" "security_node" {
   subnet_id              = module.network.public_subnet_id
   vpc_security_group_ids = [module.network.security_group_id]
 
-  # IAM을 VPC로 통합했으므로 network 모듈의 결과값을 참조
   iam_instance_profile = module.network.ec2_instance_profile_name
-  
-  tags = { Name = "DevSecOps-Analysis-Node" }
+
+  # AWS-0028: IMDSv2 강제 — 토큰 없이 메타데이터 접근 불가 (SSRF 방어)
+  metadata_options {
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
+  }
+
+  # AWS-0131: 루트 볼륨 암호화 — 물리 디스크 탈취 시 데이터 보호
+  root_block_device {
+    encrypted  = true
+    kms_key_id = aws_kms_key.shared_log_key.arn
+  }
+
+  tags = { Name = "DevSecOps-Analysis-Node", Project = "devsecops-platform" }
 }
 
 # ==========================================
@@ -117,7 +128,9 @@ resource "aws_eip" "analysis_node_eip" {
 }
 
 resource "aws_sns_topic" "security_alerts" {
-  name = "devsecops-security-alerts"
+  name              = "devsecops-security-alerts"
+  # AWS-0095: 전송 중 및 저장 데이터 암호화 — 알림 내용(IP, 공격 유형) 보호
+  kms_master_key_id = aws_kms_key.shared_log_key.id
 }
 
 resource "aws_sns_topic_subscription" "email_subscription" {
