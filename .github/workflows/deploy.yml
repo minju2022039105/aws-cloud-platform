@@ -24,6 +24,21 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
+      # ── 보안 게이트 1: IaC 취약점 스캔 (Trivy) ──────────────────
+      - name: Scan IaC with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: config
+          scan-ref: ./infra
+          severity: HIGH,CRITICAL
+          exit-code: 1
+
+      # ── 보안 게이트 2: Python 코드 취약점 스캔 (Bandit) ─────────
+      - name: Scan Python with Bandit
+        run: |
+          pip install bandit -q
+          bandit -r ./Security-AIOps-IsolationForest/monitor -ll --exit-zero
+
       # ── 배포 전: 러너 IP / SG ID 확보 ────────────────────────
       - name: Get runner public IP
         id: runner_ip
@@ -68,7 +83,6 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # fetch + reset --hard: git pull보다 안전 (exit 128 방지)
             git -C /home/ubuntu/Security-AIOps-IsolationForest fetch origin main
             git -C /home/ubuntu/Security-AIOps-IsolationForest reset --hard origin/main
 
