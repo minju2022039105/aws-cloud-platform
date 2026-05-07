@@ -1,82 +1,146 @@
 # 🛡️ Cloud-Native WAF AIOps Platform
-> **Terraform 기반 IaC와 비지도 학습(Isolation Forest) AI 모델을 결합한 실시간 이상 징후 탐지 및 보안 자동화(SOAR) 플랫폼**
+> **Terraform 기반 IaC와 비지도 학습(Isolation Forest) + 연합 학습(Federated Learning)을 결합한 준실시간 이상 징후 탐지 및 보안 자동화(SOAR) 플랫폼**
 
 ---
 
 ## 1. 프로젝트 개요 (Executive Summary)
-본 프로젝트는 AWS WAF의 정적 규칙(Static Rule)이 가진 한계를 극복하기 위해 **비지도 학습 기반 AI 분석 엔진**을 결합한 지능형 보안 운영 체계입니다. 단순히 인프라 구축에 그치지 않고, **전체 인프라를 Terraform(IaC)으로 구현**하여 수동 설정 없이 즉시 재현 가능한 가용성을 확보하였습니다. 특히 보안 엔지니어링 관점에서 비용 최적화와 심층 방어 체계를 구축하는 데 집중했습니다.
+
+AWS WAF의 정적 규칙(Static Rule)이 탐지하지 못하는 변칙적 공격 패턴을 **비지도 학습 AI 엔진**으로 보완하는 지능형 보안 운영 체계입니다.
+
+인프라 전체를 Terraform으로 코드화하여 재현 가능성을 확보하였으며, 분산 환경에서 원본 로그를 노출하지 않고 다수 노드의 위협 지식을 통합하는 **Privacy-Preserving Federated Learning** 구조를 적용했습니다.
 
 ---
 
 ## 2. 시스템 아키텍처 (Architecture)
-보안 계층(Prevention, Detection, Response)을 명확히 분리하고 데이터 흐름을 최적화한 3-Tier 기반 아키텍처입니다.
 
 <img width="2043" height="518" alt="AWS AIOps Security Architecture" src="https://github.com/user-attachments/assets/a5c144c7-ed15-40cc-9bcd-7c15b4d2de2e" />
 
-### **계층별 핵심 역할**
-* **Prevention Layer**: CloudFront와 ALB 전면에 **AWS WAF v2**를 배치하여 1차 방어선을 구축하고, 모든 트래픽 로그를 S3로 실시간 Export합니다.
-* **Detection Layer**: **Amazon Athena**를 통해 S3의 대용량 로그를 쿼리하고, **EC2(Isolation Forest)** 엔진에서 비지도 학습을 통해 이상 징후(Zero-day 공격 등)를 탐지합니다.
-* **Response Layer**: 위협 식별 시 **EventBridge → Lambda**가 트리거되어 WAF의 IP Set을 업데이트함으로써 공격지를 즉각 차단(Automated IP Block)하고 Slack으로 알림을 전송합니다.
+### 계층별 핵심 역할
 
----
-
-## 3. 핵심 기술 역량 (Technical Highlights)
-
-### ** 전략적 보안 룰셋 설계 (WAF Priority)**
-비용 최적화와 탐지 정밀도를 위해 WAF 우선순위를 다음과 같이 체계적으로 설계했습니다.
-
-| 우선순위 | 규칙명 | 역할 및 엔지니어링 근거 |
+| 계층 | 구성 | 역할 |
 | :--- | :--- | :--- |
-| **Priority 0** | **AI-RealTime-Block** | **가장 중요**: AI 엔진이 실시간으로 식별한 위협 IP를 즉각 차단하여 변칙적인 공격에 유연하게 대응합니다. |
-| **Priority 1** | **Geo-Blocking (KR)** | **비용 최적화**: 한국 외 IP를 입구에서 차단하여 분석 엔진(Athena/EC2)의 로그 처리 부하 및 비용을 획기적으로 줄입니다. |
-| **Priority 2-4** | **AWS Managed Rules** | **패턴 방어**: SQLi, XSS 등 알려진 패턴 공격을 AWS Managed 룰셋으로 정밀 방어합니다. |
-| **Priority 5** | **IP Reputation List** | **보수적 방어**: 이미 평판이 나쁜 IP들을 차단하여 전체적인 보안 안정성을 높입니다. |
+| **Prevention** | AWS WAF v2 | 1차 방어 + 전체 요청 로그 S3 Export |
+| **Detection** | Amazon Athena + Isolation Forest | S3 로그 쿼리 → AI 이상 탐지 (준실시간, 약 5~10분) |
+| **Response** | EventBridge → Lambda | 위협 확정 시 WAF IP Set 자동 업데이트 + SNS 알림 |
 
-### ** Infrastructure as Code (Terraform)**
-* **Full Automation**: VPC, EKS, WAF, Lambda 등 모든 리소스를 **Terraform 모듈**로 구성하여 인프라의 일관성을 유지합니다.
-* **Security Shift-Left**: 배포 전 **tfsec**을 활용하여 코드 레벨에서 23개의 보안 취약점(Critical 4건 포함)을 선제적으로 식별하고 개선했습니다.
+### WAF 우선순위 설계 근거
+
+| Priority | 규칙 | 엔지니어링 근거 |
+| :---: | :--- | :--- |
+| 0 | AI-RealTime-Block | AI가 식별한 위협 IP 즉각 차단 — 정적 규칙의 사각지대 보완 |
+| 1 | GeoBlock-Non-KR | 한국 외 트래픽을 입구에서 차단 → Athena 쿼리 비용 및 AI 처리 부하 절감 |
+| 2–4 | AWS Managed Rules | SQLi, XSS 등 알려진 패턴 방어 |
+| 5 | IP Reputation List | 평판 불량 IP 보수적 차단 |
 
 ---
 
-## 4. 실시간 AIOps 관제 (Observability)
-AI 분석 결과에 따라 인프라 상태를 정의하고 이를 Grafana 대시보드에 시각화하여 운영 가시성을 확보했습니다.
+## 3. AI 엔진 (AIOps Core)
 
-<img width="1024" alt="Grafana Dashboard" src="https://github.com/user-attachments/assets/e2ba077a-a9ac-410c-b7ed-78760ecac001">
+### Isolation Forest 기반 이상 탐지
 
-**[ 프로젝트 실시간 시연 영상 보러가기](https://www.youtube.com/watch?v=rIG2oWAm2Bo)**
+졸업작품 당시 가공된 데이터셋(정확도 91%) 대신, **실제 Nikto 공격 로그 450건**을 기반으로 실무형 탐지 모델을 구성했습니다.
 
-* **Normal (초록)**: 평상시 정상 모니터링 상태.
-* **Preparing (주황)**: 위협 점수 상승에 따른 선제적 방어 준비.
-* **Blocked (빨강)**: 실시간 위협 확정 및 WAF를 통한 즉각적인 **IP 차단** 실행.
-* **Stabilize (파랑)**: 공격 종료 후 시스템 복구 및 잔류 위협 집중 감시.
+| 항목 | 내용 |
+| :--- | :--- |
+| 알고리즘 | Isolation Forest (비지도 학습) |
+| 학습 데이터 | Nikto 기반 실제 WAF 공격 로그 450건 + 정상 트래픽 (수집 중) |
+| contamination | 0.15 (IQR 분석 기반, 실제 공격 비율 14.8% 반영) |
+| n_estimators | 200 (FedAvg 병합 후 노드 기여분 유의성 확보) |
+
+**알고리즘 선택 근거**: Autoencoder(리소스 과다), One-Class SVM(대규모 느림) 대비 비지도 + 준실시간 스코어링에 최적화.
+
+### 피처 설계 (4개)
+
+| 피처 | 설명 |
+| :--- | :--- |
+| `country_code` | GeoIP 기반 — 한국 외 IP는 GeoBlock 이전에도 이상치로 분류 |
+| `rule_code` | 매칭된 WAF 규칙 코드 — 동일 rule 반복 = 스캔 공격 징후 |
+| `uri_len` | URI 길이 — SQL Injection 페이로드는 비정상적으로 길어지는 경향 |
+| `uri_entropy` | **Shannon Entropy** — 인코딩된 페이로드 탐지 핵심 피처 |
+
+**Shannon Entropy 도입 이유**: 통계적 피처(평균/표준편차)는 소량 데이터에서 추정값이 불안정하지만, 엔트로피는 단일 문자열의 내재적 정보 구조를 측정하므로 샘플 수에 덜 의존적입니다.
+
+```
+정상 URI (/api/users/profile):        entropy ≈ 2.5 ~ 3.5
+SQL Injection (?id=1' UNION SELECT):  entropy ≈ 3.8 ~ 4.2
+Base64/URL 인코딩된 페이로드:          entropy ≈ 4.5 ~ 5.5
+```
+
+### Weighted Federated Averaging (연합 학습)
+
+분산된 보안 노드(본사/지사) 환경에서 **원본 WAF 로그를 전송하지 않고** 모델 파라미터(Tree 구조, Offset)만 집계합니다.
+
+```python
+# 데이터 볼륨 기반 가중치 산출
+weights = [n_samples / total_samples for n_samples in node_samples]
+# 결과: IDC 60.0% / 지사 24.9% / 소규모 지점 15.1%
+```
+
+- **Privacy-Preserving**: 개인정보보호법(PIPA) 준수 — 원본 로그 미전송
+- **불균형 보정**: 데이터가 적은 소규모 지점이 글로벌 모델을 왜곡하지 않도록 가중치 적용
+- **검증**: 3노드 시뮬레이션, 이상 탐지 비율 55.6% 확보
+
+### 모델 한계
+
+| 한계 | 내용 |
+| :--- | :--- |
+| Low-and-Slow 공격 | 장시간에 걸쳐 소량 요청을 보내는 패턴은 단기 윈도우 기반 탐지로 식별 어려움 |
+| 탐지 지연 | S3 → Athena → AI → Lambda 파이프라인으로 약 5~10분 준실시간 처리 (실시간 아님) |
+| 학습 데이터 편향 | Nikto SQLi 위주 — XSS, 경로 순회 등 다양한 공격 유형 데이터 추가 예정 |
+| Sentinel 값 왜곡 | 국가코드 99 등 더미 데이터가 Recall 지표를 왜곡 — ContaminationSentinel로 보정 중 |
+
+---
+
+## 4. Infrastructure as Code (Terraform)
+
+- **전체 리소스 코드화**: VPC, WAF, Lambda, API Gateway, KMS, CloudTrail 등 Terraform 모듈로 구성
+- **보안 시프트 레프트**: tfsec으로 배포 전 23개 취약점(Critical 4건) 선제 식별 및 수정
+- **최소 권한 IAM**: Lambda/EC2/GitHub Actions 각 Role ARN 특정, 와일드카드(*) 미사용, OIDC main 브랜치 한정
+- **비용 거버넌스**: AWS Budgets + 자동 알림으로 일일 지출 임계값 관리
 
 ---
 
 ## 5. 트러블슈팅 (Troubleshooting Deep Dive)
 
-### **1) 클라우드 비용 거버넌스 및 KMS 최적화**
-* **문제**: KMS 키 설정 오류로 인해 하루 만에 비용이 $30로 급증하는 이슈 발생.
-* **해결**: 불필요한 키 리소스를 정리하고, 모든 인프라를 즉시 삭제/재구성할 수 있도록 **Terraform 코드 정비**를 완료하여 클라우드 비용 거버넌스를 강화했습니다.
+### 1) IAM AccessDenied → 최소 권한 재설계
+- **문제**: GitHub Actions OIDC Role이 `StringLike` Condition으로 모든 브랜치에서 Assume 가능
+- **해결**: `StringEquals`로 변경하여 main 브랜치 배포만 허용. Policy Before/After 비교로 최소 권한 원칙 재설계
 
-### **2) 데이터 파이프라인 규격 이슈 (ASCII 제한)**
-* **문제**: CloudWatch Metrics 지표명에 한글 사용 시 AWS API 에러 발생.
-* **해결**: Python 코드 내 Rule Map을 영문 표준 명칭으로 변경하여 인프라 안정성을 확보했습니다.
+### 2) KMS 비용 급증 ($30/일)
+- **문제**: 리소스별 개별 KMS 키 생성으로 API 호출 비용 급증
+- **해결**: Cost Explorer → CloudTrail 역추적으로 원인 파악. 공유 KMS 키 구조로 변경하여 비용 정상화
 
-### **3) 자원 제한 환경에서의 로컬 최적화**
-* **문제**: 8GB RAM 환경에서 WSL 및 도커 구동 시 프리징 현상 발생.
-* **해결**: `.wslconfig` 설정을 통해 자원 할당량을 제어하고 가상 디스크 압축을 통해 개발 환경을 최적화했습니다.
+### 3) WAF WebACL 고정비 누수 ($5.33/월)
+- **문제**: `cleanup.sh`가 WAF WebACL을 삭제하지 않아 미사용 상태에서 월 $5 고정 과금 발생
+- **해결**: WAF WebACL 의존성 순서 파악 후 cleanup.sh에 삭제 로직 추가
 
-### **4) IaC 코드 스캔을 통한 보안 취약점 사전 제거**
-* **문제**: 인프라 배포 후 수동 점검 시 S3 퍼블릭 액세스 설정이나 암호화 미비 등의 실수 가능성 존재.
-* **해결**: CI/CD 파이프라인에 **tfsec**을 도입하여 71개의 블록을 검사, 23개의 잠재적 위협을 배포 전에 차단했습니다.
-
----
-
-## 6. Tech Stack
-* **Compute**: Amazon EKS, Amazon EC2, AWS Lambda
-* **Networking & Security**: AWS WAF v2, CloudFront, ALB, VPC
-* **Data & AI**: Amazon S3 (Partitioned), Amazon Athena, Scikit-learn (Isolation Forest)
-* **Infrastructure**: Terraform, AWS CLI, tfsec
+### 4) sklearn 1.8.0 Private 속성 접근 오류
+- **문제**: `AttributeError: '_decision_path_lengths'` — 버전 업데이트로 내부 속성이 Private으로 변경
+- **해결**: 버전 다운그레이드 대신 `getattr` 기반 안전한 속성 추출 로직으로 재구성. sklearn 내부 동작 원리 심층 파악
 
 ---
 
+## 6. 실시간 관제 대시보드 (Observability)
+
+<img width="1024" alt="Grafana Dashboard" src="https://github.com/user-attachments/assets/e2ba077a-a9ac-410c-b7ed-78760ecac001">
+
+**[ 프로젝트 시연 영상](https://www.youtube.com/watch?v=rIG2oWAm2Bo)**
+
+| 상태 | 색상 | 의미 |
+| :--- | :---: | :--- |
+| Normal | 🟢 | 정상 모니터링 |
+| Preparing | 🟠 | 위협 점수 상승, 선제적 방어 준비 |
+| Blocked | 🔴 | 위협 확정, WAF IP 자동 차단 실행 |
+| Stabilize | 🔵 | 공격 종료 후 잔류 위협 집중 감시 |
+
+---
+
+## 7. Tech Stack
+
+| 분류 | 기술 |
+| :--- | :--- |
+| **Compute** | AWS Lambda, Amazon EC2 |
+| **Networking & Security** | AWS WAF v2, CloudFront, ALB, API Gateway, VPC |
+| **Data & AI** | Amazon S3, Amazon Athena, Scikit-learn (Isolation Forest), Federated Learning |
+| **Infrastructure** | Terraform, GitHub Actions (OIDC), tfsec, AWS KMS, CloudTrail |
+| **Monitoring** | Grafana, Amazon CloudWatch, AWS SNS |
