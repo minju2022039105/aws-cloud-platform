@@ -34,17 +34,18 @@ module "security" {
   shared_kms_key_arn = aws_kms_key.shared_log_key.arn
   s3_bucket_name     = var.s3_bucket_name
   account_id         = var.account_id
+  trusted_ip_ranges  = var.waf_trusted_ip_ranges
 }
 
 # 3. 부하 분산 (ALB)
 module "alb" {
-  source         = "./modules/alb"
-  vpc_id         = module.network.vpc_id
-  public_subnets = module.network.public_subnet_ids
-  instance_id    = aws_instance.security_node.id
-  
-  # [핵심] ALB 보안 그룹에서도 내 IP만 허용하려면 배달!
-  my_ip          = var.my_ip
+  source          = "./modules/alb"
+  vpc_id          = module.network.vpc_id
+  public_subnets  = module.network.public_subnet_ids
+  instance_id     = aws_instance.security_node.id
+  my_ip           = var.my_ip
+  domain_name     = var.domain_name
+  route53_zone_id = var.route53_zone_id
 }
 
 # ==========================================
@@ -99,6 +100,58 @@ resource "aws_kms_key" "shared_log_key" {
   description             = "Centralized Shared KMS Key for Security Logs"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "EnableRootAccess"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${var.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowCloudTrailEncrypt"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudtrail.amazonaws.com"
+        }
+        Action = [
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+        Condition = {
+          StringLike = {
+            "kms:EncryptionContext:aws:cloudtrail:arn" = "arn:aws:cloudtrail:${var.aws_region}:${var.account_id}:trail/${var.project_name}-trail"
+          }
+        }
+      },
+      {
+        Sid    = "AllowCloudWatchLogs"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.${var.aws_region}.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Describe*"
+        ]
+        Resource = "*"
+        Condition = {
+          ArnLike = {
+            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${var.aws_region}:${var.account_id}:*"
+          }
+        }
+      }
+    ]
+  })
 }
 
 # ==========================================

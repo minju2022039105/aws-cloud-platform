@@ -141,7 +141,7 @@ resource "aws_wafv2_web_acl" "main" {
     }
   }
 
-  # [Priority 2] SQL 인젝션 방어 (Managed Rule)
+  # [Priority 2] SQL 인젝션 방어 — /admin/* URI와 신뢰 IP는 검사 제외 (Scope-down)
   rule {
     name     = "AWS-AWSManagedRulesSQLiRuleSet"
     priority = 2
@@ -152,6 +152,54 @@ resource "aws_wafv2_web_acl" "main" {
       managed_rule_group_statement {
         name        = "AWSManagedRulesSQLiRuleSet"
         vendor_name = "AWS"
+
+        # Scope-down: 아래 조건에 해당하는 요청만 WAF가 검사함
+        # 조건에 해당하지 않으면 이 룰을 완전히 건너뜀
+        scope_down_statement {
+          not_statement {
+            statement {
+              # trusted_ip_ranges가 있으면 or_statement(URI + IP 둘 다 제외),
+              # 없으면 byte_match_statement만 단독 사용 — or_statement는 2개 이상 필요
+              dynamic "or_statement" {
+                for_each = length(var.trusted_ip_ranges) > 0 ? [1] : []
+                content {
+                  statement {
+                    byte_match_statement {
+                      field_to_match {
+                        uri_path {}
+                      }
+                      positional_constraint = "STARTS_WITH"
+                      search_string         = "/admin/"
+                      text_transformation {
+                        priority = 0
+                        type     = "LOWERCASE"
+                      }
+                    }
+                  }
+                  statement {
+                    ip_set_reference_statement {
+                      arn = aws_wafv2_ip_set.trusted_ips[0].arn
+                    }
+                  }
+                }
+              }
+              dynamic "byte_match_statement" {
+                for_each = length(var.trusted_ip_ranges) == 0 ? [1] : []
+                content {
+                  field_to_match {
+                    uri_path {}
+                  }
+                  positional_constraint = "STARTS_WITH"
+                  search_string         = "/admin/"
+                  text_transformation {
+                    priority = 0
+                    type     = "LOWERCASE"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
     visibility_config {
@@ -161,7 +209,7 @@ resource "aws_wafv2_web_acl" "main" {
     }
   }
 
-  # [Priority 3] 일반 웹 취약점 방어 (Common Rule Set)
+  # [Priority 3] 일반 웹 취약점 방어 — /health, /metrics 같은 내부 경로 제외
   rule {
     name     = "AWS-AWSManagedRulesCommonRuleSet"
     priority = 3
@@ -172,6 +220,41 @@ resource "aws_wafv2_web_acl" "main" {
       managed_rule_group_statement {
         name        = "AWSManagedRulesCommonRuleSet"
         vendor_name = "AWS"
+
+        scope_down_statement {
+          not_statement {
+            statement {
+              or_statement {
+                statement {
+                  byte_match_statement {
+                    field_to_match {
+                      uri_path {}
+                    }
+                    positional_constraint = "STARTS_WITH"
+                    search_string         = "/health"
+                    text_transformation {
+                      priority = 0
+                      type     = "LOWERCASE"
+                    }
+                  }
+                }
+                statement {
+                  byte_match_statement {
+                    field_to_match {
+                      uri_path {}
+                    }
+                    positional_constraint = "STARTS_WITH"
+                    search_string         = "/metrics"
+                    text_transformation {
+                      priority = 0
+                      type     = "LOWERCASE"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
     visibility_config {
@@ -228,7 +311,17 @@ resource "aws_wafv2_web_acl_logging_configuration" "main" {
   }
 }
 
-# 5. AI 차단용 IP Set 생성
+# 5-a. Scope-down용 신뢰 IP Set (var.trusted_ip_ranges가 있을 때만 생성)
+resource "aws_wafv2_ip_set" "trusted_ips" {
+  count              = length(var.trusted_ip_ranges) > 0 ? 1 : 0
+  name               = "devsecops-trusted-ips"
+  description        = "WAF Scope-down 검사 제외 신뢰 IP 대역"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+  addresses          = var.trusted_ip_ranges
+}
+
+# 5-b. AI 차단용 IP Set 생성
 resource "aws_wafv2_ip_set" "ai_block_list" {
   name               = "devsecops-ai-block-list"
   description        = "IP set managed by Security-AIOps-IsolationForest"

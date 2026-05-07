@@ -12,3 +12,9 @@ variable "account_id" {
   description = "AWS 계정 ID (KMS 정책 ARN 구성용)"
   type        = string
 }
+
+variable "trusted_ip_ranges" {
+  description = "WAF Managed Rule 검사를 건너뛸 신뢰 IP CIDR 목록 (사내망, 관리 서버 등)"
+  type        = list(string)
+  default     = []
+}
