@@ -4,7 +4,8 @@
       "Bash(wsl *)",
       "WebFetch(domain:api.github.com)",
       "WebFetch(domain:github.com)",
-      "Bash(python3 scripts/federated_learning.py)"
+      "Bash(python3 scripts/federated_learning.py)",
+      "Bash(terraform output *)"
     ]
   }
 }

@@ -42,3 +42,21 @@ variable "waf_ipset_arn" {
   description = "Lambda가 업데이트하는 WAF IP Set ARN"
   type        = string
 }
+
+variable "domain_name" {
+  description = "ALB HTTPS에 사용할 도메인 (Route53에 등록된 도메인)"
+  type        = string
+  default     = ""
+}
+
+variable "route53_zone_id" {
+  description = "ACM DNS 검증 레코드를 생성할 Route53 Hosted Zone ID"
+  type        = string
+  default     = ""
+}
+
+variable "waf_trusted_ip_ranges" {
+  description = "WAF Scope-down에서 검사 제외할 신뢰 IP 대역 목록 (CIDR)"
+  type        = list(string)
+  default     = []
+}
