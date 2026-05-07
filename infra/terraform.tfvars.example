@@ -1,0 +1,10 @@
+# terraform.tfvars.example
+# 실제 값은 terraform.tfvars에 작성하세요 (gitignore됨)
+
+account_id  = "YOUR_AWS_ACCOUNT_ID"
+alert_email = "your-email@example.com"
+
+# 선택 항목 (기본값이 없는 경우 직접 설정)
+# s3_bucket_name       = "your-waf-logs-bucket-name"
+# my_ip                = ["YOUR_IP/32"]
+# waf_trusted_ip_ranges = []

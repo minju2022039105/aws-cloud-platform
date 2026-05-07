@@ -18,3 +18,8 @@ variable "trusted_ip_ranges" {
   type        = list(string)
   default     = []
 }
+
+variable "alert_email" {
+  description = "WAF 예산 알림 수신 이메일"
+  type        = string
+}

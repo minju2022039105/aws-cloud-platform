@@ -343,6 +343,6 @@ resource "aws_budgets_budget" "s3_kms_monitor" {
     threshold                  = 80 
     threshold_type             = "PERCENTAGE"
     notification_type          = "ACTUAL"
-    subscriber_email_addresses = ["mingmingdo30@gmail.com"]
+    subscriber_email_addresses = [var.alert_email]
   }
 }
