@@ -324,7 +324,7 @@ resource "aws_wafv2_ip_set" "trusted_ips" {
 # 5-b. AI 차단용 IP Set 생성
 resource "aws_wafv2_ip_set" "ai_block_list" {
   name               = "devsecops-ai-block-list"
-  description        = "IP set managed by Security-AIOps-IsolationForest"
+  description        = "IP set managed by AI anomaly detection engine"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
   addresses          = [] 
