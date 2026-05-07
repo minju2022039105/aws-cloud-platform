@@ -1,0 +1,4 @@
+rule_id,attack_count
+AWS-AWSManagedRulesCommonRuleSet,1543
+GeoBlock-Non-KR,189
+AWS-AWSManagedRulesSQLiRuleSet,2

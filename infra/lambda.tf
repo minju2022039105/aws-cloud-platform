@@ -1,8 +1,8 @@
 # [확인] 소스 코드 압축 경로 (절대 경로이므로 유지해도 무방)
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_dir  = "/home/march/aws-devsecops-platform/Security-AIOps-IsolationForest/lambda"
-  output_path = "/home/march/aws-devsecops-platform/lambda_functions.zip" # 일단 루트에 두기로 한 설정 유지
+  source_dir  = "/home/march/aws-devsecops-platform/lambda/analyzer"
+  output_path = "/home/march/aws-devsecops-platform/lambda/analyzer.zip"
 }
 
 # 2. SecurityAnalyzer (분석가 람다)

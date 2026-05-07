@@ -11,7 +11,7 @@ from sklearn.metrics import precision_score, recall_score, f1_score
 
 # 1. 경로 설정
 MODEL_PATH = '/home/march/aws-devsecops-platform/ai-security/models/isolation_forest_model.pkl'
-DATA_PATH = '/home/march/aws-devsecops-platform/Security-AIOps-IsolationForest/data/URI별 이상 징후 분석 (Target Analysis).csv'
+DATA_PATH = '/home/march/aws-devsecops-platform/ai/data/URI별 이상 징후 분석 (Target Analysis).csv'
 RESULT_DIR = '/home/march/aws-devsecops-platform/ai-security/results'
 
 # 2. 피처 추출 함수 (기존 로직 유지)

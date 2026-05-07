@@ -3,3 +3,9 @@
 *.pem
 .terraform/
 terraform.tfvars
+*.zip
+ai/models/*.pkl
+ai/models/*.joblib
+Security-AIOps-IsolationForest/venv/
+__pycache__/
+*.pyc
