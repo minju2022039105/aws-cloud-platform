@@ -38,7 +38,7 @@ AWS WAF의 정적 규칙(Static Rule)이 탐지하지 못하는 변칙적 공격
 
 ### Isolation Forest 기반 이상 탐지
 
-> 본 AI 엔진은 팀 프로젝트 [Security-AIOps-IsolationForest](https://github.com/minju2022039105/Security-AIOps-IsolationForest)에서 담당한 보안 ML 파트를 기반으로, 실제 WAF 로그 적용 / Weighted FedAvg 고도화 / Shannon Entropy 피처 설계를 이 프로젝트에서 추가 진행했습니다.
+> Lambda 함수(Analyzer, Preventer) 및 기본 탐지 파이프라인 구조는 팀 프로젝트 [Security-AIOps-IsolationForest](https://github.com/minju2022039105/Security-AIOps-IsolationForest)에서 담당한 파트를 가져왔습니다. `train_model.py`, `federated_learning.py`, Shannon Entropy 피처 설계, Weighted FedAvg, ContaminationSentinel은 이 프로젝트에서 독자적으로 설계 및 구현했습니다.
 
 졸업작품 당시 가공된 데이터셋(정확도 91%) 대신, **실제 Nikto 공격 로그 450건**을 기반으로 실무형 탐지 모델을 구성했습니다.
 
