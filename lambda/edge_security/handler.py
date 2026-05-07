@@ -20,7 +20,7 @@ from collections import Counter
 
 import boto3
 
-_S3_BUCKET = "devsecops-edge-models-095035153545"
+_S3_BUCKET = "devsecops-edge-models-YOUR_ACCOUNT_ID"  # deploy 전 실제 계정 ID로 교체
 _S3_KEY    = "models/iforest_model.json"
 _TMP_PATH  = "/tmp/iforest_model.json"
 _THRESHOLD = -0.1   # [-1, 0] 범위. -0.1은 보수적 설정. 운영 후 조정 필요.

@@ -60,3 +60,8 @@ variable "waf_trusted_ip_ranges" {
   type        = list(string)
   default     = []
 }
+
+variable "alert_email" {
+  description = "보안 알림 수신 이메일 (SNS, Budget 알림용) — terraform.tfvars에 설정"
+  type        = string
+}

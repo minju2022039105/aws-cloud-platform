@@ -35,6 +35,7 @@ module "security" {
   s3_bucket_name     = var.s3_bucket_name
   account_id         = var.account_id
   trusted_ip_ranges  = var.waf_trusted_ip_ranges
+  alert_email        = var.alert_email
 }
 
 # 3. 부하 분산 (ALB)
@@ -189,7 +190,7 @@ resource "aws_sns_topic" "security_alerts" {
 resource "aws_sns_topic_subscription" "email_subscription" {
   topic_arn = aws_sns_topic.security_alerts.arn
   protocol  = "email"
-  endpoint  = "yapp9069@naver.com" 
+  endpoint  = var.alert_email
 }
 
 resource "aws_cloudwatch_event_rule" "waf_block_event" {

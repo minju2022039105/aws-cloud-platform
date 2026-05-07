@@ -10,6 +10,6 @@ resource "aws_budgets_budget" "cost_limit" {
     threshold                  = 80
     threshold_type             = "PERCENTAGE"
     notification_type          = "ACTUAL"
-    subscriber_email_addresses = ["yapp9069@naver.com"]
+    subscriber_email_addresses = [var.alert_email]
   }
 }
