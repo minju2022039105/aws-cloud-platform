@@ -27,10 +27,12 @@ AWS WAF의 정적 규칙(Static Rule)이 탐지하지 못하는 변칙적 공격
 
 | Priority | 규칙 | 엔지니어링 근거 |
 | :---: | :--- | :--- |
-| 0 | AI-RealTime-Block | AI가 식별한 위협 IP 즉각 차단 — 정적 규칙의 사각지대 보완 |
-| 1 | GeoBlock-Non-KR | 한국 외 트래픽을 입구에서 차단 → Athena 쿼리 비용 및 AI 처리 부하 절감 |
+| 0 | GeoBlock-Non-KR | 한국 외 트래픽을 입구에서 차단 → 이후 모든 룰 검사 비용 절감 |
+| 1 | AI-RealTime-Block | AI가 식별한 위협 IP 즉각 차단 — 정적 규칙의 사각지대 보완 |
 | 2–4 | AWS Managed Rules | SQLi, XSS 등 알려진 패턴 방어 |
 | 5 | IP Reputation List | 평판 불량 IP 보수적 차단 |
+
+> **[검토 중]** 비용 최적화를 위해 현재 ALB+EC2 구조를 API Gateway+Lambda 서버리스로 전환하는 방안을 검토 중입니다.
 
 ---
 
