@@ -1,107 +1,301 @@
-> 이 글은 **AWS WAF + AI 이상 탐지 플랫폼 구축기** 시리즈의 1편입니다.
+
+
+> 이 글은 **AWS DevSecOps 플랫폼 구축기** 시리즈의 1편입니다.  
+> Terraform IaC → WAF 룰 설계 → Isolation Forest 이상 탐지 → Federated Learning까지,  
+> 실제 운영 비용·보안 지표를 기준으로 의사결정한 과정을 기록합니다.  
 > 전체 코드는 [GitHub](https://github.com/minju2022039105/aws-devsecops-platform)에서 확인할 수 있습니다.
 
 ---
 
-## WAF를 쓰면 안전한 거 아닌가요?
+## “WAF 붙였으니까 안전하겠지”
 
-클라우드 보안을 처음 공부할 때 이렇게 생각했습니다. AWS WAF를 붙이면 SQL Injection도 막고, XSS도 막고, 끝 아닌가?
+AWS 보안을 처음 공부할 때는 그렇게 생각했습니다.
 
-실제로 WAF를 직접 운영해보고 생각이 바뀌었습니다.
+WAF만 붙이면 SQL Injection이나 XSS 같은 공격은 대부분 막을 수 있고, 어느 정도 안전한 서비스가 되는 줄 알았습니다.
 
-WAF의 규칙은 **패턴 기반**입니다. `SELECT`, `UNION`, `DROP` 같은 키워드가 URI에 있으면 차단합니다. 알려진 공격은 잘 막습니다. 그런데 공격자가 Base64로 인코딩하거나, 대소문자를 섞거나, 특수문자를 URL 인코딩하면 같은 SQL Injection이어도 룰을 통과합니다.
+실제로 운영해보니 생각이 달라졌습니다.
 
-더 문제가 되는 건 **Low-and-Slow 공격**입니다. 한 번에 대량의 요청을 보내는 대신, 정상 트래픽처럼 보이는 소량의 요청을 장시간에 걸쳐 보내는 방식입니다. Rate Limit도 안 걸리고, 패턴 매칭도 안 됩니다. 이런 공격은 요청 자체보다 **URI의 정보 구조가 얼마나 비정상적인가**를 측정해야 탐지할 수 있습니다. 3편에서 Shannon Entropy를 피처로 도입한 이유가 바로 여기 있습니다.
+AWS WAF는 기본적으로 **패턴 기반 탐지**입니다.  
+예를 들어 `SELECT`, `UNION`, `DROP` 같은 특정 문자열이 요청에 포함되면 차단합니다. 알려진 공격에는 매우 강력합니다.
 
-WAF는 "알려진 나쁜 것"을 막는 도구입니다. "알려지지 않은 이상한 것"을 잡는 건 다른 접근이 필요합니다.
+하지만 공격자가:
 
----
+- Base64 인코딩을 사용하거나
+- 대소문자를 섞거나
+- 특수문자를 URL 인코딩하거나
+- 요청을 정상 트래픽처럼 분산시키면
 
-## 그래서 AI를 붙이기로 했습니다
+같은 SQL Injection이라도 룰을 우회할 수 있습니다.
 
-아이디어는 간단합니다. WAF가 모든 요청 로그를 S3에 쌓으니까, 그 로그를 AI 모델로 분석해서 **통계적으로 이상한 요청**을 탐지하면 됩니다.
+특히 문제였던 건 **Low-and-Slow 공격**이었습니다.
 
-패턴을 몰라도 됩니다. 정상 트래픽의 분포를 학습하면, 그 분포에서 벗어나는 것을 이상치로 분류할 수 있습니다. 이걸 **비지도 학습(Unsupervised Learning)** 기반 이상 탐지라고 합니다.
+한 번에 대량 요청을 보내는 대신, 정상 사용자처럼 보이는 소량 요청을 장시간에 걸쳐 보내는 방식입니다.
 
-알고리즘은 **Isolation Forest**를 선택했습니다.
+이 경우:
 
-- Autoencoder: 구조가 복잡하고 리소스가 많이 필요
-- One-Class SVM: 대규모 데이터에서 느림
-- Isolation Forest: 비지도 + 준실시간 스코어링 가능, 소량 데이터에도 안정적
+- Rate Limit에도 잘 걸리지 않고
+- 패턴 기반 룰에도 잘 탐지되지 않습니다.
 
-WAF 로그 분석이라는 특성상 라벨이 없는 데이터를 다뤄야 하고, 실시간에 가깝게 처리해야 합니다. Isolation Forest가 가장 적합했습니다.
+결국 WAF는:
 
----
-
-## 전체 아키텍처
-![](https://velog.velcdn.com/images/yapp/post/44c93adf-2328-4d1a-977e-bcf8b60728eb/image.png)
-
-> **아키텍처 전환 중**: 현재 비용 최적화를 위해 ALB+EC2 → API Gateway+Lambda 서버리스 구조로 전환 검토 중입니다. 전환 과정의 의사결정 기록은 [devlog](https://github.com/minju2022039105/aws-devsecops-platform/blob/main/docs/devlog/260507_%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98-%EC%A0%84%ED%99%98-%EA%B2%80%ED%86%A0.md)에서 확인할 수 있습니다.
-
-Prevention(WAF) → Detection(AI) → Response(자동 차단)으로 역할을 분리했습니다.
-
-AI 엔진 코드는 레포의 `ai/training/`, `ai/inference/` 경로에서 확인할 수 있습니다.
+> “알려진 공격”을 막는 데는 강하지만  
+> “알려지지 않은 이상 행동”을 탐지하는 데는 한계가 있었습니다.
 
 ---
 
-## WAF 룰 우선순위 설계가 핵심이었습니다
+## 그래서 AI 기반 이상 탐지를 붙이기로 했습니다
 
-WAF를 처음 설정할 때 룰 순서를 대충 정했습니다. 그랬더니 비용이 예상보다 훨씬 많이 나왔습니다.
+아이디어는 단순했습니다.
 
-WAF는 요청이 어떤 룰에 매칭되든 **처리한 요청 수만큼 비용**이 발생합니다. 해외 스캐너, 봇, 크롤러가 보내는 무의미한 트래픽도 모든 룰을 순서대로 검사합니다.
+WAF가 모든 요청 로그를 S3에 저장하니,  
+그 로그를 AI 모델이 분석해 **통계적으로 이상한 요청**을 탐지하도록 만드는 구조입니다.
 
-그래서 우선순위를 이렇게 재설계했습니다.
-![](https://velog.velcdn.com/images/yapp/post/d82fafcb-8dde-4b47-9e79-858ed3e34d0f/image.png)
+핵심은:
 
->| Priority | 룰 | 이유 |
-|:---:|---|---|
-| 0 | GeoBlock-Non-KR | 한국 외 IP를 입구에서 차단 → 이후 룰 검사 비용 0 |
-| 1 | AI-RealTime-Block | AI가 식별한 위협 IP 즉각 차단 |
-| 2 | AWS SQLi Managed Rule | 알려진 SQL Injection 패턴 차단 |
-| 3 | AWS Common Rule Set | XSS, 경로 순회 등 일반 공격 차단 |
-| 4 | IP Reputation List | 평판 불량 IP 차단 |
-핵심은 **GeoBlock을 Priority 0**으로 배치한 것입니다. 이 프로젝트의 서비스 대상이 한국이기 때문에 해외 IP는 어차피 차단합니다. 그렇다면 입구에서 먼저 걸러버리면, 그 이후의 고비용 룰 검사를 아예 하지 않아도 됩니다.
-결과적으로 WAF 처리 요청 수가 크게 줄었고, 비용도 함께 줄었습니다.
+> 공격 패턴을 외우는 것이 아니라,  
+> “정상 트래픽 분포에서 벗어난 요청”을 찾는 것이었습니다.
 
-![업로드중..](blob:https://velog.io/90d20661-22a8-4238-a298-0eaa9b4eca9b)
- > **Athena로 실제 WAF 로그를 쿼리한 결과**, 총 1,734건의  
-  차단 중 룰별 분포는 다음과 같습니다.
-  >
-  > | Rule | 차단 수 |
-  > |---|---:|
-  > | AWS-AWSManagedRulesCommonRuleSet | 1,543 |
-  > | GeoBlock-Non-KR | 189 |
-  > | AWS-AWSManagedRulesSQLiRuleSet | 2 |
-  >
-  > GeoBlock(Priority 0)은 비한국 IP를 입구에서 차단하고,   
-  한국 IP에서 유입되는 공격은 CommonRuleSet(Priority 3)이   
-  잡아내는 구조가 실제 로그에서도 확인됩니다. GeoBlock이    
-  없었다면 이 189건이 Priority 2~4 룰 검사를 모두 통과하며  
-  추가 비용을 발생시켰을 겁니다.
+패턴을 몰라도 됩니다.
+
+정상 트래픽의 분포를 학습한 뒤,  
+그 분포에서 벗어난 요청을 이상치로 분류하면 됩니다.
+
+이 프로젝트에서는 Isolation Forest 기반 이상 탐지를 사용했습니다.  
+알고리즘 선택과 Feature Engineering 과정은 3편에서 자세히 다룹니다.
 
 ---
 
-## Terraform으로 전체를 코드화했습니다
+## 전체 아키텍처 — Prevention / Detection / Response 분리
+![](https://velog.velcdn.com/images/yapp/post/e7d38a43-9cd1-4ece-9ad6-7df32eb7c603/image.png)
 
-"인프라를 코드로 관리한다"는 말이 처음엔 추상적으로 느껴졌습니다. 직접 해보니 의미가 달랐습니다.
+전체 구조는 크게 3개 레이어로 나눴습니다.
 
-AWS 콘솔에서 WAF 룰을 하나씩 클릭해서 만들면, 나중에 "이 룰 왜 만들었지?"를 추적할 수 없습니다. Terraform으로 관리하면 git 히스토리가 곧 인프라 변경 이력이 됩니다.
-![](https://velog.velcdn.com/images/yapp/post/63aa82c0-2fa7-48f0-a355-49fc7038e8a4/image.png)
+### 1. Prevention — WAF
 
-코드만 봐도 "한국 외 모든 IP를 차단"이라는 의도가 바로 읽힙니다.
+AWS WAF가 알려진 공격을 1차 차단합니다.
+
+### 2. Detection — AI 이상 탐지
+
+WAF 로그를 S3에 저장하고, Athena로 분석한 뒤  
+Isolation Forest 모델이 이상 요청을 스코어링합니다.
+
+### 3. Response — 자동 대응
+
+위협 IP는 Lambda를 통해 WAF IP Set에 자동 등록됩니다.
+
+탐지부터 차단까지 약 5~10분 정도의 준실시간 구조입니다.
 
 ---
 
-## 이 시리즈에서 다룰 것들
+## WAF 룰 우선순위 설계가 비용에도 영향을 줬습니다
 
-**1편**: WAF의 한계와 AI 보완의 필요성, 전체 아키텍처 개요
-**2편**: Terraform으로 WAF 인프라 설계하기 — IaC 전체 코드화, tfsec 보안 게이트
-**3편**: Isolation Forest로 이상 징후 탐지하기 — Shannon Entropy 피처, 데이터 품질 진단
-**4편**: Weighted Federated Averaging으로 Privacy-Preserving 탐지 구현
-**5편**: 트러블슈팅 — KMS $30/일, IAM 최소 권한 재설계, sklearn 1.8.0 이슈
+운영하면서 의외였던 부분은:
 
-다음 편에서는 WAF 인프라를 Terraform으로 어떻게 설계했는지, 그 과정에서 tfsec으로 보안 취약점을 어떻게 선제적으로 잡았는지 다룹니다.
+> WAF는 “처리한 요청 수” 기준으로 과금된다는 점이었습니다.
+
+해외 스캐너나 봇 트래픽도 모든 룰을 순서대로 검사합니다.
+
+즉:
+
+- 의미 없는 해외 트래픽도
+- SQLi 룰
+- XSS 룰
+- Managed Rule
+- Rate Limit
+
+같은 고비용 룰들을 전부 타게 됩니다.
+
+그래서 핵심 전략은:
+
+> GeoBlock을 Priority 0으로 배치하는 것이었습니다.
+
+서비스 대상이 한국 사용자였기 때문에,  
+해외 IP는 가장 먼저 차단하도록 설계했습니다.
+
+Athena로 실제 WAF 로그를 분석해 검증했습니다.
+
+| Rule | 차단 수 |
+|---|---:|
+| AWS-AWSManagedRulesCommonRuleSet | 1,543 |
+| GeoBlock-Non-KR | 189 |
+| AWS-AWSManagedRulesSQLiRuleSet | 2 |
+
+여기서 한 가지 의문이 생길 수 있습니다.
+
+> "GeoBlock이 Priority 0인데 왜 189건밖에 못 막았나요?"
+
+두 룰은 역할 자체가 다릅니다.
+
+GeoBlock은 **해외 IP를 차단**합니다. 실제 공격 테스트(Nikto 스캐너)는 한국 IP인 로컬 머신에서 실행했기 때문에 GeoBlock을 통과했고, CommonRuleSet에서 탐지됐습니다. GeoBlock이 잡은 189건은 외부 봇·크롤러처럼 해외에서 들어온 무관한 트래픽입니다.
+
+즉 두 룰은 경쟁 관계가 아닙니다. GeoBlock은 **해외 노이즈를 입구에서 걸러** 이후 룰의 검사 부담을 줄이고, CommonRuleSet은 **국내 트래픽 중 실제 공격 패턴을 탐지**합니다.
+
+GeoBlock을 Terraform으로 구현하면 다음과 같습니다.
+
+```hcl
+rule {
+  name     = "GeoBlock-Non-KR"
+  priority = 0
+  action {
+    block {}
+  }
+  statement {
+    not_statement {
+      statement {
+        geo_match_statement {
+          country_codes = ["KR"]
+        }
+      }
+    }
+  }
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "geoBlockNonKR"
+    sampled_requests_enabled   = true
+  }
+}
+```
+
+`not_statement`로 KR이 아닌 모든 국가를 차단합니다. GeoBlock에서 먼저 차단된 요청은 이후 고비용 룰 검사를 아예 거치지 않습니다.
+
+단순 보안 정책이 아니라,  
+비용 최적화까지 연결된 설계였습니다.
 
 ---
 
-*전체 코드: [github.com/minju2022039105/aws-devsecops-platform](https://github.com/minju2022039105/aws-devsecops-platform)*
+## 왜 EC2에서 서버리스 구조로 바꿨나
+
+처음 구조는 아래 형태였습니다.
+
+> CloudFront → WAF → ALB → EC2
+
+![](https://velog.velcdn.com/images/yapp/post/d9110d65-4d56-478d-981a-e592df50edc3/image.png)
+하지만 실제 운영에서는 문제가 있었습니다.
+
+보안 로그 분석은 실시간 API 서비스와 다르게:
+
+- 요청이 간헐적으로 발생하고
+- 배치 기반으로 처리되며
+- 특정 시간대에만 분석이 수행됩니다.
+
+그런데도:
+
+- EC2는 계속 켜져 있어야 하고
+- ALB도 계속 과금되며
+- OS 패치와 AMI 관리 부담까지 존재했습니다.
+
+그래서 최종적으로:
+
+> API Gateway + Lambda 기반 서버리스 구조로 전환했습니다.
+
+---
+
+## Before / After 아키텍처
+
+**Before — CloudFront → WAF → ALB → EC2**
+![](https://velog.velcdn.com/images/yapp/post/d9110d65-4d56-478d-981a-e592df50edc3/image.png)
+
+**After — CloudFront → WAF → API Gateway → Lambda**
+
+![](https://velog.velcdn.com/images/yapp/post/e7d38a43-9cd1-4ece-9ad6-7df32eb7c603/image.png)
+
+
+
+---
+
+## 서버리스 전환 결과
+
+| 항목 | ALB + EC2 | API Gateway + Lambda |
+|:---|:---:|:---:|
+| 월 고정 비용 | 약 $25 | 약 $0.1 이하 |
+| 운영 부담 | OS 패치 필요 | 없음 |
+| Attack Surface | EC2 OS 노출 | Managed 서비스 |
+| 확장성 | 수동 스케일링 | 자동 확장 |
+| 로그 처리 | 동기 기반 | 이벤트 기반 |
+
+결과적으로:
+
+> 월 비용은 약 99% 이상 감소했습니다.
+
+그리고 보안은 오히려 강화됐습니다.
+
+---
+
+## 실제로 있었던 KMS 비용 폭탄
+
+가장 크게 배운 건 비용 거버넌스였습니다.
+
+초기 설계에서는 리소스마다 KMS 키를 개별 생성했습니다.
+
+그 결과:
+
+> 하루 비용이 약 $30까지 급증했습니다.
+
+원인은 KMS API 호출이었습니다.
+
+KMS는 키 자체보다:
+
+- Encrypt
+- Decrypt
+- GenerateDataKey
+
+같은 API 호출 횟수 기준으로 과금됩니다.
+
+
+리소스마다 개별 CMK를 사용하니 호출량이 급격히 증가했습니다.
+
+**[이미지: AWS Cost Explorer — KMS 비용 급증 그래프]**
+![](https://velog.velcdn.com/images/yapp/post/ca270187-a2b7-4429-8b36-f0399535dcbc/image.png)
+
+
+CloudTrail 로그를 분석해 원인을 추적했고,
+**공유 KMS 키 구조**로 재설계해 비용을 정상화했습니다.
+
+이 경험 이후에는 모든 인프라를:
+- AWS Calculator로 사전 산정하고
+- Terraform으로 관리하며
+- tfsec으로 보안 검증하는 방식으로 운영했습니다.
+
+---
+
+## 비용은 줄었지만 보안은 더 강화됐습니다
+
+서버리스를 선택한 이유는 단순 비용 때문만은 아닙니다.
+
+| 보안 항목 | Before | After |
+|:---|:---|:---|
+| OS 취약점 | EC2 직접 관리 | Managed 서비스 |
+| 침해 범위 | 서버 전체 노출 가능 | 함수 단위 격리 |
+| IAM 권한 | Role 공유 가능성 | 최소 권한 분리 |
+| DDoS 보호 | ALB 기본 보호 | API Gateway + WAF |
+| IaC 보안 게이트 | tfsec 적용 | tfsec 동일 적용 |
+
+특히 Lambda 기반 구조에서는:
+
+- 함수별 최소 권한 IAM Role 적용
+- 서버 OS 제거
+- Attack Surface 축소
+
+가 가능했습니다.
+
+즉:
+
+> 비용은 줄었고, 운영 부담도 줄었으며, 보안성은 오히려 향상됐습니다.
+
+---
+
+# 이 시리즈에서 다룰 내용
+
+- **1편**: WAF의 한계와 AI 이상 탐지 도입 배경 ← 현재 글
+- **2편**: Terraform으로 WAF 인프라 설계하기
+- **3편**: Isolation Forest 기반 이상 탐지 구현
+- **4편**: Federated Learning 기반 Privacy-Preserving 탐지
+- **5편**: 트러블슈팅 — KMS 비용 폭탄, IAM 최소 권한, sklearn 이슈
+
+다음 편에서는 Terraform으로 WAF 인프라를 어떻게 코드화했고,  
+tfsec으로 어떤 취약점을 사전에 차단했는지 실제 코드 기준으로 정리해보겠습니다.
+
+---
+
+*전체 코드:*  
+[github.com/minju2022039105/aws-devsecops-platform](https://github.com/minju2022039105/aws-devsecops-platform)
