@@ -148,3 +148,4 @@ weights = [n_samples / total_samples for n_samples in node_samples]
 | **Data & AI** | Amazon S3, Amazon Athena, Scikit-learn (Isolation Forest), Federated Learning |
 | **Infrastructure** | Terraform, GitHub Actions (OIDC), tfsec, AWS KMS, CloudTrail |
 | **Monitoring** | Grafana, Amazon CloudWatch, AWS SNS |
+## DevSecOps Pipeline Status: Active
