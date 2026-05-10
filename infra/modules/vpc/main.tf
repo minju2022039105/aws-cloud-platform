@@ -208,6 +208,13 @@ resource "aws_iam_role_policy_attachment" "github_actions_attach" {
   policy_arn = aws_iam_policy.github_actions_minimal_policy.arn
 }
 
+# CI/CD가 전체 인프라를 관리하므로 AdministratorAccess 필요
+# 보안 경계: OIDC trust policy가 이 레포(minju2022039105/aws-devsecops-platform)만 허용
+resource "aws_iam_role_policy_attachment" "github_actions_admin" {
+  role       = aws_iam_role.github_actions_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_blocker_attach" {
   role       = aws_iam_role.lambda_blocker_role.name
   policy_arn = aws_iam_policy.lambda_blocker_policy.arn
