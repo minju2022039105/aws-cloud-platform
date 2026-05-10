@@ -285,23 +285,28 @@ resource "aws_iam_policy" "github_actions_minimal_policy" {
         }
       },
       {
-        # ALB 세부 권한 (Wildcard 제거 버전)
-        Effect   = "Allow"
-        Action   = [
-          "elasticloadbalancing:CreateLoadBalancer",
-          "elasticloadbalancing:DeleteLoadBalancer",
-          "elasticloadbalancing:DescribeLoadBalancers",
-          "elasticloadbalancing:CreateTargetGroup",
-          "elasticloadbalancing:DeleteTargetGroup",
-          "elasticloadbalancing:DescribeTargetGroups",
-          "elasticloadbalancing:RegisterTargets",
-          "elasticloadbalancing:DeregisterTargets",
-          "elasticloadbalancing:CreateListener",
-          "elasticloadbalancing:DeleteListener",
-          "elasticloadbalancing:DescribeListeners",
-          "elasticloadbalancing:AddTags"
+        # Terraform 상태 잠금 — DynamoDB lock table 접근
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:DeleteItem"
         ]
-        Resource = "*"
+        Resource = "arn:aws:dynamodb:us-east-1:*:table/terraform-lock-table"
+      },
+      {
+        # Terraform 상태 파일 — S3 backend 읽기/쓰기
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::minju-devsecops-tfstate-virginia",
+          "arn:aws:s3:::minju-devsecops-tfstate-virginia/*"
+        ]
       }
     ]
   })
