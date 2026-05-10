@@ -5,8 +5,8 @@
 
 data "archive_file" "traffic_generator_zip" {
   type        = "zip"
-  source_dir  = "/home/march/aws-devsecops-platform/lambda/traffic_generator"
-  output_path = "/home/march/aws-devsecops-platform/lambda/traffic_generator.zip"
+  source_dir  = "${path.root}/../lambda/traffic_generator"
+  output_path = "${path.root}/../lambda/traffic_generator.zip"
 }
 
 resource "aws_iam_role" "traffic_generator_role" {
