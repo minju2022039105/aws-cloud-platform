@@ -39,8 +39,8 @@ resource "aws_s3_bucket_public_access_block" "model_store" {
 # ── Lambda 패키지 압축 ────────────────────────────────────────────────
 data "archive_file" "edge_security_zip" {
   type        = "zip"
-  source_dir  = "/home/march/aws-devsecops-platform/lambda/edge_security"
-  output_path = "/home/march/aws-devsecops-platform/edge_security.zip"
+  source_dir  = "${path.root}/../lambda/edge_security"
+  output_path = "${path.root}/../lambda/edge_security.zip"
 }
 
 # ── IAM 역할 ──────────────────────────────────────────────────────────
