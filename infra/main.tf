@@ -1,23 +1,8 @@
 # ==========================================
-# 1. 초기 설정 (Provider & Data Sources)
-# ==========================================
-data "aws_ami" "ubuntu" {
-  most_recent = true
-  owners      = ["099720109477"]
-
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
-  }
-}
-
-# ==========================================
-# 2. 인프라 모듈 (modules/ 경로 적용)
+# 1. 인프라 모듈
 # ==========================================
 
-# infra/main.tf
-
-# 1. 네트워크 및 IAM (기존 vpc 모듈과 통합)
+# 네트워크 및 IAM
 module "network" {
   source = "./modules/vpc"
 
@@ -28,7 +13,7 @@ module "network" {
   waf_ipset_arn  = var.waf_ipset_arn
 }
 
-# 2. 보안 설정 (WAF)
+# 보안 설정 (WAF)
 module "security" {
   source             = "./modules/waf"
   shared_kms_key_arn = aws_kms_key.shared_log_key.arn
@@ -38,64 +23,9 @@ module "security" {
   alert_email        = var.alert_email
 }
 
-# 3. 부하 분산 (ALB)
-module "alb" {
-  source          = "./modules/alb"
-  vpc_id          = module.network.vpc_id
-  public_subnets  = module.network.public_subnet_ids
-  instance_id     = aws_instance.security_node.id
-  my_ip           = var.my_ip
-  domain_name     = var.domain_name
-  route53_zone_id = var.route53_zone_id
-}
-
 # ==========================================
-# 3. 개별 리소스 (EC2)
+# 2. 공유 보안 자원
 # ==========================================
-
-resource "aws_instance" "security_node" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = var.instance_type
-  key_name      = aws_key_pair.deployer.key_name
-
-  subnet_id              = module.network.public_subnet_id
-  vpc_security_group_ids = [module.network.security_group_id]
-
-  iam_instance_profile = module.network.ec2_instance_profile_name
-
-  # AWS-0028: IMDSv2 강제 — 토큰 없이 메타데이터 접근 불가 (SSRF 방어)
-  metadata_options {
-    http_tokens                 = "required"
-    http_put_response_hop_limit = 1
-  }
-
-  # AWS-0131: 루트 볼륨 암호화 — 물리 디스크 탈취 시 데이터 보호
-  root_block_device {
-    encrypted  = true
-    kms_key_id = aws_kms_key.shared_log_key.arn
-  }
-
-  tags = { Name = "DevSecOps-Analysis-Node", Project = "devsecops-platform" }
-}
-
-# ==========================================
-# 4. 보안 접속 및 공유 자원
-# ==========================================
-
-resource "tls_private_key" "rsa" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
-resource "aws_key_pair" "deployer" {
-  key_name   = "devsecops-key"
-  public_key = tls_private_key.rsa.public_key_openssh
-}
-
-resource "local_file" "private_key" {
-  content  = tls_private_key.rsa.private_key_pem
-  filename = "my-key.pem"
-}
 
 resource "aws_kms_key" "shared_log_key" {
   description             = "Centralized Shared KMS Key for Security Logs"
@@ -156,30 +86,8 @@ resource "aws_kms_key" "shared_log_key" {
 }
 
 # ==========================================
-# 5. 최종 연결 및 알림 설정
+# 3. 알림 설정
 # ==========================================
-
-# ALB → EC2 포트 80 허용 규칙 (vpc/alb 순환 참조 방지를 위해 루트 모듈에서 선언)
-resource "aws_security_group_rule" "allow_alb_to_ec2" {
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  security_group_id        = module.network.security_group_id
-  source_security_group_id = module.alb.alb_sg_id
-  description              = "Allow HTTP traffic from ALB"
-}
-
-resource "aws_wafv2_web_acl_association" "main" {
-  resource_arn = module.alb.alb_arn
-  web_acl_arn  = module.security.web_acl_arn
-}
-
-resource "aws_eip" "analysis_node_eip" {
-  instance = aws_instance.security_node.id
-  domain   = "vpc"
-  tags     = { Name = "DevSecOps-Fixed-IP" }
-}
 
 resource "aws_sns_topic" "security_alerts" {
   name              = "devsecops-security-alerts"

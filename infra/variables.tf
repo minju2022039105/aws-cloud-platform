@@ -22,12 +22,6 @@ variable "project_name" {
   default     = "devsecops-platform"
 }
 
-variable "instance_type" {
-  description = "EC2 인스턴스 타입"
-  type        = string
-  default     = "t3.micro"
-}
-
 variable "s3_bucket_name" {
   description = "WAF 로그 및 AI 분석 결과 저장 S3 버킷명"
   type        = string
