@@ -1,31 +1,38 @@
-name: Deploy to EC2
+name: DevSecOps CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 permissions:
   id-token: write
   contents: read
+  pull-requests: write
 
+env:
+  TF_VAR_account_id:      ${{ secrets.AWS_ACCOUNT_ID }}
+  TF_VAR_s3_bucket_name:  ${{ secrets.S3_BUCKET_NAME }}
+  TF_VAR_kms_key_arn:     ${{ secrets.KMS_KEY_ARN }}
+  TF_VAR_waf_ipset_arn:   ${{ secrets.WAF_IPSET_ARN }}
+  TF_VAR_domain_name:     "minju-devsec.store"
+  TF_VAR_route53_zone_id: ${{ secrets.ROUTE53_ZONE_ID }}
+  TF_VAR_alert_email:     ${{ secrets.ALERT_EMAIL }}
+  TF_VAR_my_ip:           '["0.0.0.0/0"]'
+
+# ──────────────────────────────────────────────────────────────────────
+# Job 1: 보안 게이트 — Trivy IaC + Bandit Python
+# ──────────────────────────────────────────────────────────────────────
 jobs:
-  deploy:
+  security-scan:
+    name: Security Gates
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0        # 전체 히스토리 fetch (exit 128 방지)
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
 
-      - name: Configure AWS credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: us-east-1
-
-      # ── 보안 게이트 1: IaC 취약점 스캔 (Trivy) ──────────────────
-      - name: Scan IaC with Trivy
+      - name: Trivy IaC Scan (HIGH/CRITICAL 차단)
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: config
@@ -33,86 +40,102 @@ jobs:
           severity: HIGH,CRITICAL
           exit-code: 1
 
-      # ── 보안 게이트 2: Python 코드 취약점 스캔 (Bandit) ─────────
-      - name: Scan Python with Bandit
+      - name: Bandit Python Scan
         run: |
           pip install bandit -q
-          bandit -r ./Security-AIOps-IsolationForest/monitor -ll --exit-zero
+          bandit -r ./ai ./lambda -ll --exit-zero
 
-      # ── 배포 전: 러너 IP / SG ID 확보 ────────────────────────
-      - name: Get runner public IP
-        id: runner_ip
-        run: echo "ip=$(curl -s https://checkip.amazonaws.com)/32" >> $GITHUB_OUTPUT
+# ──────────────────────────────────────────────────────────────────────
+# Job 2: Terraform Plan/Apply
+# ──────────────────────────────────────────────────────────────────────
+  terraform:
+    name: Terraform
+    needs: security-scan
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infra
 
-      - name: Get SG ID
-        id: sg
-        run: |
-          SG_ID=$(aws ec2 describe-security-groups \
-            --filters "Name=group-name,Values=devsecops-main-sg" \
-            --query "SecurityGroups[0].GroupId" \
-            --output text)
-          echo "id=$SG_ID" >> $GITHUB_OUTPUT
+    steps:
+      - uses: actions/checkout@v4
 
-      # ── 멱등성 처리: 규칙이 이미 존재하면 추가 생략 ─────────
-      - name: Allow runner IP on port 22 (idempotent)
-        env:
-          RUNNER_IP: ${{ steps.runner_ip.outputs.ip }}
-          SG_ID: ${{ steps.sg.outputs.id }}
-        run: |
-          EXISTING=$(aws ec2 describe-security-groups \
-            --group-ids "$SG_ID" \
-            --query "SecurityGroups[0].IpPermissions[?FromPort==\`22\`].IpRanges[?CidrIp==\`$RUNNER_IP\`].CidrIp" \
-            --output text)
-
-          if [ -z "$EXISTING" ] || [ "$EXISTING" = "None" ]; then
-            aws ec2 authorize-security-group-ingress \
-              --group-id "$SG_ID" \
-              --protocol tcp \
-              --port 22 \
-              --cidr "$RUNNER_IP"
-            echo "Port 22 opened for $RUNNER_IP"
-          else
-            echo "Rule already exists for $RUNNER_IP — skipping."
-          fi
-
-      # ── 배포 ─────────────────────────────────────────────────
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.7"
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -out=tfplan 2>&1 | tee plan_output.txt
+
+      - name: PR에 Plan 결과 코멘트
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
           script: |
-            git -C /home/ubuntu/Security-AIOps-IsolationForest fetch origin main
-            git -C /home/ubuntu/Security-AIOps-IsolationForest reset --hard origin/main
+            const fs = require('fs');
+            const plan = fs.readFileSync('infra/plan_output.txt', 'utf8');
+            const truncated = plan.length > 60000
+              ? plan.substring(0, 60000) + '\n... (truncated)'
+              : plan;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## Terraform Plan\n\`\`\`\n${truncated}\n\`\`\``
+            });
 
-            pkill -f monitor.py || true
-            sleep 2
+      - name: Terraform Apply
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve tfplan
 
-            setsid /home/ubuntu/Security-AIOps-IsolationForest/venv/bin/python3 \
-              /home/ubuntu/Security-AIOps-IsolationForest/monitor/monitor.py \
-              > /home/ubuntu/Security-AIOps-IsolationForest/monitor/monitor.log 2>&1 &
-            disown
+# ──────────────────────────────────────────────────────────────────────
+# Job 3: Lambda 코드 배포 (main push 전용)
+# ──────────────────────────────────────────────────────────────────────
+  deploy-lambda:
+    name: Deploy Lambda
+    needs: terraform
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
 
-            sleep 3
-            if ps -ef | grep -v grep | grep monitor.py > /dev/null; then
-              echo "monitor.py is running."
-              exit 0
-            else
-              echo "Process not found, forcing success."
-              exit 0
-            fi
+    steps:
+      - uses: actions/checkout@v4
 
-      # ── 배포 후: 러너 IP 제거 (규칙 없어도 에러 없이 종료) ──
-      - name: Revoke runner IP from port 22
-        if: always()
-        env:
-          RUNNER_IP: ${{ steps.runner_ip.outputs.ip }}
-          SG_ID: ${{ steps.sg.outputs.id }}
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Deploy SecurityAnalyzer
         run: |
-          aws ec2 revoke-security-group-ingress \
-            --group-id "$SG_ID" \
-            --protocol tcp \
-            --port 22 \
-            --cidr "$RUNNER_IP" || true
-          echo "Port 22 revoked for $RUNNER_IP (or was already removed)"
+          cd lambda/analyzer
+          zip -r analyzer.zip .
+          aws lambda update-function-code \
+            --function-name devsecops-security-analyzer \
+            --zip-file fileb://analyzer.zip
+
+      - name: Deploy SecurityPreventer
+        run: |
+          cd lambda/preventer
+          zip -r preventer.zip .
+          aws lambda update-function-code \
+            --function-name devsecops-security-preventer \
+            --zip-file fileb://preventer.zip
+
+      - name: Deploy NormalTrafficGenerator
+        run: |
+          cd lambda/traffic_generator
+          zip -r traffic_generator.zip .
+          aws lambda update-function-code \
+            --function-name devsecops-normal-traffic-generator \
+            --zip-file fileb://traffic_generator.zip
