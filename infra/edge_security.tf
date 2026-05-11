@@ -36,6 +36,29 @@ resource "aws_s3_bucket_public_access_block" "model_store" {
   restrict_public_buckets = true
 }
 
+# ISMS 2.10 — S3 HTTPS 전용 접근 강제
+resource "aws_s3_bucket_policy" "model_store_ssl" {
+  bucket     = aws_s3_bucket.model_store.id
+  depends_on = [aws_s3_bucket_public_access_block.model_store]
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid       = "DenyNonSSL"
+      Effect    = "Deny"
+      Principal = "*"
+      Action    = "s3:*"
+      Resource  = [
+        aws_s3_bucket.model_store.arn,
+        "${aws_s3_bucket.model_store.arn}/*"
+      ]
+      Condition = {
+        Bool = { "aws:SecureTransport" = "false" }
+      }
+    }]
+  })
+}
+
 # ── Lambda 패키지 압축 ────────────────────────────────────────────────
 data "archive_file" "edge_security_zip" {
   type        = "zip"

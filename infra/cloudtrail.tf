@@ -37,6 +37,19 @@ resource "aws_s3_bucket_policy" "cloudtrail_logs" {
     Version = "2012-10-17"
     Statement = [
       {
+        Sid       = "DenyNonSSL"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource  = [
+          aws_s3_bucket.cloudtrail_logs.arn,
+          "${aws_s3_bucket.cloudtrail_logs.arn}/*"
+        ]
+        Condition = {
+          Bool = { "aws:SecureTransport" = "false" }
+        }
+      },
+      {
         Sid    = "CloudTrailAclCheck"
         Effect = "Allow"
         Principal = { Service = "cloudtrail.amazonaws.com" }
