@@ -77,7 +77,9 @@ resource "aws_security_group" "main_sg" {
 }
 
 resource "aws_default_security_group" "default" {
-  vpc_id = aws_vpc.main.id
+  vpc_id  = aws_vpc.main.id
+  ingress = []
+  egress  = []
 }
 
 # ==========================================
