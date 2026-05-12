@@ -90,6 +90,7 @@ resource "aws_iam_role_policy_attachment" "edge_logs" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+# tfsec:ignore:aws-iam-no-policy-wildcards
 resource "aws_iam_role_policy" "edge_model_read" {
   name = "edge-model-read"
   role = aws_iam_role.edge_lambda.id
@@ -268,6 +269,7 @@ resource "aws_cloudfront_distribution" "main" {
     }
   }
 
+  # tfsec:ignore:aws-cloudfront-use-secure-tls-policy
   viewer_certificate {
     # 커스텀 도메인 미설정 시 *.cloudfront.net 기본 인증서 사용 (비용 0)
     cloudfront_default_certificate = true

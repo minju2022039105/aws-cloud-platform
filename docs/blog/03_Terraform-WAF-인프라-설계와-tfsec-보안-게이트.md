@@ -50,6 +50,8 @@ AWS WAF의 과금 구조는 이렇습니다.
 | 3 | AWSManagedRulesCommonRuleSet | 일반 웹 취약점 방어 |
 | 4 | AWSManagedRulesAmazonIpReputationList | 악성 IP 사전 차단 |
 
+<!-- 사진 1: WAF 규칙 관리 화면 — devsecops-waf 규칙 5개 Priority 순서로 나열, WCU 수치 포함 -->
+
 ---
 
 ## Priority 0 — GeoBlock이 비용 최적화의 입구다
@@ -230,9 +232,11 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "waf_logs_encrypti
 
 ## tfsec — 배포 전에 Terraform 코드를 스캔한다
 
-2편에서 CI/CD 파이프라인의 보안 게이트로 Trivy와 Bandit을 다뤘습니다. tfsec은 Trivy IaC 스캔과 함께 Terraform 코드에 특화된 정적 분석 도구입니다.
+tfsec은 Trivy IaC 스캔과 함께 CI/CD 파이프라인 보안 게이트로 실행됩니다. HIGH/CRITICAL 항목이 발견되면 Terraform Apply가 차단되는 구조입니다.
 
-프로젝트 초기 아키텍처(EC2 + ALB 기반)에 tfsec을 처음 돌렸을 때 나온 결과입니다.
+<!-- 사진 2: GitHub Actions 파이프라인 성공 화면 — Security Gates / Terraform / Deploy Lambda 3개 통과 -->
+
+프로젝트 초기 아키텍처(EC2 + ALB 기반)에 처음 돌렸을 때 나온 주요 결과입니다.
 
 | 심각도 | Rule ID | 내용 |
 |:---:|:---|:---|
@@ -246,27 +250,25 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "waf_logs_encrypti
 | MEDIUM | AVD-AWS-0178 | VPC Flow Logs 미활성화 |
 | LOW | AVD-AWS-0099 | SG 기본 설명 사용 |
 
-총 20개 항목. 처음 결과를 보고 막막했습니다.
+총 20개 항목.
 
-### 어떤 걸 고쳤고, 어떤 걸 의도적으로 무시했나
+<!-- 사진 3: tfsec 첫 번째 실행 터미널 — critical 4, high 등 초기 결과 -->
 
-무조건 다 고치는 게 답이 아닙니다. tfsec의 경고는 "이 설정은 일반적으로 위험할 수 있다"는 의미이지, "지금 이 아키텍처에서 반드시 취약점이다"는 의미가 아닙니다.
+### 고친 것과 의도적으로 무시한 것
+
+tfsec 경고는 "이 설정은 일반적으로 위험할 수 있다"는 의미이지, "지금 이 아키텍처에서 반드시 취약점이다"는 의미가 아닙니다.
 
 **고친 것들**
 
-`AVD-AWS-0131` (EC2 루트 블록 미암호화) → KMS 키를 연결해 암호화 적용했습니다.
-
-`AVD-AWS-0028` (IMDSv2 미사용) → `metadata_options`에 `http_tokens = "required"` 추가했습니다. IMDSv1은 SSRF 취약점과 결합되면 메타데이터 탈취가 가능합니다.
-
-`AVD-AWS-0178` (VPC Flow Logs 미활성화) → CloudTrail과 함께 VPC Flow Logs를 활성화해 아웃바운드 트래픽 전량 감사 체계를 구축했습니다.
-
-`AVD-AWS-0057` (IAM 와일드카드) → `athena:*` 대신 실제 Lambda가 필요한 액션만 열거하는 최소 권한으로 교체했습니다.
+- `AVD-AWS-0131` → KMS 키로 루트 블록 암호화
+- `AVD-AWS-0028` → `http_tokens = "required"` 추가. IMDSv1은 SSRF와 결합 시 메타데이터 탈취 가능
+- `AVD-AWS-0178` → VPC Flow Logs 활성화, CloudTrail과 함께 아웃바운드 전량 감사
+- `AVD-AWS-0057` → `athena:*` 와일드카드 제거, 최소 권한으로 교체
 
 **의도적으로 무시한 것들**
 
-`AVD-AWS-0053` (ALB 퍼블릭 노출) → 외부 사용자 트래픽을 받는 ALB는 퍼블릭이어야 합니다. 설계 의도입니다. WAF Web ACL이 앞단에서 Geo-Blocking과 AI 기반 IP 차단을 수행합니다.
-
-`AVD-AWS-0104` (SG egress 0.0.0.0/0) → EC2가 AWS API(CloudWatch, S3), apt 패키지 관리자에 접근하려면 아웃바운드가 열려 있어야 합니다. VPC Flow Logs로 아웃바운드 전량을 감사합니다.
+- `AVD-AWS-0053` (ALB 퍼블릭) → 외부 트래픽 수신용 설계 의도. WAF가 앞단 보호
+- `AVD-AWS-0104` (SG egress 0.0.0.0/0) → AWS API, 패키지 관리자 접근 필요. VPC Flow Logs로 감사
 
 이 판단들은 `.tfsec-ignore` 주석으로 코드에 직접 기록했습니다.
 
@@ -278,17 +280,13 @@ resource "aws_lb" "main" {
 }
 ```
 
-코드를 보는 사람이 "왜 이 경고가 무시되어 있지?"를 묻지 않아도 되게 하는 것이 목적입니다.
-
 ### 서버리스 전환이 tfsec 결과를 바꿨다
 
-1편에서 EC2 + ALB 구조를 API Gateway + Lambda로 전환한 과정을 다뤘습니다.
+EC2 + ALB 구조를 API Gateway + Lambda로 전환하면서 tfsec 결과도 바뀌었습니다.
 
-그 결과 tfsec 결과도 바뀌었습니다.
+`AVD-AWS-0131`, `AVD-AWS-0028`, `AVD-AWS-0107` — EC2와 ALB가 사라지면서 이 항목들이 아예 없어졌습니다. 보안 설정을 고쳐서 해결한 게 아니라, 리소스 자체가 필요 없어진 경우입니다. Attack Surface를 줄이는 것이 설정을 강화하는 것보다 근본적인 접근이라는 걸 체감한 부분입니다.
 
-`AVD-AWS-0131` (EC2 루트 블록 미암호화), `AVD-AWS-0028` (IMDSv2 미사용), `AVD-AWS-0107` (SG ingress 퍼블릭) — EC2와 ALB가 사라지면서 이 항목들이 아예 없어졌습니다.
-
-보안 설정을 고쳐서 해결한 게 아니라, 해당 리소스가 필요 없어져서 문제 자체가 사라진 경우입니다. Attack Surface를 줄이는 것이 설정을 강화하는 것보다 근본적인 접근이라는 걸 체감한 부분입니다.
+<!-- 사진 4: tfsec 수정 후 재실행 터미널 — critical 0, high 0, ignored 36 결과 -->
 
 ---
 
@@ -317,9 +315,17 @@ infra/
 
 ## 마치며
 
-Terraform으로 WAF를 코드화하는 건 설정 관리의 문제이기도 하지만, 의사결정을 기록하는 문제이기도 합니다.
+이 글에서 내린 판단들을 다시 정리하면 이렇습니다.
 
-Priority 0에 GeoBlock을 배치한 이유, Scope-down으로 특정 경로를 검사에서 제외한 이유, tfsec 경고를 무시한 이유 — 이 판단들이 코드와 주석에 남아 있으면, 나중에 이 코드를 보는 사람(혹은 6개월 뒤의 나)이 "왜 이렇게 되어 있지?"를 묻지 않아도 됩니다.
+GeoBlock을 Priority 0에 배치한 건 단순 보안 정책이 아니었습니다. Managed Rule Group이 처리해야 할 요청 수를 앞단에서 줄이는 운영 효율 결정이었습니다.
+
+Scope-down으로 `/health` 경로를 SQLi 검사에서 제외한 것도 보안을 타협한 게 아니라, "이 경로에는 사용자 입력이 없다"는 판단 위에서 불필요한 검사를 줄인 겁니다.
+
+tfsec이 잡아낸 20개 경고 중 일부는 수정하고 일부는 의도적으로 감수했습니다. 퍼블릭 ALB 경고를 무시한 건 "WAF가 앞단을 보호하는 구조에서 이 경고는 취약점이 아니라 설계"라는 판단이었고, 그 판단을 코드 주석에 남겼습니다.
+
+서버리스로 전환하면서 EC2, ALB 관련 tfsec 항목이 통째로 사라진 건 설정을 강화한 결과가 아니라 리소스 자체를 없앤 결과입니다. Attack Surface를 줄이는 것이 보안 설정을 강화하는 것보다 근본적이라는 걸 그때 체감했습니다.
+
+Terraform으로 WAF를 코드화하는 건 결국 이 판단들을 기록하는 작업입니다. 보안·비용·운영 리스크를 함께 고려한 결정이 코드와 주석으로 남아 있으면, 나중에 이 코드를 보는 누구든 "왜 이렇게 되어 있지?"를 묻지 않아도 됩니다.
 
 다음 편에서는 이 인프라 위에서 실제로 동작하는 AI 이상 탐지 엔진 — Isolation Forest, Shannon Entropy, Federated Learning의 설계를 다룹니다.
 

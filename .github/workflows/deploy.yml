@@ -22,7 +22,7 @@ env:
   TF_VAR_my_ip:           '["0.0.0.0/0"]'
 
 # ──────────────────────────────────────────────────────────────────────
-# Job 1: 보안 게이트 — Trivy IaC + Bandit Python
+# Job 1: 보안 게이트 — Trivy IaC + Bandit Python + tfsec
 # ──────────────────────────────────────────────────────────────────────
 jobs:
   security-scan:
@@ -39,6 +39,13 @@ jobs:
           scan-ref: ./infra
           severity: HIGH,CRITICAL
           exit-code: 1
+
+      - name: tfsec (Terraform 전용 정적 분석)
+        uses: aquasecurity/tfsec-action@v1.0.0
+        with:
+          working_directory: ./infra
+          soft_fail: false
+          tfsec_args: --minimum-severity HIGH
 
       - name: Bandit Python Scan
         run: |
