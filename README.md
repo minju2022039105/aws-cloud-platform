@@ -104,7 +104,59 @@ weights = [n_samples / total_samples for n_samples in node_samples]
 
 ---
 
-## 5. 트러블슈팅 (Troubleshooting Deep Dive)
+## 5. ISMS 컴플라이언스 자동화 (AWS Config)
+
+클라우드 보안 아키텍트 포지션 JD의 ISMS/ISO27001 컴플라이언스 경험 요건을 충족하기 위해, 기존 인프라(WAF, GuardDuty, CloudTrail)와 겹치는 ISMS 통제항목을 **AWS Config Rules로 자동 점검하는 파이프라인**을 구축했습니다.
+
+### 파이프라인 구조
+
+```
+AWS Config Recorder (전체 리소스 유형 기록)
+    ↓
+Config Rules 11개 (ISMS 통제항목 1:1 매핑)
+    ↓
+NON_COMPLIANT 감지 → EventBridge Rule
+    ↓
+기존 devsecops-security-alerts SNS 토픽 (알림 채널 통합)
+    ↓
+기존 CloudTrail S3 버킷 (/config prefix 분리 저장)
+```
+
+### ISMS 통제항목 ↔ Config Rule 매핑
+
+| ISMS 항목 | Config Rule | 준수 상태 |
+| :--- | :--- | :---: |
+| 2.5 인증 및 권한관리 | Root 액세스 키 미사용 | ✅ 준수 |
+| 2.5 인증 및 권한관리 | IAM 패스워드 정책 (14자, 대소문자+숫자+특수, 90일 만료) | ✅ 준수 |
+| 2.5 인증 및 권한관리 | 콘솔 접근 MFA 활성화 | — 평가 없음 (IAM 콘솔 사용자 없음) |
+| 2.6 접근통제 | S3 퍼블릭 읽기 차단 | ✅ 준수 |
+| 2.6 접근통제 | S3 퍼블릭 쓰기 차단 | ✅ 준수 |
+| 2.6 접근통제 | VPC 기본 보안그룹 비활성화 | ✅ 준수 |
+| 2.9 로그 관리 | CloudTrail 활성화 | ✅ 준수 |
+| 2.9 로그 관리 | CloudTrail 로그 무결성 검증 | ✅ 준수 |
+| 2.10 시스템 보안관리 | S3 HTTPS 전용 접근 (SSL) | ✅ 준수 |
+| 2.10 시스템 보안관리 | EBS 볼륨 암호화 | — 평가 없음 (EC2 없음) |
+| 2.11 사고 예방 및 대응 | GuardDuty 활성화 | ✅ 준수 |
+
+### 설계 포인트
+
+- **기존 인프라 재사용**: Config 전달 채널에 CloudTrail 전용 S3 버킷(`/config` prefix 분리) 재활용 → 버킷 추가 비용 없음
+- **알림 채널 통합**: NON_COMPLIANT 이벤트를 기존 `devsecops-security-alerts` SNS 토픽으로 라우팅 → 단일 알림 채널 유지
+- **추적 가능한 Rule 명명**: `isms-{항목번호}-{내용}` 형식으로 ISMS 매핑 관계를 코드에서 직접 확인 가능
+
+### 미준수 → 수정 이력
+
+| 발견 항목 | 원인 | 해결 |
+| :--- | :--- | :--- |
+| Root 액세스 키 존재 | 초기 설정 시 생성한 키 잔존 (마지막 사용 51일 전) | AWS 콘솔에서 수동 삭제 |
+| IAM 패스워드 정책 미설정 | 정책 리소스 미생성 | `aws_iam_account_password_policy` 추가 → terraform apply |
+| VPC 기본 보안그룹 규칙 존재 | Terraform 관리 외 기본 VPC의 default SG에 self-referencing 규칙 잔존 | Terraform VPC: `aws_default_security_group` ingress/egress 빈 배열 명시 + 기본 VPC: CLI로 규칙 직접 제거 |
+| S3 버킷 5개 SSL 정책 누락 | 버킷 생성 시 bucket policy 미적용 | Terraform 관리 버킷 3개: `aws_s3_bucket_policy` 추가 / Terraform 외부 버킷 2개: `aws s3api put-bucket-policy` CLI로 직접 적용 |
+| GuardDuty 미활성화 | 리소스 미생성 | `aws_guardduty_detector` 추가 → terraform apply |
+
+---
+
+## 6. 트러블슈팅 (Troubleshooting Deep Dive)
 
 ### 1) IAM AccessDenied → 최소 권한 재설계
 - **문제**: GitHub Actions OIDC Role이 `StringLike` Condition으로 모든 브랜치에서 Assume 가능
@@ -124,7 +176,7 @@ weights = [n_samples / total_samples for n_samples in node_samples]
 
 ---
 
-## 6. 실시간 관제 대시보드 (Observability)
+## 7. 실시간 관제 대시보드 (Observability)
 
 <img width="1024" alt="Grafana Dashboard" src="https://github.com/user-attachments/assets/e2ba077a-a9ac-410c-b7ed-78760ecac001">
 
@@ -139,13 +191,14 @@ weights = [n_samples / total_samples for n_samples in node_samples]
 
 ---
 
-## 7. Tech Stack
+## 8. Tech Stack
 
 | 분류 | 기술 |
 | :--- | :--- |
 | **Compute** | AWS Lambda, Amazon EC2 |
 | **Networking & Security** | AWS WAF v2, CloudFront, ALB, API Gateway, VPC |
 | **Data & AI** | Amazon S3, Amazon Athena, Scikit-learn (Isolation Forest), Federated Learning |
+| **Compliance** | AWS Config (Rules 11개), Amazon GuardDuty, AWS IAM Password Policy |
 | **Infrastructure** | Terraform, GitHub Actions (OIDC), tfsec, AWS KMS, CloudTrail |
 | **Monitoring** | Grafana, Amazon CloudWatch, AWS SNS |
 ## DevSecOps Pipeline Status: Active
