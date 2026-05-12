@@ -32,12 +32,10 @@ MODEL_OUT = os.path.join(BASE_DIR, "../../ai-security/models/isolation_forest_mo
 SCALER_OUT = os.path.join(BASE_DIR, "../../ai-security/models/scaler.pkl")
 
 # ─── 하이퍼파라미터 ──────────────────────────────────────────────
-# contamination=0.15 설정 근거:
-#   final_preprocessed_waf_data.csv 분석 결과 전체 100건 중 공격 로그가
-#   14.8건(약 14.8%)을 차지함. 실제 공격 비율에 맞게 설정함으로써
-#   임계값이 훈련 데이터에 과적합되는 것을 방지하고 Precision/Recall 균형 확보.
-#   (contamination=0.2 사용 시 false positive 증가 확인됨)
-CONTAMINATION = 0.15
+# contamination=0.25 설정 근거:
+#   혼합 재학습 데이터(공격 400건 + 정상 1350건 = 1800건) 기준
+#   실제 공격 비율 400/1800 ≈ 22.2% → 0.25로 올림 (소량 오차 여유)
+CONTAMINATION = 0.25
 RANDOM_STATE = 42
 
 # 소량 데이터 과적합 방지: n_estimators를 충분히 크게 설정
