@@ -34,11 +34,11 @@ AWS WAF의 과금 구조는 이렇습니다.
 - 룰 추가 시: 룰당 월 $1
 - 요청 처리: 백만 건당 $0.6
 
-요청이 많아질수록 처리 비용이 증가합니다. 특히 Managed Rule Group(AWSManagedRules*)은 내부에서 다수의 하위 룰을 실행하기 때문에 무거운 편입니다.
+요청이 많아질수록 처리 비용이 증가합니다. 특히 Managed Rule Group(AWSManagedRules*)은 단순 GeoMatch보다 평가 로직이 복잡하므로, 불필요한 요청이 하위 룰까지 내려가지 않도록 앞단에서 걸러내는 것이 운영 효율 측면에서 유리합니다.
 
 그래서 전략은 하나였습니다.
 
-> 비용이 크고 복잡한 룰을 뒤에 배치하고, 빠르고 저렴한 룰로 앞에서 최대한 걸러내자.
+> 평가 로직이 복잡한 룰을 뒤에 배치하고, 빠르게 판단 가능한 룰로 앞에서 최대한 걸러내자.
 
 최종 Priority 구성은 다음과 같습니다.
 
@@ -127,12 +127,12 @@ scope_down_statement {
   not_statement {
     statement {
       or_statement {
-        # /admin/ 경로는 검사 제외
+        # /health, /metrics 같은 내부 상태 확인 경로는 검사 제외
         statement {
           byte_match_statement {
             field_to_match { uri_path {} }
             positional_constraint = "STARTS_WITH"
-            search_string         = "/admin/"
+            search_string         = "/health"
             text_transformation {
               priority = 0
               type     = "LOWERCASE"
