@@ -63,7 +63,7 @@ WAF가 모든 요청 로그를 S3에 저장하니,
 그 분포에서 벗어난 요청을 이상치로 분류하면 됩니다.
 
 이 프로젝트에서는 Isolation Forest 기반 이상 탐지를 사용했습니다.  
-알고리즘 선택과 Feature Engineering 과정은 3편에서 자세히 다룹니다.
+알고리즘 선택과 Feature Engineering 과정은 4편에서 자세히 다룹니다.
 
 ---
 
@@ -248,10 +248,10 @@ rule {
 # 이 시리즈에서 다룰 내용
 
 - **1편**: WAF의 한계와 AI 이상 탐지 도입 배경 ← 현재 글
-- **2편**: Terraform으로 WAF 인프라 설계하기
-- **3편**: Isolation Forest 기반 이상 탐지 구현
-- **4편**: Federated Learning 기반 Privacy-Preserving 탐지
-- **5편**: 트러블슈팅 — KMS 비용 폭탄, IAM 최소 권한, sklearn 이슈
+- **2편**: 보안은 배포 전에 시작된다 — DevSecOps CI/CD 설계기
+- **3편**: WAF 룰 5단계를 Terraform으로 코드화하다 — tfsec이 잡아낸 것들
+- **4편**: AI 이상 탐지 엔진 — Isolation Forest, Shannon Entropy, Federated Learning
+- **5편**: 트러블슈팅 — KMS 비용 폭증 사고
 
 다음 편에서는 Terraform으로 WAF 인프라를 어떻게 코드화했고,  
 tfsec으로 어떤 취약점을 사전에 차단했는지 실제 코드 기준으로 정리해보겠습니다.
