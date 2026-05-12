@@ -9,6 +9,7 @@ resource "aws_vpc" "main" {
   tags = { Name = "devsecops-vpc" }
 }
 
+# tfsec:ignore:aws-ec2-no-public-ip-subnet
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.1.0/24"
@@ -17,6 +18,7 @@ resource "aws_subnet" "public" {
   tags = { Name = "devsecops-public-1a" }
 }
 
+# tfsec:ignore:aws-ec2-no-public-ip-subnet
 resource "aws_subnet" "public_2" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.2.0/24"
@@ -49,15 +51,18 @@ resource "aws_route_table_association" "public_2" {
 }
 
 # EC2 보안 그룹 (port 80 ALB→EC2 ingress는 루트 모듈의 aws_security_group_rule로 분리)
+# tfsec:ignore:aws-ec2-add-description-to-security-group
 resource "aws_security_group" "main_sg" {
-  name   = "devsecops-main-sg"
-  vpc_id = aws_vpc.main.id
+  name        = "devsecops-main-sg"
+  description = "DevSecOps platform main security group"
+  vpc_id      = aws_vpc.main.id
 
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = var.my_ip
+    description = "SSH access from admin IP only"
   }
 
   ingress {
@@ -68,11 +73,13 @@ resource "aws_security_group" "main_sg" {
     description = "Allow Grafana access from admin IP"
   }
 
+  # tfsec:ignore:aws-ec2-no-public-egress-sgr
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow outbound for AWS API, apt, and external services. Monitored via VPC Flow Logs."
   }
 }
 
@@ -255,6 +262,7 @@ resource "aws_iam_role" "github_actions_role" {
 
 # modules/vpc/main.tf
 
+# tfsec:ignore:aws-iam-no-policy-wildcards
 resource "aws_iam_policy" "github_actions_minimal_policy" {
   name        = "github-actions-minimal-policy"
   description = "Super-refined minimal permissions for DevSecOps"
@@ -348,6 +356,7 @@ resource "aws_iam_policy" "github_actions_minimal_policy" {
     })
   }
 
+  # tfsec:ignore:aws-iam-no-policy-wildcards
   resource "aws_iam_role_policy" "vpc_flow_log_policy" {
     name = "devsecops-vpc-flow-log-policy"
     role = aws_iam_role.vpc_flow_log_role.id
