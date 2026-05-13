@@ -42,14 +42,15 @@ AWS WAF의 정적 규칙(Static Rule)이 탐지하지 못하는 변칙적 공격
 
 > Lambda 함수(Analyzer, Preventer) 및 기본 탐지 파이프라인 구조는 팀 프로젝트 [Security-AIOps-IsolationForest](https://github.com/minju2022039105/Security-AIOps-IsolationForest)에서 담당한 파트를 가져왔습니다. `train_model.py`, `federated_learning.py`, Shannon Entropy 피처 설계, Weighted FedAvg, ContaminationSentinel은 이 프로젝트에서 독자적으로 설계 및 구현했습니다.
 
-졸업작품 당시 가공된 데이터셋(정확도 91%) 대신, **실제 Nikto 공격 로그 450건**을 기반으로 실무형 탐지 모델을 구성했습니다.
+졸업작품 당시 가공된 데이터셋(정확도 91%) 대신, **실제 Nikto 공격 로그 + 합성 정상 트래픽 혼합 1,800건**을 기반으로 실무형 탐지 모델을 구성했습니다.
 
 | 항목 | 내용 |
 | :--- | :--- |
 | 알고리즘 | Isolation Forest (비지도 학습) |
-| 학습 데이터 | Nikto 기반 실제 WAF 공격 로그 450건 + 정상 트래픽 (수집 중) |
-| contamination | 0.15 (테스트 환경 공격 비중 14.8% 기반 전략적 설정 — Recall 최대화 목적, 운영 시 0.01~0.05로 하향 예정) |
-| n_estimators | 100 (50개 대비 결정 경계 안정적, 200개 이상 대비 추론 속도 우세 — 준실시간 보안 관제 최적화) |
+| 학습 데이터 | 공격 로그 400건 (Nikto SQLi/XSS) + 합성 정상 트래픽 1,350건 = **1,800건** |
+| contamination | **0.25** (공격 400/1,800 ≈ 22.2% → 오차 여유 포함. 초기 0.15에서 정상 트래픽 혼합 후 상향) |
+| n_estimators | **200** (과적합 방지를 위한 충분한 트리 수 — 소량 데이터일수록 트리 수↑로 분산 평균화) |
+| 탐지 결과 | 이상 탐지 345건 / 19.2%, Score IQR=0.0611 (과적합 기준 0.05 초과 → 정상 판정) |
 
 **알고리즘 선택 근거**: Autoencoder(리소스 과다), One-Class SVM(대규모 느림) 대비 비지도 + 준실시간 스코어링에 최적화.
 
