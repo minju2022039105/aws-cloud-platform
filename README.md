@@ -190,6 +190,32 @@ NON_COMPLIANT 감지 → EventBridge Rule
 | Blocked | 🔴 | 위협 확정, WAF IP 자동 차단 실행 |
 | Stabilize | 🔵 | 공격 종료 후 잔류 위협 집중 감시 |
 
+### Observability 설계 결정
+
+이 프로젝트의 관측 구조는 계층을 명확히 분리했습니다.
+
+```
+[Local / Demo Layer]
+monitor.py
+ └─ Prometheus metrics (:8000) — 로컬 데모 및 구현 실험용
+
+[Production Observability Layer]
+Lambda / API Gateway / WAF
+ └─ AWS CloudWatch Metrics & Logs — 서버리스 운영 메트릭 자동 수집
+
+[Visualization Layer]
+Grafana Cloud
+ └─ CloudWatch datasource — 실제 운영 대시보드
+```
+
+> Prometheus metrics were implemented for local testing and observability experimentation, while the production monitoring pipeline uses AWS CloudWatch, which better aligns with the serverless architecture.
+
+**Prometheus를 운영 계층에서 제외한 이유:**  
+Prometheus는 pull 방식으로 항상 떠 있는 서버를 스크래핑합니다. Lambda/API Gateway 기반 서버리스 구조에서는 스크래핑할 고정 엔드포인트가 없어 구조적으로 맞지 않습니다. Prometheus 연동은 직접 구현하고 검토했으나, 운영 환경에서는 AWS 네이티브 CloudWatch가 더 적합하다고 판단했습니다.
+
+**Grafana Cloud를 선택한 이유:**  
+Grafana는 대시보드 설정과 세션을 저장하는 Stateful 서비스입니다. 서버리스 파이프라인에 EC2를 추가하는 아키텍처 불일치를 피하기 위해 Managed SaaS로 분리했습니다. CloudWatch 데이터소스는 IAM Role 기반으로 연동되어 장기 자격증명 없이 안전하게 연결됩니다.
+
 ---
 
 ## 8. Tech Stack
