@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from collections import Counter as CharCounter
 from datetime import datetime
-from prometheus_client import start_http_server, Counter, Gauge
+from prometheus_client import start_http_server, Counter, Gauge, Histogram
 import boto3
 
 _BASE = os.path.dirname(os.path.abspath(__file__))
@@ -110,6 +110,18 @@ PREMIT_TRIGGER = Counter("aiops_premitigation_trigger_total", "Pre-mitigation tr
 BLOCKED = Counter("aiops_block_total", "Blocked requests total")
 PASSED = Counter("aiops_pass_total", "Passed requests total")
 
+# AI 재학습 결과 시각화용 메트릭
+# RAW_SCORE: Isolation Forest decision_function 원점수 (양수=정상, 음수=이상)
+RAW_SCORE = Gauge("aiops_raw_score", "Isolation Forest decision score (positive=normal, negative=anomaly)")
+# ANOMALY_THRESHOLD: 탐지 경계값 (전체 점수의 5th percentile). Grafana 참조선으로 사용
+ANOMALY_THRESHOLD = Gauge("aiops_anomaly_threshold", "Decision boundary score (5th percentile of training scores)")
+# SCORE_HIST: 점수 분포 — 버킷은 실측 IQR(0.07) 기준으로 0.05 간격 설계
+SCORE_HIST = Histogram(
+    "aiops_score_distribution",
+    "Isolation Forest score distribution",
+    buckets=[-0.30, -0.20, -0.15, -0.10, -0.05, 0.00, 0.05, 0.10, 0.15, 0.20, 0.30],
+)
+
 # ==============================
 # 2) 데이터 로드 + 재학습 모델 로드
 # ==============================
@@ -130,6 +142,10 @@ scores_all = model.decision_function(X_scaled)
 THRESHOLD = np.percentile(scores_all, 5)
 MIN_S = float(scores_all.min())
 MAX_S = float(scores_all.max())
+
+# 모델 로드 시점에 경계값을 Prometheus에 고정값으로 등록
+# Grafana에서 이 값을 참조선(threshold line)으로 그려서 정상/이상 구간을 구분함
+ANOMALY_THRESHOLD.set(float(THRESHOLD))
 
 def risk_from_score(score: float) -> float:
     """decision_function 점수 -> 0~100 위험도"""
@@ -269,6 +285,12 @@ while True:
     PREMIT_STATUS.set(1 if premit_on else 0)
     MIT_LEVEL.set(float(level))
     ANOMALY_STATUS.set(float(anomaly))
+
+    # AI 재학습 결과 시각화: raw_score를 Gauge와 Histogram 양쪽에 기록
+    # Gauge → 현재 점수 실시간 추이 (Time series 패널)
+    # Histogram → 점수 분포 누적 (Heatmap/Bar 패널, ANOMALY_THRESHOLD 기준으로 정상/이상 경계 확인)
+    RAW_SCORE.set(float(raw_score))
+    SCORE_HIST.observe(float(raw_score))
 
     # ===S3에 올릴 데이터들 만들기!!!! ===
     # CSV 샘플에서 IP 가져오기 (컬럼명이 'source_ip'라고 가정, 없으면 'unknown' 처리)
