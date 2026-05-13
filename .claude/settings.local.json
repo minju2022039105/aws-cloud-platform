@@ -7,7 +7,9 @@
       "Bash(python3 scripts/federated_learning.py)",
       "Bash(terraform output *)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "WebFetch(domain:velog.io)"
+      "WebFetch(domain:velog.io)",
+      "Read(///wsl.localhost/Ubuntu/home/march/aws-devsecops-platform/ai-security/**)",
+      "Read(///wsl.localhost/Ubuntu/home/march/aws-devsecops-platform/lambda/**)"
     ]
   }
 }
