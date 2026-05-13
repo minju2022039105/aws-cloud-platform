@@ -27,17 +27,22 @@ resource "aws_lambda_function" "analyzer" {
   }
 }
 
+data "archive_file" "preventer_zip" {
+  type        = "zip"
+  source_dir  = "${path.root}/../lambda/preventer"
+  output_path = "${path.root}/../lambda/preventer.zip"
+}
+
 # 3. SecurityPreventer (방어자 람다)
 resource "aws_lambda_function" "preventer" {
-  filename      = data.archive_file.lambda_zip.output_path
+  filename      = data.archive_file.preventer_zip.output_path
   function_name = "SecurityPreventer"
-  role = module.network.lambda_blocker_role_arn  
+  role          = module.network.lambda_blocker_role_arn
   handler       = "lambda_security_preventer.handler"
   runtime       = "python3.11"
-  timeout       = 30 # 예방 로직 처리를 위해 넉넉히 설정
+  timeout       = 30
 
-  # ⭐️ 핵심: Preventer도 코드 변경 시 즉시 반영되도록 설정
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  source_code_hash = data.archive_file.preventer_zip.output_base64sha256
 }
 
 # 4. S3 트리거 권한 (S3 -> Analyzer)

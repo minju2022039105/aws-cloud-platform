@@ -74,7 +74,7 @@ def handler(event, context):
 
         # 3. Preventer 람다 호출
         payload = {
-            "attack_ip": target_ip,
+            "ip": target_ip,
             "count": attack_count,
             "message": "AI-based Anomaly Detected"
         }

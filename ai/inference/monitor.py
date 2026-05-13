@@ -1,19 +1,20 @@
+import math
 import time
+import json
+import os
+import joblib
 import numpy as np
 import pandas as pd
-import os  # 추가
-import sys # 추가
+from collections import Counter as CharCounter
 from datetime import datetime
-from sklearn.ensemble import IsolationForest
-from sklearn.preprocessing import StandardScaler
 from prometheus_client import start_http_server, Counter, Gauge
-import boto3  # 추가 
-import json
+import boto3
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+_BASE = os.path.dirname(os.path.abspath(__file__))
+os.chdir(_BASE)
 
-# S3 설정 (함수 바깥에 선언) 
-S3_BUCKET_NAME = "aws-waf-logs-minju-0417-project" 
+# S3 설정 (함수 바깥에 선언)
+S3_BUCKET_NAME = "aws-waf-logs-minju-0417-project"
 s3_client = boto3.client('s3', region_name='us-east-1')
 
 def upload_to_s3(data_dict):
@@ -59,8 +60,17 @@ def invoke_preventer(ip, risk, level):
 # ==============================
 # 0) 설정
 # ==============================
-CSV_PATH = "../data/final_preprocessed_waf_data.csv"
-FEATURES = ["country_code", "rule_code", "uri_len"]
+CSV_PATH = os.path.join(_BASE, "../data/final_preprocessed_waf_data.csv")
+MODEL_PATH = os.path.join(_BASE, "../../ai-security/models/isolation_forest_model.pkl")
+SCALER_PATH = os.path.join(_BASE, "../../ai-security/models/scaler.pkl")
+FEATURES = ["country_code", "rule_code", "uri_len", "uri_entropy"]
+
+
+def _rule_entropy(rule_code) -> float:
+    b = bin(int(rule_code))
+    freq = CharCounter(b)
+    n = len(b)
+    return -sum((cnt / n) * math.log2(cnt / n) for cnt in freq.values())
 
 # 촬영용 타임라인(총 210초 ≈ 3분30초)
 SCENARIO = [
@@ -101,9 +111,10 @@ BLOCKED = Counter("aiops_block_total", "Blocked requests total")
 PASSED = Counter("aiops_pass_total", "Passed requests total")
 
 # ==============================
-# 2) 데이터 로드 + 모델 학습 (실제 CSV 기반)
+# 2) 데이터 로드 + 재학습 모델 로드
 # ==============================
 df = pd.read_csv(CSV_PATH)
+df["uri_entropy"] = df["rule_code"].apply(_rule_entropy)
 
 missing = [c for c in FEATURES if c not in df.columns]
 if missing:
@@ -111,15 +122,12 @@ if missing:
 
 X = df[FEATURES].copy()
 
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
-
-# contamination은 데모/데이터에 맞춰 조절 가능
-model = IsolationForest(contamination=0.2, random_state=42)
-model.fit(X_scaled)
+model = joblib.load(MODEL_PATH)
+scaler = joblib.load(SCALER_PATH)
+X_scaled = scaler.transform(X)
 
 scores_all = model.decision_function(X_scaled)
-THRESHOLD = np.percentile(scores_all, 5)  # 동적 임계값(하위 5%)
+THRESHOLD = np.percentile(scores_all, 5)
 MIN_S = float(scores_all.min())
 MAX_S = float(scores_all.max())
 
@@ -180,20 +188,20 @@ while True:
     # PREMITIGATE: 사전방어 on, 공격 패턴 더 강하게
     # ATTACK_ATTEMPT: 공격 패턴 매우 강하게(실제 공격 시도 재현)
     if mode == "PREDICT":
-        # 징후 수준: uri_len만 살짝 늘림
         sample.loc[:, "uri_len"] = sample["uri_len"].astype(int) + np.random.randint(200, 600)
+        sample.loc[:, "uri_entropy"] = np.random.uniform(3.5, 4.2)
 
     elif mode == "PREMITIGATE":
-        # 공격 패턴 강화
         sample.loc[:, "uri_len"] = sample["uri_len"].astype(int) + np.random.randint(800, 1800)
         sample.loc[:, "rule_code"] = np.random.choice(ATTACK_RULES)
         sample.loc[:, "country_code"] = np.random.choice(ATTACK_COUNTRIES)
+        sample.loc[:, "uri_entropy"] = np.random.uniform(4.2, 5.0)
 
     elif mode == "ATTACK_ATTEMPT":
-        # 공격 시도 강하게
         sample.loc[:, "uri_len"] = sample["uri_len"].astype(int) + np.random.randint(1500, 4000)
         sample.loc[:, "rule_code"] = np.random.choice(ATTACK_RULES)
         sample.loc[:, "country_code"] = np.random.choice(ATTACK_COUNTRIES)
+        sample.loc[:, "uri_entropy"] = np.random.uniform(4.5, 5.5)
         ATTACK_ATTEMPT.inc(np.random.randint(3, 8))
 
     # ---------- 실측(Observed) 점수 계산 ----------
