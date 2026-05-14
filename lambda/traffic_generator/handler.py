@@ -5,7 +5,7 @@ import time
 import os
 import json
 
-ALB_ENDPOINT = os.environ.get("ALB_ENDPOINT", "http://minju-alb-733893612.us-east-1.elb.amazonaws.com")
+TARGET_URL = os.environ.get("TARGET_URL", "https://minju-devsec.store")
 REQUEST_COUNT = int(os.environ.get("REQUEST_COUNT", "300"))
 
 USER_AGENTS = [
@@ -61,7 +61,7 @@ def handler(event, context):
         path = random.choice(PATHS)
         ua = random.choice(USER_AGENTS)
         req = urllib.request.Request(
-            ALB_ENDPOINT + path,
+            TARGET_URL + path,
             headers={
                 "User-Agent": ua,
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
