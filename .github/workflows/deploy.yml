@@ -45,7 +45,7 @@ jobs:
         with:
           working_directory: ./infra
           soft_fail: false
-          tfsec_args: --minimum-severity HIGH
+          additional_args: --minimum-severity HIGH
 
       - name: Bandit Python Scan
         run: |
