@@ -45,31 +45,6 @@ resource "aws_lambda_function" "preventer" {
   source_code_hash = data.archive_file.preventer_zip.output_base64sha256
 }
 
-data "archive_file" "traffic_generator_zip" {
-  type        = "zip"
-  source_dir  = "${path.root}/../lambda/traffic_generator"
-  output_path = "${path.root}/../lambda/traffic_generator.zip"
-}
-
-# NormalTrafficGenerator
-resource "aws_lambda_function" "traffic_generator" {
-  filename      = data.archive_file.traffic_generator_zip.output_path
-  function_name = "NormalTrafficGenerator"
-  role          = module.network.lambda_blocker_role_arn
-  handler       = "handler.handler"
-  runtime       = "python3.11"
-  timeout       = 300
-
-  source_code_hash = data.archive_file.traffic_generator_zip.output_base64sha256
-
-  environment {
-    variables = {
-      TARGET_URL    = "https://${var.domain_name}"
-      REQUEST_COUNT = "300"
-    }
-  }
-}
-
 # 4. S3 트리거 권한 (S3 -> Analyzer)
 resource "aws_lambda_permission" "allow_s3" {
   statement_id  = "AllowExecutionFromS3Bucket"
