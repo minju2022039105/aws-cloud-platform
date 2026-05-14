@@ -39,7 +39,7 @@ resource "aws_lambda_function" "traffic_generator" {
 
   environment {
     variables = {
-      ALB_ENDPOINT   = "http://minju-alb-733893612.us-east-1.elb.amazonaws.com"
+      TARGET_URL     = "https://${var.domain_name}"
       REQUEST_COUNT  = "300"
     }
   }
