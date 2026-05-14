@@ -8,10 +8,10 @@ from collections import Counter
 from datetime import datetime
 
 # ─── 경로 설정 ──────────────────────────────────────────────────────
-MODEL_PATH  = '/home/march/aws-devsecops-platform/ai-security/models/isolation_forest_model.pkl'
-SCALER_PATH = '/home/march/aws-devsecops-platform/ai-security/models/scaler.pkl'
+MODEL_PATH  = '/home/march/aws-devsecops-platform/ai/models/isolation_forest_model.pkl'
+SCALER_PATH = '/home/march/aws-devsecops-platform/ai/models/scaler.pkl'
 DATA_PATH   = '/home/march/aws-devsecops-platform/ai/data/URI별 이상 징후 분석 (Target Analysis).csv'
-RESULT_DIR  = '/home/march/aws-devsecops-platform/ai-security/results'
+RESULT_DIR  = '/home/march/aws-devsecops-platform/ai/results'
 
 
 # ─── Shannon Entropy 함수 (기존 호환 + 강화) ────────────────────────

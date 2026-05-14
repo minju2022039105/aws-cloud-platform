@@ -9,9 +9,9 @@ from collections import Counter
 from datetime import datetime
 
 # 1. 경로 설정
-MODEL_PATH = '/home/march/aws-devsecops-platform/ai-security/models/isolation_forest_model.pkl'
+MODEL_PATH = '/home/march/aws-devsecops-platform/ai/models/isolation_forest_model.pkl'
 DATA_PATH = '/home/march/aws-devsecops-platform/ai/data/URI별 이상 징후 분석 (Target Analysis).csv'
-SAVE_PATH = '/home/march/aws-devsecops-platform/ai-security/results/detection_result.png'
+SAVE_PATH = '/home/march/aws-devsecops-platform/ai/results/detection_result.png'
 
 # 2. 피처 추출 함수 (엔트로피 포함)
 def calculate_entropy(s):

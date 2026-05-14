@@ -60,9 +60,9 @@ def invoke_preventer(ip, risk, level):
 # ==============================
 # 0) 설정
 # ==============================
-CSV_PATH = os.path.join(_BASE, "../data/final_preprocessed_waf_data.csv")
-MODEL_PATH = os.path.join(_BASE, "../../ai-security/models/isolation_forest_model.pkl")
-SCALER_PATH = os.path.join(_BASE, "../../ai-security/models/scaler.pkl")
+CSV_PATH = os.path.join(_BASE, "../../ai/data/final_preprocessed_waf_data.csv")
+MODEL_PATH = os.path.join(_BASE, "../../ai/models/isolation_forest_model.pkl")
+SCALER_PATH = os.path.join(_BASE, "../../ai/models/scaler.pkl")
 FEATURES = ["country_code", "rule_code", "uri_len", "uri_entropy"]
 
 

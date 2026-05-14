@@ -10,7 +10,7 @@ import os
 S3_BUCKET = "minju-sec-core" 
 S3_KEY    = "models/iforest_model.json"
 # 모델 파일의 실제 절대 경로
-DEFAULT_PKL_PATH = "/home/march/aws-devsecops-platform/ai-security/models/isolation_forest_model.pkl"
+DEFAULT_PKL_PATH = "/home/march/aws-devsecops-platform/ai/models/isolation_forest_model.pkl"
 
 def export(pkl_path: str) -> dict:
     if not os.path.exists(pkl_path):
