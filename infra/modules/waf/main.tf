@@ -122,12 +122,12 @@ resource "aws_wafv2_web_acl" "main" {
     allow {} 
   }
 
-# [Priority 0] Geo-Blocking (KR 전용) - 한국 외 IP 차단
+# [Priority 0] Geo-Blocking (KR 전용) - 임시 COUNT 모드 (end-to-end 테스트용, 테스트 후 block으로 복귀)
   rule {
     name     = "GeoBlock-Non-KR"
-    priority = 0 
+    priority = 0
     action {
-      block {} 
+      count {}
     }
     statement {
       not_statement {
