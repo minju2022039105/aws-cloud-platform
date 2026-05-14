@@ -3,7 +3,7 @@ import time
 import random
 
 # 1. 설정
-TARGET_URL = "http://minju-alb-783307637.us-east-1.elb.amazonaws.com"
+TARGET_URL = "https://r1a7gf0yhh.execute-api.us-east-1.amazonaws.com/prod"
 NORMAL_PATHS = ["/", "/index.php", "/login", "/about", "/contact"]
 ATTACK_PATTERNS = [
     "/?id=1' OR 1=1--",                # SQLi 변형

@@ -28,8 +28,8 @@ from sklearn.preprocessing import StandardScaler
 # ─── 경로 설정 ──────────────────────────────────────────────────
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(BASE_DIR, "../../ai/data/final_preprocessed_waf_data.csv")
-MODEL_OUT = os.path.join(BASE_DIR, "../../ai-security/models/isolation_forest_model.pkl")
-SCALER_OUT = os.path.join(BASE_DIR, "../../ai-security/models/scaler.pkl")
+MODEL_OUT = os.path.join(BASE_DIR, "../../ai/models/isolation_forest_model.pkl")
+SCALER_OUT = os.path.join(BASE_DIR, "../../ai/models/scaler.pkl")
 
 # ─── 하이퍼파라미터 ──────────────────────────────────────────────
 # contamination=0.25 설정 근거:

@@ -8,7 +8,7 @@ from sklearn.ensemble import IsolationForest
 
 # 1. 경로 설정 (민주님 환경 절대 경로)
 DATA_PATH = '/home/march/aws-devsecops-platform/ai/data/URI별 이상 징후 분석 (Target Analysis).csv'
-MODEL_DIR = '/home/march/aws-devsecops-platform/ai-security/models'
+MODEL_DIR = '/home/march/aws-devsecops-platform/ai/models'
 MODEL_PATH = os.path.join(MODEL_DIR, 'isolation_forest_model.pkl')
 
 # 2. 피처 추출 함수 고도화 (엔트로피 로직 동기화)

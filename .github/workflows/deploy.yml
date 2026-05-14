@@ -50,7 +50,7 @@ jobs:
       - name: Bandit Python Scan
         run: |
           pip install bandit -q
-          bandit -r ./ai ./lambda -ll --exit-zero
+          bandit -r ./ai ./lambda ./monitoring -ll --exit-zero
 
 # ──────────────────────────────────────────────────────────────────────
 # Job 2: Terraform Plan/Apply

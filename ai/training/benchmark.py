@@ -41,7 +41,7 @@ from sklearn.preprocessing import StandardScaler
 # ─── 경로 ──────────────────────────────────────────────────────────
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH  = os.path.join(BASE_DIR, "../data/final_preprocessed_waf_data.csv")
-METRICS_OUT = os.path.join(BASE_DIR, "../../ai-security/results/performance_metrics.json")
+METRICS_OUT = os.path.join(BASE_DIR, "../../ai/results/performance_metrics.json")
 
 CONTAMINATION_VALUES = [0.05, 0.10, 0.15, 0.20, 0.25, 0.30]
 RANDOM_STATE = 42
