@@ -13,26 +13,59 @@ resource "aws_s3_bucket_public_access_block" "waf_logs_block" {
   restrict_public_buckets = true
 }
 
-# ISMS 2.10 — S3 HTTPS 전용 접근 강제
+# ISMS 2.10 — S3 HTTPS 전용 접근 강제 + WAF 로그 전송 허용
 resource "aws_s3_bucket_policy" "waf_logs_ssl" {
   bucket     = aws_s3_bucket.waf_logs.id
   depends_on = [aws_s3_bucket_public_access_block.waf_logs_block]
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Sid       = "DenyNonSSL"
-      Effect    = "Deny"
-      Principal = "*"
-      Action    = "s3:*"
-      Resource  = [
-        aws_s3_bucket.waf_logs.arn,
-        "${aws_s3_bucket.waf_logs.arn}/*"
-      ]
-      Condition = {
-        Bool = { "aws:SecureTransport" = "false" }
+    Statement = [
+      {
+        Sid       = "DenyNonSSL"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource  = [
+          aws_s3_bucket.waf_logs.arn,
+          "${aws_s3_bucket.waf_logs.arn}/*"
+        ]
+        Condition = {
+          Bool = { "aws:SecureTransport" = "false" }
+        }
+      },
+      # WAF direct-to-S3 로그 전송: delivery.logs.amazonaws.com PutObject 허용
+      # DenyNonSSL과 충돌하지 않음 — delivery service는 항상 HTTPS 사용
+      {
+        Sid    = "AWSLogDeliveryWrite"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "${aws_s3_bucket.waf_logs.arn}/AWSLogs/${var.account_id}/*"
+        Condition = {
+          StringEquals = {
+            "s3:x-amz-acl"      = "bucket-owner-full-control"
+            "aws:SourceAccount" = var.account_id
+          }
+        }
+      },
+      {
+        Sid    = "AWSLogDeliveryAclCheck"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action   = "s3:GetBucketAcl"
+        Resource = aws_s3_bucket.waf_logs.arn
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = var.account_id
+          }
+        }
       }
-    }]
+    ]
   })
 }
 
