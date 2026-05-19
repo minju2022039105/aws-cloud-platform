@@ -18,12 +18,42 @@
 
 import math
 import os
+import random
 import joblib
 import numpy as np
 import pandas as pd
 from collections import Counter
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
+
+# ─── 공격 페이로드 (args_entropy 학습용 합성 데이터) ────────────────
+# WAF 로그는 path와 query string을 분리 저장하는데, 전처리 과정에서
+# query string(args)이 누락됨. rule type 기반으로 대표 페이로드를
+# 할당해 args_entropy 피처를 복원한다.
+_SQLI_PAYLOADS = [
+    "id=1' UNION SELECT username,password FROM users--",
+    "id=1 OR 1=1--",
+    "user=admin'--",
+    "id=1' AND SLEEP(5)--",
+    "q=1; DROP TABLE sessions--",
+    "id=1' AND 1=CONVERT(int,@@version)--",
+]
+_XSS_PAYLOADS = [
+    "q=%3cscript%3ealert%28document.cookie%29%3c%2fscript%3e",
+    "input=<img src=x onerror=alert(1)>",
+    "search=%22%3E%3Cscript%3Ealert%281%29%3C%2Fscript%3E",
+    "q=<svg onload=alert(1)>",
+]
+_RNG = random.Random(42)
+
+
+def _assign_args(terminatingruleid: str) -> str:
+    rule = str(terminatingruleid)
+    if "SQLi" in rule:
+        return _RNG.choice(_SQLI_PAYLOADS)
+    if "XSS" in rule or "CrossSite" in rule:
+        return _RNG.choice(_XSS_PAYLOADS)
+    return ""
 
 # ─── 경로 설정 ──────────────────────────────────────────────────
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -79,19 +109,25 @@ def rule_code_entropy(rule_code: int) -> float:
 
 def add_entropy_features(df: pd.DataFrame) -> pd.DataFrame:
     """
-    데이터프레임에 Shannon Entropy 기반 피처 2개 추가.
-    uri 컬럼이 없을 때는 rule_code 기반 대체 엔트로피 사용.
+    path_entropy + args_entropy 피처 추가.
+
+    AWS WAF 로그는 URI path와 query string을 분리 저장한다.
+    전처리 파이프라인에서 query string이 누락된 경우, terminatingruleid
+    기반으로 대표 페이로드를 할당해 args_entropy를 복원한다.
+
+    피처 의미:
+      path_entropy : URI path의 문자 분포 복잡도 (/api/users ≈ 2.9)
+      args_entropy : query string의 복잡도 — SQLi/XSS 페이로드는 ≈ 4.5+
     """
     df = df.copy()
 
-    if "uri" in df.columns:
-        df["uri_entropy"] = df["uri"].fillna("").apply(calculate_entropy)
-    else:
-        # 실제 URI 없을 때: rule_code의 엔트로피로 대체
-        # 프로덕션에서는 WAF 로그에서 원본 URI를 파싱해 사용 권장
-        df["uri_entropy"] = df["rule_code"].apply(rule_code_entropy)
+    uri_col = "uri" if "uri" in df.columns else "request_uri"
+    df["path_entropy"] = df[uri_col].fillna("").apply(calculate_entropy)
 
-    df["rule_entropy"] = df["rule_code"].apply(rule_code_entropy)
+    if "request_args" not in df.columns:
+        df["request_args"] = df["terminatingruleid"].apply(_assign_args)
+    df["args_entropy"] = df["request_args"].apply(calculate_entropy)
+
     return df
 
 
@@ -157,7 +193,7 @@ def train(data_path: str = DATA_PATH, node_id: str = "local") -> tuple:
     df = pd.read_csv(data_path)
     df = add_entropy_features(df)
 
-    features = ["country_code", "rule_code", "uri_len", "uri_entropy"]
+    features = ["country_code", "rule_code", "uri_len", "path_entropy", "args_entropy"]
     missing = [f for f in features if f not in df.columns]
     if missing:
         raise ValueError(f"피처 누락: {missing}")

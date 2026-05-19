@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-04 19:00",
+  "last_updated": "2026-05-20 00:22",
   "evaluation_strategy": "unsupervised_score_distribution",
   "strategy_change_reason": "합성 데이터의 '정상' 행이 country_code=99, rule_code=999 등 실제 트래픽과 이질적인 sentinel 값을 가져 pseudo-label 기반 Precision/Recall 평가 불가. Isolation Forest가 sentinel 행을 이상치로 올바르게 판단하나, 이는 데이터 품질 문제. 실제 WAF 로그 도입 시 supervised 평가로 전환 예정.",
   "data_quality_finding": {
@@ -19,10 +19,10 @@
   },
   "dataset": {
     "source": "final_preprocessed_waf_data.csv",
-    "total_records": 450,
+    "total_records": 1800,
     "groups": {
+      "지역차단": 1650,
       "SQLi": 100,
-      "지역차단": 300,
       "정상(sentinel)": 50
     }
   },
@@ -30,8 +30,8 @@
     "country_code",
     "rule_code",
     "uri_len",
-    "uri_entropy",
-    "rule_entropy"
+    "path_entropy",
+    "args_entropy"
   ],
   "baseline_thesis": {
     "note": "졸업작품(2024) — Accuracy만 측정, 불균형 데이터 과대 추정",
@@ -42,247 +42,247 @@
   "experiments": [
     {
       "contamination": 0.05,
-      "n_flagged": 0,
-      "flagged_pct": 0.0,
-      "score_iqr": 0.0703,
-      "score_mean": 0.1156,
+      "n_flagged": 79,
+      "flagged_pct": 4.4,
+      "score_iqr": 0.0491,
+      "score_mean": 0.1073,
       "group_stats": {
         "SQLi": {
           "count": 100,
-          "mean": 0.0839,
-          "std": 0.0,
-          "q25": 0.0839,
-          "median": 0.0839,
-          "q75": 0.0839,
-          "flagged_as_anomaly": 0,
-          "flagged_pct": 0.0
+          "mean": -0.0009,
+          "std": 0.0036,
+          "q25": -0.006,
+          "median": 0.0003,
+          "q75": 0.002,
+          "flagged_as_anomaly": 29,
+          "flagged_pct": 29.0
         },
         "정상(sentinel)": {
           "count": 50,
-          "mean": 0.0,
+          "mean": -0.0814,
           "std": 0.0,
-          "q25": 0.0,
-          "median": 0.0,
-          "q75": 0.0,
-          "flagged_as_anomaly": 0,
-          "flagged_pct": 0.0
+          "q25": -0.0814,
+          "median": -0.0814,
+          "q75": -0.0814,
+          "flagged_as_anomaly": 50,
+          "flagged_pct": 100.0
         },
         "지역차단": {
-          "count": 300,
-          "mean": 0.1454,
-          "std": 0.0125,
-          "q25": 0.1277,
-          "median": 0.1543,
-          "q75": 0.1543,
+          "count": 1650,
+          "mean": 0.1195,
+          "std": 0.0359,
+          "q25": 0.1034,
+          "median": 0.1166,
+          "q75": 0.1492,
           "flagged_as_anomaly": 0,
           "flagged_pct": 0.0
         }
       },
-      "stability_warning": false
+      "stability_warning": true
     },
     {
       "contamination": 0.1,
-      "n_flagged": 0,
-      "flagged_pct": 0.0,
-      "score_iqr": 0.0703,
-      "score_mean": 0.1156,
+      "n_flagged": 150,
+      "flagged_pct": 8.3,
+      "score_iqr": 0.0491,
+      "score_mean": 0.0759,
       "group_stats": {
         "SQLi": {
           "count": 100,
-          "mean": 0.0839,
-          "std": 0.0,
-          "q25": 0.0839,
-          "median": 0.0839,
-          "q75": 0.0839,
-          "flagged_as_anomaly": 0,
-          "flagged_pct": 0.0
+          "mean": -0.0322,
+          "std": 0.0036,
+          "q25": -0.0373,
+          "median": -0.031,
+          "q75": -0.0293,
+          "flagged_as_anomaly": 100,
+          "flagged_pct": 100.0
         },
         "정상(sentinel)": {
           "count": 50,
-          "mean": 0.0,
+          "mean": -0.1127,
           "std": 0.0,
-          "q25": 0.0,
-          "median": 0.0,
-          "q75": 0.0,
-          "flagged_as_anomaly": 0,
-          "flagged_pct": 0.0
+          "q25": -0.1127,
+          "median": -0.1127,
+          "q75": -0.1127,
+          "flagged_as_anomaly": 50,
+          "flagged_pct": 100.0
         },
         "지역차단": {
-          "count": 300,
-          "mean": 0.1454,
-          "std": 0.0125,
-          "q25": 0.1277,
-          "median": 0.1543,
-          "q75": 0.1543,
+          "count": 1650,
+          "mean": 0.0882,
+          "std": 0.0359,
+          "q25": 0.0721,
+          "median": 0.0853,
+          "q75": 0.1179,
           "flagged_as_anomaly": 0,
           "flagged_pct": 0.0
         }
       },
-      "stability_warning": false
+      "stability_warning": true
     },
     {
       "contamination": 0.15,
-      "n_flagged": 50,
-      "flagged_pct": 11.1,
-      "score_iqr": 0.0703,
-      "score_mean": 0.0317,
+      "n_flagged": 245,
+      "flagged_pct": 13.6,
+      "score_iqr": 0.0491,
+      "score_mean": 0.0445,
       "group_stats": {
         "SQLi": {
           "count": 100,
-          "mean": 0.0,
-          "std": 0.0,
-          "q25": 0.0,
-          "median": 0.0,
-          "q75": 0.0,
-          "flagged_as_anomaly": 0,
-          "flagged_pct": 0.0
+          "mean": -0.0636,
+          "std": 0.0036,
+          "q25": -0.0688,
+          "median": -0.0625,
+          "q75": -0.0608,
+          "flagged_as_anomaly": 100,
+          "flagged_pct": 100.0
         },
         "정상(sentinel)": {
           "count": 50,
-          "mean": -0.0839,
+          "mean": -0.1441,
           "std": 0.0,
-          "q25": -0.0839,
-          "median": -0.0839,
-          "q75": -0.0839,
+          "q25": -0.1441,
+          "median": -0.1441,
+          "q75": -0.1441,
           "flagged_as_anomaly": 50,
           "flagged_pct": 100.0
         },
         "지역차단": {
-          "count": 300,
-          "mean": 0.0615,
-          "std": 0.0125,
-          "q25": 0.0438,
-          "median": 0.0703,
-          "q75": 0.0703,
-          "flagged_as_anomaly": 0,
-          "flagged_pct": 0.0
+          "count": 1650,
+          "mean": 0.0568,
+          "std": 0.0359,
+          "q25": 0.0406,
+          "median": 0.0538,
+          "q75": 0.0865,
+          "flagged_as_anomaly": 95,
+          "flagged_pct": 5.8
         }
       },
-      "stability_warning": false
+      "stability_warning": true
     },
     {
       "contamination": 0.2,
-      "n_flagged": 50,
-      "flagged_pct": 11.1,
-      "score_iqr": 0.0703,
-      "score_mean": 0.0317,
+      "n_flagged": 327,
+      "flagged_pct": 18.2,
+      "score_iqr": 0.0491,
+      "score_mean": 0.0306,
       "group_stats": {
         "SQLi": {
           "count": 100,
-          "mean": 0.0,
-          "std": 0.0,
-          "q25": 0.0,
-          "median": 0.0,
-          "q75": 0.0,
-          "flagged_as_anomaly": 0,
-          "flagged_pct": 0.0
+          "mean": -0.0776,
+          "std": 0.0036,
+          "q25": -0.0827,
+          "median": -0.0764,
+          "q75": -0.0747,
+          "flagged_as_anomaly": 100,
+          "flagged_pct": 100.0
         },
         "정상(sentinel)": {
           "count": 50,
-          "mean": -0.0839,
+          "mean": -0.1581,
           "std": 0.0,
-          "q25": -0.0839,
-          "median": -0.0839,
-          "q75": -0.0839,
+          "q25": -0.1581,
+          "median": -0.1581,
+          "q75": -0.1581,
           "flagged_as_anomaly": 50,
           "flagged_pct": 100.0
         },
         "지역차단": {
-          "count": 300,
-          "mean": 0.0615,
-          "std": 0.0125,
-          "q25": 0.0438,
-          "median": 0.0703,
-          "q75": 0.0703,
-          "flagged_as_anomaly": 0,
-          "flagged_pct": 0.0
+          "count": 1650,
+          "mean": 0.0428,
+          "std": 0.0359,
+          "q25": 0.0267,
+          "median": 0.0399,
+          "q75": 0.0725,
+          "flagged_as_anomaly": 177,
+          "flagged_pct": 10.7
         }
       },
-      "stability_warning": false
+      "stability_warning": true
     },
     {
       "contamination": 0.25,
-      "n_flagged": 50,
-      "flagged_pct": 11.1,
-      "score_iqr": 0.0703,
-      "score_mean": 0.0317,
+      "n_flagged": 427,
+      "flagged_pct": 23.7,
+      "score_iqr": 0.0491,
+      "score_mean": 0.0102,
       "group_stats": {
         "SQLi": {
           "count": 100,
-          "mean": 0.0,
-          "std": 0.0,
-          "q25": 0.0,
-          "median": 0.0,
-          "q75": 0.0,
-          "flagged_as_anomaly": 0,
-          "flagged_pct": 0.0
+          "mean": -0.098,
+          "std": 0.0036,
+          "q25": -0.1031,
+          "median": -0.0968,
+          "q75": -0.0951,
+          "flagged_as_anomaly": 100,
+          "flagged_pct": 100.0
         },
         "정상(sentinel)": {
           "count": 50,
-          "mean": -0.0839,
+          "mean": -0.1785,
           "std": 0.0,
-          "q25": -0.0839,
-          "median": -0.0839,
-          "q75": -0.0839,
+          "q25": -0.1785,
+          "median": -0.1785,
+          "q75": -0.1785,
           "flagged_as_anomaly": 50,
           "flagged_pct": 100.0
         },
         "지역차단": {
-          "count": 300,
-          "mean": 0.0615,
-          "std": 0.0125,
-          "q25": 0.0438,
-          "median": 0.0703,
-          "q75": 0.0703,
-          "flagged_as_anomaly": 0,
-          "flagged_pct": 0.0
+          "count": 1650,
+          "mean": 0.0224,
+          "std": 0.0359,
+          "q25": 0.0063,
+          "median": 0.0195,
+          "q75": 0.0521,
+          "flagged_as_anomaly": 277,
+          "flagged_pct": 16.8
         }
       },
-      "stability_warning": false
+      "stability_warning": true
     },
     {
       "contamination": 0.3,
-      "n_flagged": 50,
-      "flagged_pct": 11.1,
-      "score_iqr": 0.0703,
-      "score_mean": 0.0317,
+      "n_flagged": 464,
+      "flagged_pct": 25.8,
+      "score_iqr": 0.0491,
+      "score_mean": 0.0039,
       "group_stats": {
         "SQLi": {
           "count": 100,
-          "mean": 0.0,
-          "std": 0.0,
-          "q25": 0.0,
-          "median": 0.0,
-          "q75": 0.0,
-          "flagged_as_anomaly": 0,
-          "flagged_pct": 0.0
+          "mean": -0.1043,
+          "std": 0.0036,
+          "q25": -0.1094,
+          "median": -0.1031,
+          "q75": -0.1014,
+          "flagged_as_anomaly": 100,
+          "flagged_pct": 100.0
         },
         "정상(sentinel)": {
           "count": 50,
-          "mean": -0.0839,
+          "mean": -0.1848,
           "std": 0.0,
-          "q25": -0.0839,
-          "median": -0.0839,
-          "q75": -0.0839,
+          "q25": -0.1848,
+          "median": -0.1848,
+          "q75": -0.1848,
           "flagged_as_anomaly": 50,
           "flagged_pct": 100.0
         },
         "지역차단": {
-          "count": 300,
-          "mean": 0.0615,
-          "std": 0.0125,
-          "q25": 0.0438,
-          "median": 0.0703,
-          "q75": 0.0703,
-          "flagged_as_anomaly": 0,
-          "flagged_pct": 0.0
+          "count": 1650,
+          "mean": 0.0161,
+          "std": 0.0359,
+          "q25": 0.0,
+          "median": 0.0132,
+          "q75": 0.0458,
+          "flagged_as_anomaly": 314,
+          "flagged_pct": 19.0
         }
       },
-      "stability_warning": false
+      "stability_warning": true
     }
   ],
   "recommended": {
-    "contamination": 0.05,
+    "contamination": 0.25,
     "reason": "IQR 안정성 기준 + 실제 공격 비율(14.8%)에 근접. contamination 값이 지나치게 높으면 FPR 증가, 낮으면 Recall 저하 → 운영 환경의 트레이드오프 고려."
   },
   "tradeoff_principle": "contamination ↑ → 더 많은 이상치 탐지 (Recall↑) but FPR 증가 (오탐 처리 운영 비용↑). contamination ↓ → 정밀도 향상 (FPR↓) but 공격 미탐 위험↑. 보안 환경에서는 업무 중요도에 따라 조정 필요."

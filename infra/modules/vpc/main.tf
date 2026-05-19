@@ -202,6 +202,12 @@ resource "aws_iam_policy" "lambda_blocker_policy" {
         Effect = "Allow"
         Action = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
         Resource = "*"
+      },
+      {
+        Sid    = "PutAIOpsMetrics"
+        Effect = "Allow"
+        Action = ["cloudwatch:PutMetricData"]
+        Resource = "*"
       }
     ]
   })

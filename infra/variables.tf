@@ -32,10 +32,6 @@ variable "kms_key_arn" {
   type        = string
 }
 
-variable "waf_ipset_arn" {
-  description = "Lambda가 업데이트하는 WAF IP Set ARN"
-  type        = string
-}
 
 variable "domain_name" {
   description = "ALB HTTPS에 사용할 도메인 (Route53에 등록된 도메인)"

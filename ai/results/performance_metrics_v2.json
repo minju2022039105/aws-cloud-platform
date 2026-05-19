@@ -1,0 +1,30 @@
+{
+    "run_timestamp": "2026-05-20 01:14",
+    "model_type": "IsolationForest (train_model.py / contamination=0.25)",
+    "dataset": "final_preprocessed_waf_data.csv",
+    "features": [
+        "country_code",
+        "rule_code",
+        "uri_len",
+        "path_entropy",
+        "args_entropy"
+    ],
+    "eval_scope": "SQLi only (GeoBlock excluded from P/R/F1)",
+    "n_total": 1800,
+    "n_sqli": 100,
+    "n_geoblock": 300,
+    "n_normal": 1350,
+    "n_eval": 1500,
+    "tp": 100,
+    "fp": 227,
+    "fn": 0,
+    "tn": 1173,
+    "precision": 0.3058,
+    "recall": 1.0,
+    "f1_score": 0.4684,
+    "fpr": 0.1621,
+    "avg_latency_ms": 0.016,
+    "geoblock_ai_flagged": 100,
+    "before_waf_sqli_detections": 100,
+    "after_ai_additional_detections": 227
+}

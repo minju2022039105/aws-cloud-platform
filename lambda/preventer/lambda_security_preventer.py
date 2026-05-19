@@ -1,3 +1,4 @@
+import os
 import json
 import boto3
 from datetime import datetime
@@ -7,8 +8,8 @@ waf_client = boto3.client('wafv2', region_name='us-east-1')
 cloudwatch = boto3.client('cloudwatch', region_name='us-east-1')
 
 # 설정값 (민주님의 환경에 맞게 수정)
-IP_SET_NAME = "devsecops-ai-block-list"
-IP_SET_ID = "266e5501-31b8-46ca-b3eb-3a58c28c51f7" # 👈 아까 확인한 ID!
+IP_SET_NAME = os.environ.get("IP_SET_NAME", "devsecops-ai-block-list")
+IP_SET_ID   = os.environ.get("IP_SET_ID", "d061410e-3732-4d5e-8234-c9cc9e163b43") # 👈 아까 확인한 ID!
 CW_NAMESPACE = "AIOps/Security"
 
 def handler(event, context):
