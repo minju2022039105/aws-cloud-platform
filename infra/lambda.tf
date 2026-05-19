@@ -43,6 +43,13 @@ resource "aws_lambda_function" "preventer" {
   timeout       = 30
 
   source_code_hash = data.archive_file.preventer_zip.output_base64sha256
+
+  environment {
+    variables = {
+      IP_SET_ID   = module.security.ai_block_list_id
+      IP_SET_NAME = module.security.ai_block_list_name
+    }
+  }
 }
 
 # 4. S3 트리거 권한 (S3 -> Analyzer)

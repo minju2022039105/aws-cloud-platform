@@ -10,7 +10,7 @@ module "network" {
   account_id     = var.account_id
   s3_bucket_name = var.s3_bucket_name
   kms_key_arn    = var.kms_key_arn
-  waf_ipset_arn  = var.waf_ipset_arn
+  waf_ipset_arn  = module.security.ai_block_list_arn
 }
 
 # 보안 설정 (WAF)

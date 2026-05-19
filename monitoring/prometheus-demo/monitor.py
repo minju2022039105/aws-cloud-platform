@@ -87,7 +87,7 @@ LEAD_SECONDS = 60            # "1분 선행" 연출
 ATTACK_RULES = [9001, 9002, 9100, 9200]
 ATTACK_COUNTRIES = [643, 156, 364, 410]   # 예시: RU/CN/IR/KR 같은 코드라고 '가정' (실제 의미는 발표에서 일반화 표현 권장)
 
-TICK_SEC = 1
+TICK_SEC = 0.5
 
 # ==============================
 # 1) Prometheus Exporter
