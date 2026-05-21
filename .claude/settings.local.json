@@ -43,7 +43,13 @@
       "Bash(aws s3 cp *)",
       "Bash(dir \"\\\\\\\\\\\\\\\\wsl.localhost\\\\\\\\Ubuntu\\\\\\\\home\\\\\\\\march\\\\\\\\aws-devsecops-platform\\\\\\\\docs\\\\\\\\\")",
       "Bash(dir *)",
-      "PowerShell(wsl cat \"/home/march/aws-devsecops-platform/docs/blog/04_AI-이상탐지-엔진-설계.md\")"
+      "PowerShell(wsl cat \"/home/march/aws-devsecops-platform/docs/blog/04_AI-이상탐지-엔진-설계.md\")",
+      "Bash(aws sts *)",
+      "Bash(aws configure list *)",
+      "Bash(aws iam *)",
+      "PowerShell(Import-Csv *)",
+      "Bash(aws configure *)",
+      "Bash(aws athena list-table-metadata *)"
     ]
   }
 }
