@@ -63,7 +63,7 @@ def invoke_preventer(ip, risk, level):
 CSV_PATH = os.path.join(_BASE, "../../ai/data/final_preprocessed_waf_data.csv")
 MODEL_PATH = os.path.join(_BASE, "../../ai/models/isolation_forest_model.pkl")
 SCALER_PATH = os.path.join(_BASE, "../../ai/models/scaler.pkl")
-FEATURES = ["country_code", "rule_code", "uri_len", "uri_entropy"]
+FEATURES = ["country_code", "rule_code", "uri_len", "path_entropy", "args_entropy"]
 
 
 def _rule_entropy(rule_code) -> float:
@@ -126,7 +126,8 @@ SCORE_HIST = Histogram(
 # 2) 데이터 로드 + 재학습 모델 로드
 # ==============================
 df = pd.read_csv(CSV_PATH)
-df["uri_entropy"] = df["rule_code"].apply(_rule_entropy)
+df["path_entropy"] = df["rule_code"].apply(_rule_entropy)
+df["args_entropy"] = df["rule_code"].apply(_rule_entropy)
 
 missing = [c for c in FEATURES if c not in df.columns]
 if missing:
@@ -205,19 +206,22 @@ while True:
     # ATTACK_ATTEMPT: 공격 패턴 매우 강하게(실제 공격 시도 재현)
     if mode == "PREDICT":
         sample.loc[:, "uri_len"] = sample["uri_len"].astype(int) + np.random.randint(200, 600)
-        sample.loc[:, "uri_entropy"] = np.random.uniform(3.5, 4.2)
+        sample.loc[:, "path_entropy"] = np.random.uniform(3.5, 4.2)
+        sample.loc[:, "args_entropy"] = np.random.uniform(3.5, 4.2)
 
     elif mode == "PREMITIGATE":
         sample.loc[:, "uri_len"] = sample["uri_len"].astype(int) + np.random.randint(800, 1800)
         sample.loc[:, "rule_code"] = np.random.choice(ATTACK_RULES)
         sample.loc[:, "country_code"] = np.random.choice(ATTACK_COUNTRIES)
-        sample.loc[:, "uri_entropy"] = np.random.uniform(4.2, 5.0)
+        sample.loc[:, "path_entropy"] = np.random.uniform(4.2, 5.0)
+        sample.loc[:, "args_entropy"] = np.random.uniform(4.2, 5.0)
 
     elif mode == "ATTACK_ATTEMPT":
         sample.loc[:, "uri_len"] = sample["uri_len"].astype(int) + np.random.randint(1500, 4000)
         sample.loc[:, "rule_code"] = np.random.choice(ATTACK_RULES)
         sample.loc[:, "country_code"] = np.random.choice(ATTACK_COUNTRIES)
-        sample.loc[:, "uri_entropy"] = np.random.uniform(4.5, 5.5)
+        sample.loc[:, "path_entropy"] = np.random.uniform(4.5, 5.5)
+        sample.loc[:, "args_entropy"] = np.random.uniform(4.5, 5.5)
         ATTACK_ATTEMPT.inc(np.random.randint(3, 8))
 
     # ---------- 실측(Observed) 점수 계산 ----------

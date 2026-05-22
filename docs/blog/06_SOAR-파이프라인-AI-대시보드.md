@@ -12,7 +12,7 @@
 
 `SecurityAnalyzer` Lambda가 Athena 테이블(`aiops_results`)을 참조하는데, 그 테이블이 없었습니다. Lambda는 실행될 때마다 에러를 내고 있었고, 파이프라인 전체가 조용히 끊겨 있었습니다.
 
-이 글은 그 구멍을 메우고, AI 탐지 결과를 실시간으로 볼 수 있는 대시보드까지 완성한 과정입니다.
+이 글은 그 구멍을 메우고, AI 평가 결과와 SOAR 차단 이벤트를 Grafana에서 확인할 수 있는 대시보드까지 완성한 과정입니다.
 
 ---
 
@@ -147,7 +147,7 @@ SecurityPreventer Lambda
 
 ---
 
-## AI 대시보드 설계 원칙 — 실제 데이터만 표시한다
+## AI 대시보드 설계 원칙 — 검증 가능한 데이터만 표시한다
 
 파이프라인이 완성된 다음 단계는 대시보드였습니다.
 
@@ -240,7 +240,7 @@ SELECT fp AS value FROM default.model_metrics
 ├───────────────────────────────────────────┤
 │       TP/FP/FN/TN 분포 (Pie chart)        │
 ├───────────────────────────────────────────┤
-│    AI 실시간 차단 이벤트 (CloudWatch TS)   │
+│    AI 기반 차단 이벤트 (CloudWatch TS)     │
 └───────────────────────────────────────────┘
 ```
 
@@ -252,7 +252,7 @@ SELECT fp AS value FROM default.model_metrics
 - AI 추가 탐지 후보 227건: WAF가 ALLOW한 트래픽 중 AI가 이상 패턴으로 분류한 것
 - Recall 100% / FN=0: SQLi 100건 전부 탐지, 미탐 없음
 - Precision 30.6%: 비지도 이상 탐지 특성상 FP가 발생하는 구조 — FP 227건은 실제 공격 여부를 사람이 검토해야 함
-- FPR 16.2%: 정상 트래픽 1,350건 중 잘못 차단된 비율
+- FPR 16.2%: 정상 트래픽 중 일부를 이상으로 잘못 분류한 비율
 
 여기서 "AI 추가 탐지 후보"를 "AI가 탐지한 추가 공격"이라고 부르지 않은 데 이유가 있습니다.
 
@@ -279,7 +279,7 @@ eval_model_v2.py 평가 결과 → S3 → Athena → Grafana (정적 KPI)
 
 그렇지만 실제 WAF 로그 기반으로 수치를 검증했고, 파이프라인을 실제로 end-to-end로 동작시켰으며, 한계를 숨기지 않았습니다.
 
-실무 환경이라면 `monitor.py` 대신 Kinesis Firehose로 실시간 스트리밍을 구성하고, AI 추론은 SageMaker 엔드포인트에서 처리할 것입니다. 그 방향은 향후 개선 과제로 남겨뒀습니다.
+향후에는 `monitor.py` 대신 실제 WAF 로그를 Lambda 추론 입력으로 연결하고, 더 큰 운영 환경에서는 Kinesis Firehose나 SageMaker 엔드포인트로 확장할 수 있습니다.
 
 ---
 
