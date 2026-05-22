@@ -83,10 +83,7 @@ resource "aws_kms_key" "waf_s3_key" {
         Sid    = "Enable Admin Privilege"
         Effect = "Allow"
         Principal = {
-          AWS = [
-            "arn:aws:iam::${var.account_id}:root",
-            "arn:aws:iam::${var.account_id}:user/system/devsecops-admin-user"
-          ]
+          AWS = "arn:aws:iam::${var.account_id}:root"
         }
         Action   = "kms:*"
         Resource = "*"
