@@ -18,6 +18,12 @@
 
 ---
 
+## Architecture
+
+![전체 아키텍처](docs/architecture/devsecops-페이지-3.png)
+
+---
+
 ## 1. Project Overview
 
 AWS WAF의 정적 룰이 탐지하지 못하는 변칙적 공격 패턴을 AI 엔진으로 보완하고, 위협 탐지부터 차단까지를 서버리스로 자동화한 DevSecOps 플랫폼입니다.
