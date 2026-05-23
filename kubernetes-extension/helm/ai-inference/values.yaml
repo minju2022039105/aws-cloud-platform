@@ -1,0 +1,29 @@
+replicaCount: 1
+
+image:
+  repository: ai-inference
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+config:
+  modelPath: "/models/isolation_forest_model.pkl"
+  scalerPath: "/models/scaler.pkl"

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ai-inference-config
+data:
+  MODEL_PATH: "/models/isolation_forest_model.pkl"
+  SCALER_PATH: "/models/scaler.pkl"
