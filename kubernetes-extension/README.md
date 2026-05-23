@@ -66,8 +66,8 @@ kubernetes-extension/
 # 클러스터 생성
 kind create cluster --name devsecops-local
 
-# 이미지 빌드
-docker build -t ai-inference:latest ./ai-inference-server
+# 이미지 빌드 (레포 루트에서 실행)
+docker build -t ai-inference:latest -f kubernetes-extension/ai-inference-server/Dockerfile .
 
 # kind에 이미지 로드
 kind load docker-image ai-inference:latest --name devsecops-local
