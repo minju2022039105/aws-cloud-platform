@@ -55,7 +55,8 @@
       "Bash(bash *)",
       "Bash(xargs ls -la)",
       "Bash(python3 *)",
-      "Bash(xargs grep -n \"flat\\\\|s3\\\\|upload\\\\|put_object\")"
+      "Bash(xargs grep -n \"flat\\\\|s3\\\\|upload\\\\|put_object\")",
+      "Bash(git -C \"//wsl.localhost/Ubuntu/home/march/aws-devsecops-platform\" diff --stat HEAD)"
     ]
   }
 }

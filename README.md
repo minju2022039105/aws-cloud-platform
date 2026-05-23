@@ -9,9 +9,9 @@
 
 | 편 | 제목 | 핵심 내용 |
 | :---: | :--- | :--- |
-| 1편 | WAF만으로는 부족했다 | 프로젝트 배경, AI 보완의 필요성 |
-| 2편 | 완벽한 WAF를 만들고 배포에서 무너지지 않는 법 | GitHub Actions OIDC, Terraform 배포 자동화 |
-| 3편 | WAF 룰 5단계를 Terraform으로 코드화하다 | tfsec 수동 보안 점검, WAF Priority 설계 |
+| [1편](https://velog.io/@yapp/WAF%EB%A7%8C%EC%9C%BC%EB%A1%9C%EB%8A%94-%EB%B6%80%EC%A1%B1%ED%96%88%EB%8B%A4-AI-%EC%9D%B4%EC%83%81-%ED%83%90%EC%A7%80%EB%A5%BC-%EB%B6%99%EC%9D%B8-%EC%9D%B4%EC%9C%A0) | WAF만으로는 부족했다 | 프로젝트 배경, AI 보완의 필요성 |
+| [2편](https://velog.io/@yapp/%EB%B3%B4%EC%95%88%EC%9D%80-%EB%B0%B0%ED%8F%AC-%EC%A0%84%EC%97%90-%EC%8B%9C%EC%9E%91%EB%90%9C%EB%8B%A4-AWS-DevSecOps-CICD-%EC%84%A4%EA%B3%84%EA%B8%B0) | 완벽한 WAF를 만들고 배포에서 무너지지 않는 법 | GitHub Actions OIDC, Terraform 배포 자동화 |
+| [3편](https://velog.io/@yapp/WAF-%EB%A3%B0-5%EB%8B%A8%EA%B3%84%EB%A5%BC-Terraform%EC%9C%BC%EB%A1%9C-%EC%BD%94%EB%93%9C%ED%99%94%ED%95%98%EB%8B%A4-tfsec%EC%9D%B4-%EC%9E%A1%EC%95%84%EB%82%B8-%EA%B2%83%EB%93%A4) | WAF 룰 5단계를 Terraform으로 코드화하다 | tfsec 수동 보안 점검, WAF Priority 설계 |
 | [4편](https://velog.io/@yapp/WAF가-놓친-것을-AI가-잡는-법) | WAF가 놓친 것을 AI가 잡는 법 | Isolation Forest, 피처 엔지니어링, 모델 평가 |
 | [5편](https://velog.io/@yapp/트러블슈팅-KMS-비용-폭증-사고) | 하루 $30이 사라졌다 — KMS 비용 폭증 사고 | CloudTrail 역추적, 비용 최적화 |
 | 6편 | 탐지에서 차단까지 자동화하다 | SOAR 파이프라인 복구, AI 대시보드 구축 |
@@ -20,7 +20,7 @@
 
 ## Architecture
 
-![전체 아키텍처](docs/architecture/devsecops-페이지-3.png)
+![전체 아키텍처](docs/architecture/최종아키텍처.png)
 
 ---
 
