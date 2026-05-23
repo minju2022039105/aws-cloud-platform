@@ -56,7 +56,30 @@
       "Bash(xargs ls -la)",
       "Bash(python3 *)",
       "Bash(xargs grep -n \"flat\\\\|s3\\\\|upload\\\\|put_object\")",
-      "Bash(git -C \"//wsl.localhost/Ubuntu/home/march/aws-devsecops-platform\" diff --stat HEAD)"
+      "Bash(git -C \"//wsl.localhost/Ubuntu/home/march/aws-devsecops-platform\" diff --stat HEAD)",
+      "Bash(git ls-files *)",
+      "PowerShell(wsl -e git -C /home/march/aws-devsecops-platform ls-files lambda/analyzer.zip lambda/preventer.zip lambda/edge_security.zip lambda/traffic_generator.zip 2>&1)",
+      "PowerShell(wsl -e bash -c \"ls /home/march/aws-devsecops-platform/out.json && ls -la /home/march/aws-devsecops-platform/data/ 2>/dev/null || echo 'data/ not found'\")",
+      "PowerShell(wsl -e git -C /home/march/aws-devsecops-platform ls-files out.json data/ 2>&1)",
+      "PowerShell(wsl -e git -C /home/march/aws-devsecops-platform rm out.json 2>&1)",
+      "PowerShell(wsl -e git -C /home/march/aws-devsecops-platform rm -r data/ 2>&1)",
+      "PowerShell(wsl -e bash -c \"mkdir -p /home/march/aws-devsecops-platform/docs/archive && echo 'created'\")",
+      "PowerShell(wsl -e git -C /home/march/aws-devsecops-platform mv docs/portfolio/original_improvements.md docs/archive/original_improvements.md 2>&1)",
+      "PowerShell(wsl -e git -C /home/march/aws-devsecops-platform mv docs/portfolio/portfolio_improvements.md docs/archive/portfolio_improvements.md 2>&1)",
+      "PowerShell(wsl -e git -C /home/march/aws-devsecops-platform mv \"docs/portfolio/20260512_progress_analysis.md\" \"docs/archive/20260512_progress_analysis.md\" 2>&1)",
+      "PowerShell(wsl -e git -C /home/march/aws-devsecops-platform mv docs/writing/why_i_write_velog.md docs/archive/why_i_write_velog.md 2>&1)",
+      "PowerShell(wsl -e git -C /home/march/aws-devsecops-platform status --short 2>&1)",
+      "PowerShell(wsl -e git -C /home/march/aws-devsecops-platform rm \"docs/portfolio/kubernetes-mini-project-plan.md\" 2>&1)",
+      "Bash(git *)",
+      "PowerShell(wsl -e git -C /home/march/aws-devsecops-platform commit -m \"chore: 1차 레포 정리 \\(불필요 파일 삭제 + docs/archive 분리\\)\" -m \"- out.json, data/ \\(Prometheus WAL 잔재물\\) 삭제`n- docs/portfolio/ 작업 노트 3개 -> docs/archive/ 이동`n- docs/writing/why_i_write_velog.md -> docs/archive/ 이동`n- docs/portfolio/kubernetes-mini-project-plan.md git tracking 제거 \\(한글명으로 교체됨\\)`n`nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\" 2>&1)",
+      "PowerShell(wsl -e git -C /home/march/aws-devsecops-platform commit -m \"feat: kubernetes-extension/ 디렉토리 구조 생성\" -m \"- ai-inference-server: FastAPI /predict 엔드포인트 뼈대 \\(schemas, model_loader, main, Dockerfile\\)`n- k8s/: deployment, service, configmap, hpa YAML 매니페스트`n- helm/ai-inference/: Chart.yaml, values.yaml, templates 3종`n- README.md: 로컬\\(kind\\) 실행 가이드 + EKS Phase2 안내`n`nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\" 2>&1)",
+      "PowerShell(wsl -e ls /home/march/aws-devsecops-platform/ai/models/)",
+      "PowerShell(wsl -e bash -c \"kind version 2>&1; echo '---'; kubectl version --client 2>&1; echo '---'; docker info --format '{{.ServerVersion}}' 2>&1\")",
+      "PowerShell(Get-Command *)",
+      "PowerShell(wsl -e ls /home/march/aws-devsecops-platform/docs/이력서_김민주.md 2>&1)",
+      "PowerShell(wsl -e git -C /home/march/aws-devsecops-platform commit -m \"chore: docs/blog → docs/작업일지 이름 변경\" -m \"Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\" 2>&1)",
+      "PowerShell(wsl -e ls /home/march/aws-devsecops-platform/docs/ 2>&1)",
+      "PowerShell(wsl -e ls /home/march/aws-devsecops-platform/docs/Velog/ 2>&1)"
     ]
   }
 }
