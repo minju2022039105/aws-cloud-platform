@@ -9,3 +9,4 @@ ai/models/*.joblib
 Security-AIOps-IsolationForest/venv/
 __pycache__/
 *.pyc
+docs/이력서_김민주.md
