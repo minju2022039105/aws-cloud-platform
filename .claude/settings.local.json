@@ -82,7 +82,13 @@
       "PowerShell(wsl -e ls /home/march/aws-devsecops-platform/docs/Velog/ 2>&1)",
       "PowerShell(wsl -e git -C /home/march/aws-devsecops-platform commit -m \"chore: docs 폴더 구조 정리 \\(devlog→작업일지, 작업일지→Velog\\)\" -m \"- docs/devlog → docs/작업일지 \\(날짜별 작업 기록\\)`n- docs/작업일지\\(구 blog\\) → docs/Velog \\(Velog 원고\\)`n- docs/portfolio 한글 파일 2개 git 추가`n`nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\" 2>&1)",
       "PowerShell(wsl -d Ubuntu -e git -C /home/march/aws-devsecops-platform push origin main 2>&1)",
-      "PowerShell(wsl -e git -C /home/march/aws-devsecops-platform log --oneline -5 2>&1)"
+      "PowerShell(wsl -e git -C /home/march/aws-devsecops-platform log --oneline -5 2>&1)",
+      "Bash(kind version *)",
+      "Bash(kubectl version *)",
+      "Bash(docker version *)",
+      "Bash(curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh)",
+      "Bash(sudo sh -s -- -b /usr/local/bin)",
+      "Bash(helm version *)"
     ]
   }
 }
