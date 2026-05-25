@@ -13,15 +13,15 @@
 
 > "Kubernetes 경험이 있나요?"
 
-많은 클라우드/DevOps 포지션에서 Kubernetes 경험을 요구하거나 우대합니다. 서버리스로 설계한 이유를 설명할 수 있더라도, K8s를 전혀 다뤄보지 않았다면 아쉬운 부분이 될 수 있습니다.
+많은 클라우드/DevOps 포지션에서 Kubernetes 경험을 요구하거나 우대합니다. 부트캠프 팀 프로젝트에서 EKS 기반 인프라를 구성한 경험이 있었지만, 개인 포트폴리오에는 Kubernetes 배포 흐름이 명시적으로 드러나지 않았습니다.
 
 기존 프로젝트에 EKS를 억지로 붙이면 서버리스 보안 자동화라는 메시지가 흐려집니다. 대신 같은 레포 안에 `kubernetes-extension/` 디렉토리를 별도로 추가했습니다.
 
 면접 답변 구조는 이렇습니다.
 
 > "기존 프로젝트는 서버리스 구조로 설계했고,
-> Kubernetes 배포 경험은 별도 미니 확장 프로젝트에서
-> 컨테이너 배포와 보안 스캔 흐름으로 보완했습니다."
+> 부트캠프 팀 프로젝트에서 EKS를 다뤄본 경험을 바탕으로
+> 개인 포트폴리오에도 컨테이너 배포와 보안 스캔 흐름을 별도로 구현했습니다."
 
 ---
 
@@ -338,9 +338,9 @@ aws ecr delete-repository --repository-name ai-inference --region us-east-1 --fo
 
 비용 발생 시간은 약 30분으로 제한했고, 실습 직후 클러스터와 ECR 레포지토리를 삭제했습니다.
 
-<!-- 📸 스크린샷 #3 — EKS kubectl get pods Running 상태
-  내용: EKS 클러스터에서 kubectl get pods 결과 (1/1 Running)
-  효과: 로컬이 아닌 실제 AWS EKS에서 동작함을 증명
+<!-- 📸 스크린샷 #3 — EKS kubectl get nodes + kubectl get pods
+  내용: EKS 노드 Ready 상태 + Pod 1/1 Running 화면
+  효과: 실제 AWS EKS 클러스터에서 노드와 Pod 모두 정상 동작함을 증명
 -->
 
 <!-- 📸 스크린샷 #4 — EKS /predict 호출 결과
@@ -354,6 +354,6 @@ aws ecr delete-repository --repository-name ai-inference --region us-east-1 --fo
 
 서버리스와 Kubernetes는 상호 배타적인 선택이 아닙니다. 이 프로젝트에서 서버리스가 적합한 이유를 설명할 수 있게 됐고, 동시에 Kubernetes 배포 흐름도 직접 다뤄봤습니다.
 
-오늘 배포 과정에서 인상적이었던 건 Trivy였습니다. IaC 스캔에서 이미 써본 도구인데, 이미지 스캔으로 확장하는 것이 자연스러웠습니다. 스캔을 돌리자마자 starlette CVE가 두 개 나왔고, 버전을 올리고 재스캔하는 흐름이 보안 게이트를 파이프라인에 넣는 실제 감각을 줬습니다.
+오늘 배포 과정에서 인상적이었던 건 Trivy였습니다. IaC 스캔에서 이미 써본 도구인데, 이미지 스캔으로 확장하는 것이 자연스러웠습니다. 스캔을 돌리자마자 starlette CVE가 두 개 나왔고, 버전을 올리고 재스캔하는 흐름이 컨테이너 이미지 스캔을 보안 게이트로 활용하는 실제 감각을 줬습니다.
 
 다음 편은 이 시리즈의 마무리로, 전체 아키텍처와 회고를 정리할 예정입니다.
