@@ -497,6 +497,10 @@ aws-devsecops-platform/
 ├── monitoring/               # Observability (역할 기준 분리)
 │   ├── prometheus-demo/      # monitor.py — 로컬 데모용
 │   └── cloudwatch/           # Athena DDL, Grafana 대시보드
+├── kubernetes-extension/     # Kubernetes 확장 (Phase 1: kind / Phase 2: EKS)
+│   ├── ai-inference-server/  # FastAPI 추론 서버 + Dockerfile
+│   ├── k8s/                  # Deployment, Service, ConfigMap, HPA
+│   └── helm/                 # Helm 차트
 ├── scripts/                  # 트래픽 시뮬레이션
 ├── docs/                     # 블로그, 작업일지
 └── tfsec/                    # Terraform 보안 스캔 결과
@@ -517,7 +521,39 @@ aws-devsecops-platform/
 
 ---
 
-## 13. Limitations / Future Work
+## 13. Kubernetes Extension
+
+> 서버리스 보안 자동화 구조를 유지하면서, 동일한 AI 추론 엔진을 컨테이너로 배포하는 흐름을 별도 디렉토리로 구현했습니다.
+
+### 구현 범위
+
+| 단계 | 내용 |
+| :--- | :--- |
+| **Phase 1 (로컬)** | FastAPI AI 추론 서버 컨테이너화 → kind 클러스터 배포 → `/predict` 호출 검증 |
+| **Phase 2 (EKS)** | ECR 이미지 push → EKS 클러스터 생성 → 실배포 후 엔드포인트 검증 |
+
+### 주요 구성
+
+- **FastAPI 추론 서버**: `/health`, `/predict` 엔드포인트 — WAF 로그 피처 5개 입력 → anomaly(0/1), score 반환
+- **Kubernetes 매니페스트**: Deployment / Service / ConfigMap / HPA
+- **Helm 차트**: `helm install` 단일 명령 배포, `helm rollback` 롤백
+- **Rolling Update / Rollback**: `kubectl set image` → `kubectl rollout undo` → `kubectl rollout history` 검증
+- **Trivy 이미지 스캔**: CRITICAL 0건, Python 패키지 CVE 2건 조치 완료
+
+```
+kubernetes-extension/
+├── ai-inference-server/   # FastAPI 추론 서버
+│   ├── app/               # main.py, model_loader.py, schemas.py
+│   └── Dockerfile
+├── k8s/                   # Deployment / Service / ConfigMap / HPA
+└── helm/ai-inference/     # Helm 차트
+```
+
+> 메인 프로젝트의 서버리스 구조(Lambda)와 컨테이너 배포(Kubernetes) 두 가지 방식을 모두 경험한 구조입니다.
+
+---
+
+## 14. Limitations / Future Work
 
 | 항목 | 현재 구현 범위 | 향후 개선 방향 |
 | :--- | :--- | :--- |
