@@ -15,6 +15,7 @@
 | [4편](https://velog.io/@yapp/WAF%EA%B0%80-%EB%86%93%EC%B9%9C-%EA%B2%83%EC%9D%84-AI%EA%B0%80-%EC%9E%A1%EB%8A%94-%EB%B2%95-Isolation-Forest-Shannon-Entropy-%EA%B7%B8%EB%A6%AC%EA%B3%A0-%EC%A0%95%EC%A7%81%ED%95%9C-%ED%95%9C%EA%B3%84) | WAF가 놓친 것을 AI가 잡는 법 — Isolation Forest, Shannon Entropy, 그리고 한계 | Isolation Forest, 피처 엔지니어링, 모델 평가 |
 | [5편](https://velog.io/@yapp/%ED%83%90%EC%A7%80%EC%97%90%EC%84%9C-%EC%B0%A8%EB%8B%A8%EA%B9%8C%EC%A7%80-%EC%9E%90%EB%8F%99%ED%99%94%ED%95%98%EB%8B%A4-SOAR-%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8%EA%B3%BC-AI-%EB%8C%80%EC%8B%9C%EB%B3%B4%EB%93%9C-%EA%B5%AC%EC%B6%95%EA%B8%B0) | 탐지에서 차단까지 자동화하다 — SOAR 파이프라인과 AI 대시보드 구축기 | SOAR 파이프라인, AI 대시보드 구축 |
 | [6편](https://velog.io/@yapp/5.-614%EB%A7%8C-%EA%B1%B4%EC%9D%98-KMS-%ED%98%B8%EC%B6%9C-%EB%AC%B4%ED%95%9C%EB%A3%A8%ED%94%84%EA%B0%80-30-%EC%B2%AD%EA%B5%AC%EC%84%9C%EB%A5%BC-%EB%A7%8C%EB%93%A0-%EB%82%A0) | 614만 건의 KMS 호출 - 무한루프가 $30 청구서를 만든 날 | CloudTrail 역추적, 비용 최적화 |
+| [7편](https://velog.io/@yapp/07.-1.-%EC%84%9C%EB%B2%84%EB%A6%AC%EC%8A%A4-%ED%8F%AC%ED%8A%B8%ED%8F%B4%EB%A6%AC%EC%98%A4%EC%97%90-Kubernetes-%EB%8D%94%ED%95%98%EA%B8%B0-kind%EB%B6%80%ED%84%B0-EKS%EA%B9%8C%EC%A7%80) | Kubernetes AI 추론 서버 컨테이너 배포 | FastAPI 컨테이너화, kind/EKS 배포, Helm, Trivy 이미지 스캔 |
 
 ---
 
