@@ -88,7 +88,8 @@
       "Bash(docker version *)",
       "Bash(curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh)",
       "Bash(sudo sh -s -- -b /usr/local/bin)",
-      "Bash(helm version *)"
+      "Bash(helm version *)",
+      "WebFetch(domain:career.megazone.com)"
     ]
   }
 }
