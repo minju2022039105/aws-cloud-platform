@@ -584,4 +584,4 @@ kubernetes-extension/
 
 ---
 
-## DevSecOps Pipeline Status: Completed (2026.05.28)
+## DevSecOps Pipeline Status: Active
