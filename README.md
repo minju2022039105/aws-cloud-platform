@@ -358,6 +358,8 @@ Config Rules 11개로 ISMS 통제항목을 자동 점검합니다.
 
 NON_COMPLIANT 감지 → EventBridge → 기존 `devsecops-security-alerts` SNS 토픽 알림
 
+![ISMS Config Rules 준수 현황](docs/architecture/스크린샷/isms_config_rules_2.png)
+
 ---
 
 ## 9. IAM & Network Security
