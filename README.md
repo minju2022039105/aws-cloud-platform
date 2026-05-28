@@ -1,11 +1,5 @@
 # AWS DevSecOps CI/CD Platform
 
-![CI/CD](https://github.com/minju2022039105/aws-devsecops-platform/actions/workflows/deploy.yml/badge.svg)
-![Terraform](https://img.shields.io/badge/Terraform-1.7-7B42BC?logo=terraform)
-![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python)
-![AWS](https://img.shields.io/badge/AWS-WAF%20%7C%20Lambda%20%7C%20EKS-FF9900?logo=amazonaws)
-![Kubernetes](https://img.shields.io/badge/Kubernetes-EKS-326CE5?logo=kubernetes)
-![License](https://img.shields.io/badge/License-MIT-green)
 
 > **Terraform IaC + GitHub Actions OIDC + Security Gates (Trivy + Bandit) + Serverless 보안 자동화**  
 > CI/CD 파이프라인이 인프라를 배포하고, 배포된 인프라가 실제로 보안 자동화를 수행하는 플랫폼
