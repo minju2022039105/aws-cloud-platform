@@ -260,4 +260,5 @@ NON_COMPLIANT 감지 → EventBridge → SNS 알림 자동화.
 
 ---
 
-*DevSecOps Pipeline Status: 진행중*
+**DevSecOps 인프라 파이프라인**: 완료 (2026.05.28)  
+**AI 탐지 고도화**: 진행 예정 (WAF 로그 직접 연동 / contamination 재튜닝)
