@@ -17,7 +17,7 @@
 
 ## Project 1. AWS 3-Layer Security AIOps Platform
 
-> 6인 팀 프로젝트 | 역할: 클라우드 보안 아키텍처 설계 및 SOAR 파이프라인 전담 구현 (ML 모델·EKS 구성은 타 팀원 담당) | 클라우드웨이브 7기 (AWS 파트너사 주관 실무 부트캠프) | 2026.02 (3주)  
+> 6인 팀 프로젝트 | 역할: 6인 팀 프로젝트 | 담당: CloudFront·WAF 기반 보안 아키텍처 설계, GuardDuty·Lambda SOAR 구현, 공격 차단 검증 | 클라우드웨이브 7기 (AWS 파트너사 주관 실무 부트캠프) | 2026.02 (3주)  
 > GitHub: https://github.com/minju2022039105/Security-AIOps-IsolationForest
 
 | 제약 | 설계 결정 |
