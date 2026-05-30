@@ -2,85 +2,36 @@
 
 **GitHub**: https://github.com/minju2022039105/aws-devsecops-platform
 
-> Terraform IaC + GitHub Actions OIDC + Security Gates (Trivy + Bandit) + Serverless 보안 자동화  
-> CI/CD 파이프라인이 인프라를 배포하고, 배포된 인프라가 실제로 보안 자동화를 수행하는 플랫폼
+> AWS WAF 로그를 기반으로 위협 탐지, 분석, 자동 차단, 보안 검증까지 연결한 클라우드 보안 자동화 플랫폼
 
 ---
 
-## 1. Project Overview
+## 핵심 성과
 
-AWS WAF의 정적 룰이 탐지하지 못하는 변칙적 공격 패턴을 AI 엔진으로 보완하고, 위협 탐지부터 차단까지를 서버리스로 자동화한 DevSecOps 플랫폼.
-
-| 역할 | 구성 |
-| :--- | :--- |
-| **CI/CD** | GitHub Actions → Trivy + Bandit → Terraform → Lambda 배포 |
-| **Prevention** | AWS WAF v2 (GeoBlock + Managed Rules + AI 기반 IP Set 자동 업데이트) |
-| **Detection** | Isolation Forest 이상 탐지 + Athena WAF 로그 분석 |
-| **Response** | Lambda SOAR (WAF IP Set 자동 차단 + SNS 알림) |
-| **Observability** | Grafana Cloud + CloudWatch + Athena 운영 관제 |
+- GitHub Actions OIDC로 장기 AWS Access Key 없는 배포 구조 구현
+- tfsec 기준 Critical 1건 → 0, High 10건 → 0 제거
+- S3 → Lambda → WAF IP Set 자동 차단 파이프라인 end-to-end 검증
+- Isolation Forest 기반 SQLi 탐지 Recall 100%, FN 0건 달성
+- CloudTrail 역추적으로 KMS 호출 폭증 원인 특정 후 일일 $30 비용 정상화
 
 ---
 
-## 2. Architecture
+## Architecture
 
 ![전체 아키텍처](../architecture/최종아키텍처.png)
 
 ---
 
-## 3. DevSecOps CI/CD Pipeline
+## 1. DevSecOps CI/CD — 보안을 배포 전에 강제화
 
-```
-[Push to main]
-      │
-      ▼
-┌─────────────────────┐
-│   Job 1: Security   │  Trivy IaC scan (HIGH/CRITICAL 차단)
-│       Gates         │  Bandit Python 코드 분석
-└─────────┬───────────┘
-          │ 통과 시
-          ▼
-┌─────────────────────┐
-│  Job 2: Terraform   │  terraform init → plan → apply
-│    Plan / Apply     │  PR에 Plan 결과 자동 코멘트
-└─────────┬───────────┘
-          │ main push 시
-          ▼
-┌─────────────────────┐
-│  Job 3: Lambda      │  SecurityAnalyzer / SecurityPreventer
-│    Deploy           │  NormalTrafficGenerator 배포
-└─────────────────────┘
-```
+**문제**: 인프라 코드와 Lambda 코드에 보안 검증 없이 AWS에 직접 배포되는 구조. 장기 Access Key로 GitHub Actions 인증 — 키 유출 시 계정 전체 노출.
 
-- 코드가 AWS에 닿기 전에 보안 검증 완료 (Trivy + Bandit)
-- PR 단계에서 Terraform Plan 결과를 자동 코멘트로 확인
-- main 브랜치 push 시에만 실제 배포 실행 (OIDC 조건 제한)
-
-![CI/CD 파이프라인](../architecture/스크린샷/cd_pipeline.png)
-
----
-
-## 4. Security Gates
-
-| 도구 | 검사 대상 | 기준 |
-| :--- | :--- | :--- |
-| **Trivy IaC** | Terraform 코드 정적 분석 | HIGH / CRITICAL 차단 |
-| **Bandit** | Python Lambda 코드 분석 | 보안 취약점 정적 분석 |
-| **tfsec** (수동) | Terraform 코드 수동 감사 | Critical 1 → 0, High 10 → 0 조치 |
-
-주요 조치: Cognito 패스워드 재사용 방지 3회 → 24회, S3 SSL 전용 접근 버킷 정책 추가
-
-| Before | After |
-|:---:|:---:|
-| ![tfsec Before](../architecture/스크린샷/tfsec_before.png) | ![tfsec After](../architecture/스크린샷/tfsec_after.png) |
-
----
-
-## 5. OIDC Authentication
-
-장기 자격증명(Access Key) 없이 GitHub Actions → AWS 배포 구현.
+**해결**:
+- OIDC 기반 임시 자격증명 채택. `StringLike` 조건은 모든 브랜치에서 역할 Assume이 가능해 `StringEquals`로 교체 — main 브랜치 push에서만 허용.
+- Trivy(Terraform IaC)와 Bandit(Python Lambda)을 Security Gate로 직렬 배치. HIGH/CRITICAL 감지 시 Terraform apply 차단.
+- tfsec은 CI 워크플로우 안정성 문제로 로컬 수동 감사로 운영. Critical·High 이슈는 배포 전 전량 조치.
 
 ```hcl
-# main 브랜치 push만 역할 Assume 허용
 Condition = {
   StringEquals = {
     "token.actions.githubusercontent.com:sub" =
@@ -89,129 +40,124 @@ Condition = {
 }
 ```
 
-GitHub Secrets 유출 시에도 이 Condition이 없는 외부 환경에서는 AWS 접근 불가.
+**결과**:
+- 장기 Access Key 완전 제거. GitHub Secrets 유출 시에도 외부 환경에서 AWS 접근 불가.
+- tfsec Critical 1 → 0, High 10 → 0
+- 모든 인프라 변경이 보안 검증 통과 후에만 배포
+
+![CI/CD 파이프라인](../architecture/스크린샷/cd_pipeline.png)
+
+| Before | After |
+|:---:|:---:|
+| ![tfsec Before](../architecture/스크린샷/tfsec_before.png) | ![tfsec After](../architecture/스크린샷/tfsec_after.png) |
 
 ---
 
-## 6. WAF 우선순위 설계
+## 2. WAF Rule Architecture — 차단 순서가 곧 비용 설계
+
+**문제**: WAF 룰 순서가 잘못되면 불필요한 검사 비용이 발생. 정적 룰만으로는 변칙 공격 패턴 대응 불가.
+
+**해결**: Priority 0에 GeoBlock-Non-KR 배치 — 한국 외 트래픽을 입구에서 차단해 이후 Managed Rules 검사 비용 절감. Priority 1은 AI가 실시간으로 갱신하는 IP Set으로 구성해 탐지와 차단을 연결.
 
 | Priority | 규칙 | 근거 |
 | :---: | :--- | :--- |
-| 0 | GeoBlock-Non-KR | 한국 외 입구 차단 → 이후 모든 룰 검사 비용 절감 |
-| 1 | AI-RealTime-Block | AI가 식별한 위협 IP 즉각 차단 |
-| 2–4 | AWS Managed Rules | SQLi, XSS 등 알려진 패턴 방어 |
+| 0 | GeoBlock-Non-KR | 입구 차단으로 이후 룰 검사 비용 절감 |
+| 1 | AI-RealTime-Block | AI 식별 위협 IP 즉각 차단 |
+| 2–4 | AWS Managed Rules | SQLi, XSS 알려진 패턴 방어 |
 | 5 | IP Reputation List | 평판 불량 IP 차단 |
+
+**결과**: CloudFront `geo_restriction`(CF 경로)과 WAF GeoBlock Priority 0(API Gateway 직접 접근) 이중화 — 두 레이어가 서로의 우회 경로를 차단.
 
 ---
 
-## 7. Serverless SOAR Pipeline
+## 3. Lambda SOAR — 탐지에서 차단까지 자동화
+
+**문제**: WAF 이상 탐지 결과가 나와도 운영자가 수동으로 IP를 WAF에 등록하는 구조 — 대응 지연 발생.
+
+**해결**: S3 ObjectCreated 트리거로 SecurityAnalyzer → SecurityPreventer 파이프라인 구성. Athena로 anomaly=1 IP를 추출한 뒤 WAF IP Set을 자동 업데이트. SecurityPreventer 역할은 WAF IP Set 업데이트만 허용 — WebACL 생성·삭제 권한 없음.
 
 ```
-monitor.py (AI 추론 결과 생성)
-      │  S3 업로드: results/*.json
-      ▼
-S3 ObjectCreated 트리거
-      ▼
-Lambda: SecurityAnalyzer
-      │  Athena aiops_results 쿼리 → anomaly=1 IP 추출
-      ▼
-Lambda: SecurityPreventer
-      ├── WAF IP Set (devsecops-ai-block-list) 자동 업데이트
-      └── CloudWatch Namespace: AIOps/Security 메트릭 기록
+AI 탐지 결과 → S3 results/*.json
+      ↓ ObjectCreated 트리거
+SecurityAnalyzer: Athena 쿼리 → anomaly=1 IP 추출
+      ↓
+SecurityPreventer: WAF IP Set 자동 등록 + CloudWatch 메트릭 기록
 ```
 
-> S3 → Lambda → WAF IP Set 자동 차단까지 end-to-end 파이프라인 검증 완료.  
-> monitor.py는 현재 CSV 기반 시뮬레이션 입력 생성기 — 실제 WAF 로그 직접 연동은 향후 개선 방향.
+**결과**: S3 → Lambda → WAF IP Set 자동 차단 파이프라인 end-to-end 검증 완료. 위협 IP 탐지 후 운영자 개입 없이 자동 차단.
 
 ![CloudWatch AI 탐지 메트릭](../architecture/스크린샷/cloudwatch_ai_metric.png)
 
 ---
 
-## 8. AI 이상 탐지 (Isolation Forest)
+## 4. Isolation Forest — WAF 정적 룰의 사각지대 보완
 
-AWS WAF 정적 룰의 사각지대를 비지도 학습으로 보완.
+**문제**: WAF 정적 룰은 알려진 패턴만 차단 — 변칙적 SQLi나 저빈도 공격에 사각지대 존재. 레이블 없는 운영 환경에서 지도 학습 적용 불가.
 
-| 항목 | 값 |
+**해결**: 정상 트래픽 분포를 기준으로 이상치를 탐지하는 비지도 학습 Isolation Forest 선택. AWS WAF 로그의 `uri`와 `args`를 분리해 각각 Shannon Entropy 측정 — SQLi 페이로드가 query string에 집중되기 때문에 단일 `uri_entropy`로는 탐지력이 낮았음.
+
+| 피처 | 설명 |
 | :--- | :--- |
-| 알고리즘 | Isolation Forest (비지도 학습) |
-| 학습 데이터 | 공격 400건 + 정상 1,400건 = **1,800건** |
-| contamination | **0.25** |
-| n_estimators | **200** |
+| `args_entropy` | query string 엔트로피 — SQLi 탐지 핵심 피처 |
+| `path_entropy` | URI path 엔트로피 |
+| `uri_len` | 비정상적으로 긴 URI = SQLi 페이로드 징후 |
+| `country_code` | 한국 외 IP 이상치 분류 |
+| `rule_code` | 동일 룰 반복 = 스캔 공격 징후 |
 
-**피처 5개**: `country_code`, `rule_code`, `uri_len`, `path_entropy`, `args_entropy`
+**결과** (SQLi 100건 + 정상 1,350건 = 1,500건 기준):
 
-SQLi 페이로드는 query string에 집중 → `path`와 `args` 엔트로피를 분리 측정한 것이 핵심 설계 결정.
+| 지표 | 값 |
+| :--- | :---: |
+| Recall | **100%** |
+| FN | **0건** — 공격 미탐 0 |
+| FPR | 16.2% (FP 227건, 운영자 검토 대상) |
+| 처리 속도 | **0.016ms/건** — 실시간 처리 가능 |
 
-**모델 성능** (SQLi 100건 + 정상 1,350건 = 1,500건 기준):
-
-| 지표 | 값 | 설명 |
-| :--- | :---: | :--- |
-| Recall | **100%** | FN=0, 공격 미탐 0건 |
-| Precision | **30.6%** | 비지도 이상 탐지 특성상 FP 발생 |
-| FPR | **16.2%** | 정상 1,350건 중 227건을 이상 후보로 분류 |
-| 처리 속도 | **0.016ms/건** | 실시간 처리 가능한 수준 |
-
-> Recall 100% / FN=0: 공격 미탐 방지를 우선하는 보수적 탐지 전략.  
-> FP 227건은 운영자 검토 대상. WAF 정적 룰의 사각지대를 보완하는 2차 레이어.
+WAF 정적 룰 차단 100건 + AI 이상 후보 227건 = 총 보안 검토 대상 327건으로 확장.
 
 ![AI 보안 대시보드](../architecture/스크린샷/ai_dashboard.png)
 
 ---
 
-## 9. Monitoring & Observability
+## 5. Athena + Grafana — 속도와 분석 깊이의 분리
 
-**CloudWatch vs Athena 역할 분리**:
+**문제**: CloudWatch만으로는 원본 WAF 로그(IP, URI, 국가)에 접근 불가. OpenSearch는 클러스터 운영 비용이 과도. 로컬 Prometheus는 외부 Grafana Cloud에서 접근 불가.
 
-| 항목 | CloudWatch | Athena |
-| :--- | :--- | :--- |
-| 반영 속도 | ~1분 | ~5~15분 |
-| 분석 대상 | 집계 메트릭 (차단 건수, 룰별 통계) | 원본 로그 (IP, URI, 국가) |
-| 용도 | 긴급 대응·이상 징후 탐지 | 원인 분석·보안 인텔리전스 |
+**해결**: CloudWatch(집계 메트릭, ~1분)와 Athena(S3 원본 로그 SQL 분석, ~5~15분)를 역할에 따라 분리. Grafana Cloud에서 두 데이터소스를 단일 대시보드로 통합.
 
-Grafana Cloud에서 두 데이터소스를 단일 대시보드로 통합 — WAF 메트릭 + AI 모델 성능 + 원본 로그 분석을 한 화면에.
+- **CloudWatch**: 차단 건수 급증 즉각 감지 → 긴급 대응
+- **Athena**: 공격 IP Top10, 국가별 분포, URI 패턴 → 원인 분석
+
+**결과**: WAF 메트릭 + AI 모델 성능 + 원본 로그를 단일 화면에서 관제. ISMS Config Rules 11개 NON_COMPLIANT 감지 → EventBridge → SNS 자동 알림.
 
 ![WAF 보안 관제 대시보드](../architecture/스크린샷/waf_dashboard.png)
-
-**ISMS 컴플라이언스**: AWS Config Rules 11개로 ISMS 통제항목 자동 점검.  
-NON_COMPLIANT 감지 → EventBridge → SNS 알림 자동화.
 
 ![ISMS Config Rules](../architecture/스크린샷/isms_config_rules_2.png)
 
 ---
 
-## 10. IAM & Network Security
+## 6. KMS 비용 폭증 — $30/일 원인 추적 및 정상화
 
-- **GitHub Actions OIDC**: 장기 자격증명 없음. 인스턴스 타입 조건으로 비용 폭탄 방지. 태그 없는 리소스 삭제 불가.
-- **Lambda 역할 최소 권한**: WAF IP Set 업데이트만 허용 (WebACL 생성·삭제 권한 없음), S3는 `results/` 경로만.
-- **지역 차단 이중화**: CloudFront `geo_restriction`(CF 경로) + WAF GeoBlock Priority 0(API Gateway 직접 접근) — 두 레이어가 상호 우회 경로 차단.
-- **전송 중 암호화**: 사용자 → CloudFront → API Gateway 전 구간 HTTPS, S3 `DenyNonSSL` 정책.
-- **감사 로깅**: CloudTrail(멀티리전 + KMS + 무결성 검증) + VPC Flow Logs(CloudWatch 30일 + S3 장기 이중 저장).
+**문제**: 일일 비용이 갑자기 $30까지 급증. 원인 불명.
 
----
+**추적**: Cost Explorer로 KMS 비용 급증 확인 → CloudTrail로 API 호출 출처 역추적 → 리소스별 개별 KMS 키 생성으로 614만 건/일 호출 발생이 원인임을 특정.
 
-## 11. 주요 트러블슈팅
+**해결**: 공유 KMS 키 구조로 전환 + S3 Bucket Key 활성화로 S3 → KMS 직접 호출 횟수 대폭 감소.
 
-**KMS 비용 $30/일 급증**  
-리소스별 개별 KMS 키 생성 → Cost Explorer + CloudTrail 역추적으로 호출 출처 특정 → 공유 KMS 키 + S3 Bucket Key 전환으로 해결.
-
-**OIDC Condition 보안 취약**  
-`StringLike` Condition으로 모든 브랜치에서 Assume 가능 → `StringEquals`로 main 브랜치 배포만 허용.
-
-**WAF WebACL 고정비 누수 ($5.33/월)**  
-`cleanup.sh`가 WAF WebACL 의존성 순서를 무시하고 삭제 실패 → 의존성 순서 파악 후 삭제 로직 재구성.
+**결과**: KMS 호출 정상화, 일일 $30 비용 구조 개선.
 
 ---
 
-## 12. Kubernetes Extension
+## 7. Kubernetes Extension — 동일 AI 엔진의 컨테이너 배포 검증
 
-서버리스 구조와 별개로 동일 AI 추론 엔진을 컨테이너로 배포.
+서버리스(Lambda)로 운영 중인 AI 추론 엔진을 컨테이너 환경에서도 동일하게 배포할 수 있는지 검증.
 
 | 단계 | 내용 |
 | :--- | :--- |
-| **Phase 1 (로컬)** | FastAPI AI 추론 서버 컨테이너화 → kind 클러스터 배포 → `/predict` 호출 검증 |
-| **Phase 2 (EKS)** | ECR 이미지 push → EKS 클러스터 생성 → 실배포 후 엔드포인트 검증 |
+| Phase 1 (로컬) | FastAPI 추론 서버 컨테이너화 → kind 배포 → `/predict` 검증 |
+| Phase 2 (EKS) | ECR push → EKS 실배포 → 엔드포인트 검증 |
 
-Helm 차트, Rolling Update / Rollback (`kubectl rollout undo`), Trivy 이미지 스캔 (CRITICAL 0건) 포함.
+Helm 차트 단일 명령 배포, Rolling Update / Rollback 검증, Trivy 이미지 스캔 CRITICAL 0건.
 
 ![Trivy 이미지 스캔](../architecture/스크린샷/trivy_image_scan.png)
 
@@ -219,17 +165,16 @@ Helm 차트, Rolling Update / Rollback (`kubectl rollout undo`), Trivy 이미지
 
 ---
 
-## 13. Tech Stack
+## Tech Stack
 
 | 분류 | 기술 |
 | :--- | :--- |
-| **Compute** | AWS Lambda (Serverless) |
-| **Networking & Security** | AWS WAF v2, CloudFront, API Gateway |
-| **AI/ML** | Scikit-learn (Isolation Forest), Weighted Federated Averaging |
-| **Compliance** | AWS Config (Rules 11개), GuardDuty, IAM Password Policy |
-| **Infrastructure / CI/CD** | Terraform, GitHub Actions (OIDC), Trivy, Bandit, tfsec, KMS, CloudTrail |
-| **Monitoring** | Grafana Cloud, CloudWatch, Athena, SNS |
-| **Container** | Docker, Kubernetes (kind / EKS), Helm, ECR |
+| Infrastructure / CI/CD | Terraform, GitHub Actions (OIDC), Trivy, Bandit, tfsec |
+| Security | AWS WAF v2, CloudTrail, AWS Config, GuardDuty, KMS |
+| Serverless | AWS Lambda, API Gateway, CloudFront |
+| AI/ML | Scikit-learn (Isolation Forest) |
+| Monitoring | Grafana Cloud, CloudWatch, Athena, SNS |
+| Container | Docker, Kubernetes (kind / EKS), Helm, ECR |
 
 ---
 
