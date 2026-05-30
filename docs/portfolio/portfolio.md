@@ -19,7 +19,30 @@
 
 ---
 
-## 2. Key Achievements
+## 2. Design Decisions
+
+### 왜 이 프로젝트를 시작했는가
+
+AWS WAF는 알려진 공격 패턴에 강하지만 변칙적 공격에는 사각지대가 존재합니다.
+룰 기반 탐지의 한계를 보완하고, 탐지 이후 차단까지 자동화된 구조를 목표로 설계했습니다.
+
+### 핵심 설계 결정
+
+**Why OIDC?**
+GitHub Secrets 기반 Access Key를 제거하고 장기 자격증명 유출 위험을 차단하기 위해. `StringEquals` 조건으로 main 브랜치에서만 배포 가능한 구조를 구현했습니다.
+
+**Why Isolation Forest?**
+레이블이 없는 운영 환경에서 지도 학습 적용이 불가능했습니다. 비지도 학습으로 라벨링 비용을 제거하고, WAF 정적 룰의 2차 탐지 계층으로 설계했습니다.
+
+**Why Athena?**
+CloudWatch는 집계 메트릭 중심이라 원본 WAF 로그(IP, URI, 국가)에 접근이 불가능합니다. Athena로 S3의 원본 로그를 SQL로 직접 분석하는 구조를 선택했습니다.
+
+**Why Serverless?**
+운영 부담 없이 이벤트 기반 자동 대응 구조를 구현하기 위해. S3 트리거 → Lambda → WAF IP Set 업데이트로 탐지부터 차단까지 운영자 개입 없이 자동화했습니다.
+
+---
+
+## 3. Key Achievements
 
 - GitHub Actions OIDC 기반 장기 AWS Access Key 없는 배포 구조 구현
 - Trivy / Bandit / tfsec 기반 배포 전 보안 검증 체계 구축
@@ -30,13 +53,13 @@
 
 ---
 
-## 3. Architecture
+## 4. Architecture
 
 ![전체 아키텍처](../architecture/최종아키텍처.png)
 
 ---
 
-## 4. DevSecOps CI/CD Pipeline
+## 5. DevSecOps CI/CD Pipeline
 
 ```
 [Push to main]
@@ -68,7 +91,7 @@
 
 ---
 
-## 5. Security Gates
+## 6. Security Gates
 
 | 도구 | 검사 대상 | 기준 |
 | :--- | :--- | :--- |
@@ -84,7 +107,7 @@
 
 ---
 
-## 6. OIDC Authentication
+## 7. OIDC Authentication
 
 장기 자격증명(Access Key) 없이 GitHub Actions → AWS 배포 구현.
 
@@ -102,7 +125,7 @@ GitHub Secrets 유출 시에도 이 Condition이 없는 외부 환경에서는 A
 
 ---
 
-## 7. WAF Rule Architecture
+## 8. WAF Rule Architecture
 
 | Priority | 규칙 | 근거 |
 | :---: | :--- | :--- |
@@ -113,7 +136,7 @@ GitHub Secrets 유출 시에도 이 Condition이 없는 외부 환경에서는 A
 
 ---
 
-## 8. Serverless SOAR Pipeline
+## 9. Serverless SOAR Pipeline
 
 ```
 monitor.py (AI 추론 결과 생성)
@@ -137,7 +160,7 @@ Lambda: SecurityPreventer
 
 ---
 
-## 9. AI 이상 탐지 (Isolation Forest)
+## 10. AI 이상 탐지 (Isolation Forest)
 
 AWS WAF 정적 룰의 사각지대를 비지도 학습으로 보완.
 
@@ -168,7 +191,7 @@ SQLi 페이로드는 query string에 집중 → `path`와 `args` 엔트로피를
 
 ---
 
-## 10. Monitoring & Observability
+## 11. Monitoring & Observability
 
 **CloudWatch vs Athena 역할 분리**:
 
@@ -189,7 +212,7 @@ NON_COMPLIANT 감지 → EventBridge → SNS 알림 자동화.
 
 ---
 
-## 11. IAM & Network Security
+## 12. IAM & Network Security
 
 - **Lambda 최소 권한**: WAF IP Set 업데이트만 허용, S3는 `results/` 경로만 — WebACL 생성·삭제 권한 없음.
 - **지역 차단 이중화**: CloudFront `geo_restriction` + WAF GeoBlock Priority 0 — CF 경로와 API Gateway 직접 접근 양쪽 차단.
@@ -198,7 +221,7 @@ NON_COMPLIANT 감지 → EventBridge → SNS 알림 자동화.
 
 ---
 
-## 12. 주요 트러블슈팅
+## 13. 주요 트러블슈팅
 
 **KMS 비용 $30/일 급증**  
 리소스별 개별 KMS 키 생성 → Cost Explorer + CloudTrail 역추적으로 호출 출처 특정 → 공유 KMS 키 + S3 Bucket Key 전환으로 해결.
@@ -211,7 +234,7 @@ NON_COMPLIANT 감지 → EventBridge → SNS 알림 자동화.
 
 ---
 
-## 13. Extension: Kubernetes 기반 AI 추론 서버 배포
+## 14. Extension: Kubernetes 기반 AI 추론 서버 배포
 
 메인 프로젝트(Lambda 서버리스)의 AI 추론 엔진을 컨테이너 환경에서도 동일하게 운용할 수 있는지 검증한 확장 실험.
 
@@ -225,7 +248,7 @@ NON_COMPLIANT 감지 → EventBridge → SNS 알림 자동화.
 
 ---
 
-## 14. Tech Stack
+## 15. Tech Stack
 
 | 분류 | 기술 |
 | :--- | :--- |
