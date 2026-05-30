@@ -88,7 +88,10 @@
       "Bash(docker version *)",
       "Bash(curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh)",
       "Bash(sudo sh -s -- -b /usr/local/bin)",
-      "Bash(helm version *)"
+      "Bash(helm version *)",
+      "Bash(pandoc --version)",
+      "Bash(mv \"//wsl.localhost/Ubuntu/home/march/aws-devsecops-platform/docs/portfolio/쿠버네티스 미니.md\" \"//wsl.localhost/Ubuntu/home/march/aws-devsecops-platform/kubernetes-extension/file/\")",
+      "Bash(mv \"//wsl.localhost/Ubuntu/home/march/aws-devsecops-platform/docs/portfolio/k8s-개념정리.md\" \"//wsl.localhost/Ubuntu/home/march/aws-devsecops-platform/kubernetes-extension/file/\")"
     ]
   }
 }
