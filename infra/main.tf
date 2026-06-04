@@ -9,7 +9,7 @@ module "network" {
   my_ip          = var.my_ip
   account_id     = var.account_id
   s3_bucket_name = var.s3_bucket_name
-  kms_key_arn    = var.kms_key_arn
+  kms_key_arn    = module.security.waf_s3_key_arn
   waf_ipset_arn  = module.security.ai_block_list_arn
 }
 

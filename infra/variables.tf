@@ -27,11 +27,6 @@ variable "s3_bucket_name" {
   type        = string
 }
 
-variable "kms_key_arn" {
-  description = "EC2 AI 엔진이 WAF 로그 복호화에 사용하는 KMS 키 ARN"
-  type        = string
-}
-
 
 variable "domain_name" {
   description = "ALB HTTPS에 사용할 도메인 (Route53에 등록된 도메인)"

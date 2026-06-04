@@ -83,7 +83,10 @@ resource "aws_kms_key" "waf_s3_key" {
         Sid    = "Enable Admin Privilege"
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::${var.account_id}:root"
+          AWS = [
+            "arn:aws:iam::${var.account_id}:root",
+            "arn:aws:iam::${var.account_id}:user/system/devsecops-admin-user"
+          ]
         }
         Action   = "kms:*"
         Resource = "*"
@@ -371,7 +374,7 @@ resource "aws_wafv2_ip_set" "trusted_ips" {
   description        = "WAF Scope-down 검사 제외 신뢰 IP 대역"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
-  addresses          = var.trusted_ip_ranges
+ terraform apply -target=aws_iam_policy.lambda_blocker_policy addresses          = var.trusted_ip_ranges
 }
 
 # 5-b. AI 차단용 IP Set 생성

@@ -91,7 +91,12 @@
       "Bash(helm version *)",
       "Bash(pandoc --version)",
       "Bash(mv \"//wsl.localhost/Ubuntu/home/march/aws-devsecops-platform/docs/portfolio/쿠버네티스 미니.md\" \"//wsl.localhost/Ubuntu/home/march/aws-devsecops-platform/kubernetes-extension/file/\")",
-      "Bash(mv \"//wsl.localhost/Ubuntu/home/march/aws-devsecops-platform/docs/portfolio/k8s-개념정리.md\" \"//wsl.localhost/Ubuntu/home/march/aws-devsecops-platform/kubernetes-extension/file/\")"
+      "Bash(mv \"//wsl.localhost/Ubuntu/home/march/aws-devsecops-platform/docs/portfolio/k8s-개념정리.md\" \"//wsl.localhost/Ubuntu/home/march/aws-devsecops-platform/kubernetes-extension/file/\")",
+      "Bash(terraform state *)",
+      "Read(//c/Users/김민주/.local/bin/**)",
+      "Read(//usr/local/bin/**)",
+      "Bash(chmod +x scripts/start.sh scripts/stop.sh)",
+      "Bash(chmod +x //wsl.localhost/Ubuntu/home/march/aws-devsecops-platform/scripts/start.sh //wsl.localhost/Ubuntu/home/march/aws-devsecops-platform/scripts/stop.sh)"
     ]
   }
 }

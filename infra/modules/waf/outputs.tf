@@ -18,3 +18,8 @@ output "ai_block_list_arn" {
   value       = aws_wafv2_ip_set.ai_block_list.arn
 }
 
+output "waf_s3_key_arn" {
+  description = "WAF S3 버킷 암호화 KMS 키 ARN"
+  value       = aws_kms_key.waf_s3_key.arn
+}
+
