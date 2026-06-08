@@ -96,7 +96,8 @@
       "Read(//c/Users/김민주/.local/bin/**)",
       "Read(//usr/local/bin/**)",
       "Bash(chmod +x scripts/start.sh scripts/stop.sh)",
-      "Bash(chmod +x //wsl.localhost/Ubuntu/home/march/aws-devsecops-platform/scripts/start.sh //wsl.localhost/Ubuntu/home/march/aws-devsecops-platform/scripts/stop.sh)"
+      "Bash(chmod +x //wsl.localhost/Ubuntu/home/march/aws-devsecops-platform/scripts/start.sh //wsl.localhost/Ubuntu/home/march/aws-devsecops-platform/scripts/stop.sh)",
+      "Bash(pip3 install *)"
     ]
   }
 }

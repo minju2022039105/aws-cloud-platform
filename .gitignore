@@ -4,10 +4,20 @@
 .terraform/
 terraform.tfvars
 *.zip
+*.tar.gz
 ai/models/*.pkl
 ai/models/*.joblib
 Security-AIOps-IsolationForest/venv/
 __pycache__/
 *.pyc
+
+# 내부 문서 (로컬에만 유지)
 docs/이력서_김민주.md
-*.tar.gz.venv/
+docs/작업일지/
+docs/archive/
+docs/etc/
+docs/portfolio/
+
+# 생성된 결과 파일
+ai/results/*.png
+ai/results/gen_*.py
