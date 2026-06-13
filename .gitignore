@@ -21,3 +21,4 @@ docs/portfolio/
 # 생성된 결과 파일
 ai/results/*.png
 ai/results/gen_*.py
+infra/tfplan

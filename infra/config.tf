@@ -241,7 +241,7 @@ resource "aws_cloudwatch_event_rule" "config_compliance" {
   description = "Config 컴플라이언스 위반 시 알림"
 
   event_pattern = jsonencode({
-    source      = ["aws.config"]
+    source        = ["aws.config"]
     "detail-type" = ["Config Rules Compliance Change"]
     detail = {
       newEvaluationResult = {

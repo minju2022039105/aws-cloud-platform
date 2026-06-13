@@ -41,7 +41,7 @@ resource "aws_s3_bucket_policy" "cloudtrail_logs" {
         Effect    = "Deny"
         Principal = "*"
         Action    = "s3:*"
-        Resource  = [
+        Resource = [
           aws_s3_bucket.cloudtrail_logs.arn,
           "${aws_s3_bucket.cloudtrail_logs.arn}/*"
         ]
@@ -50,11 +50,11 @@ resource "aws_s3_bucket_policy" "cloudtrail_logs" {
         }
       },
       {
-        Sid    = "CloudTrailAclCheck"
-        Effect = "Allow"
+        Sid       = "CloudTrailAclCheck"
+        Effect    = "Allow"
         Principal = { Service = "cloudtrail.amazonaws.com" }
-        Action   = "s3:GetBucketAcl"
-        Resource = aws_s3_bucket.cloudtrail_logs.arn
+        Action    = "s3:GetBucketAcl"
+        Resource  = aws_s3_bucket.cloudtrail_logs.arn
         Condition = {
           StringEquals = {
             "AWS:SourceArn" = "arn:aws:cloudtrail:${var.aws_region}:${var.account_id}:trail/${var.project_name}-trail"
@@ -62,31 +62,31 @@ resource "aws_s3_bucket_policy" "cloudtrail_logs" {
         }
       },
       {
-        Sid    = "CloudTrailWrite"
-        Effect = "Allow"
+        Sid       = "CloudTrailWrite"
+        Effect    = "Allow"
         Principal = { Service = "cloudtrail.amazonaws.com" }
-        Action   = "s3:PutObject"
-        Resource = "${aws_s3_bucket.cloudtrail_logs.arn}/AWSLogs/${var.account_id}/*"
+        Action    = "s3:PutObject"
+        Resource  = "${aws_s3_bucket.cloudtrail_logs.arn}/AWSLogs/${var.account_id}/*"
         Condition = {
           StringEquals = {
-            "s3:x-amz-acl" = "bucket-owner-full-control"
+            "s3:x-amz-acl"  = "bucket-owner-full-control"
             "AWS:SourceArn" = "arn:aws:cloudtrail:${var.aws_region}:${var.account_id}:trail/${var.project_name}-trail"
           }
         }
       },
       {
-        Sid    = "VPCFlowLogAclCheck"
-        Effect = "Allow"
+        Sid       = "VPCFlowLogAclCheck"
+        Effect    = "Allow"
         Principal = { Service = "delivery.logs.amazonaws.com" }
-        Action   = "s3:GetBucketAcl"
-        Resource = aws_s3_bucket.cloudtrail_logs.arn
+        Action    = "s3:GetBucketAcl"
+        Resource  = aws_s3_bucket.cloudtrail_logs.arn
       },
       {
-        Sid    = "VPCFlowLogWrite"
-        Effect = "Allow"
+        Sid       = "VPCFlowLogWrite"
+        Effect    = "Allow"
         Principal = { Service = "delivery.logs.amazonaws.com" }
-        Action   = "s3:PutObject"
-        Resource = "${aws_s3_bucket.cloudtrail_logs.arn}/vpc-flow-logs/AWSLogs/${var.account_id}/*"
+        Action    = "s3:PutObject"
+        Resource  = "${aws_s3_bucket.cloudtrail_logs.arn}/vpc-flow-logs/AWSLogs/${var.account_id}/*"
         Condition = {
           StringEquals = { "s3:x-amz-acl" = "bucket-owner-full-control" }
         }

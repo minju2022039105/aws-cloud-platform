@@ -28,19 +28,19 @@ resource "aws_iam_role_policy_attachment" "traffic_generator_basic" {
 }
 
 resource "aws_lambda_function" "traffic_generator" {
-  filename         = data.archive_file.traffic_generator_zip.output_path
-  function_name    = "NormalTrafficGenerator"
-  role             = aws_iam_role.traffic_generator_role.arn
-  handler          = "handler.handler"
-  runtime          = "python3.11"
-  timeout          = 300  # 300건 × 최대 0.2초 = 최대 60초, 여유있게 5분
+  filename      = data.archive_file.traffic_generator_zip.output_path
+  function_name = "NormalTrafficGenerator"
+  role          = aws_iam_role.traffic_generator_role.arn
+  handler       = "handler.handler"
+  runtime       = "python3.11"
+  timeout       = 300 # 300건 × 최대 0.2초 = 최대 60초, 여유있게 5분
 
   source_code_hash = data.archive_file.traffic_generator_zip.output_base64sha256
 
   environment {
     variables = {
-      TARGET_URL     = "https://${var.domain_name}"
-      REQUEST_COUNT  = "300"
+      TARGET_URL    = "https://${var.domain_name}"
+      REQUEST_COUNT = "300"
     }
   }
 

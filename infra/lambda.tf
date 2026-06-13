@@ -9,8 +9,8 @@ data "archive_file" "lambda_zip" {
 resource "aws_lambda_function" "analyzer" {
   filename      = data.archive_file.lambda_zip.output_path
   function_name = "SecurityAnalyzer"
-  role    = module.network.lambda_blocker_role_arn
-  handler = "lambda_security_analyzer.handler"  
+  role          = module.network.lambda_blocker_role_arn
+  handler       = "lambda_security_analyzer.handler"
   runtime       = "python3.11"
   timeout       = 30
 

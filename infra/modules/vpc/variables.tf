@@ -26,3 +26,15 @@ variable "waf_ipset_arn" {
   type        = string
   description = "Lambda가 업데이트하는 WAF IP Set ARN"
 }
+
+variable "private_app_subnet_cidrs" {
+  type        = list(string)
+  description = "Private App 서브넷 CIDR 블록 (EKS 노드 그룹)"
+  default     = ["10.0.11.0/24", "10.0.12.0/24"]
+}
+
+variable "private_db_subnet_cidrs" {
+  type        = list(string)
+  description = "Private DB 서브넷 CIDR 블록 (RDS)"
+  default     = ["10.0.21.0/24", "10.0.22.0/24"]
+}

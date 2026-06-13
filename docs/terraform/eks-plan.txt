@@ -1,0 +1,3031 @@
+Acquiring state lock. This may take a few moments...
+[0m[1mdata.archive_file.traffic_generator_zip: Reading...[0m[0m
+[0m[1mdata.archive_file.edge_security_zip: Reading...[0m[0m
+[0m[1mdata.archive_file.preventer_zip: Reading...[0m[0m
+[0m[1mdata.archive_file.lambda_zip: Reading...[0m[0m
+[0m[1mdata.archive_file.edge_security_zip: Read complete after 0s [id=969e67c64e80811327df3b18fb586377102d27ba][0m
+[0m[1mdata.archive_file.lambda_zip: Read complete after 0s [id=674add7c738ad041cd04389c42faf917c4105796][0m
+[0m[1mdata.archive_file.preventer_zip: Read complete after 0s [id=52a0707fd15c7f26b16fe1388228f6adc01d2970][0m
+[0m[1mdata.archive_file.traffic_generator_zip: Read complete after 0s [id=77ddb21301ffb37ea5c975f5e8c12b6fe6f01816][0m
+[0m[1mdata.aws_route53_zone.main: Reading...[0m[0m
+[0m[1maws_iam_role.edge_lambda: Refreshing state... [id=devsecops-edge-lambda-role][0m
+[0m[1mmodule.network.data.aws_availability_zones.available: Reading...[0m[0m
+[0m[1mmodule.network.data.aws_availability_zones.available: Read complete after -15s [id=us-east-1][0m
+[0m[1maws_lambda_function.edge_security: Refreshing state... [id=devsecops-edge-security][0m
+[0m[1mdata.aws_route53_zone.main: Read complete after 2s [id=Z04690263FQ7USBL2HWDX][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [32m+[0m create[0m
+ [36m<=[0m read (data resources)[0m
+
+Terraform will perform the following actions:
+
+[1m  # data.aws_iam_policy_document.sns_topic_policy[0m will be read during apply
+  # (config refers to values not yet known)
+[0m [36m<=[0m[0m data "aws_iam_policy_document" "sns_topic_policy" {
+      [32m+[0m[0m id            = (known after apply)
+      [32m+[0m[0m json          = (known after apply)
+      [32m+[0m[0m minified_json = (known after apply)
+
+      [32m+[0m[0m statement {
+          [32m+[0m[0m actions   = [
+              [32m+[0m[0m "SNS:Publish",
+            ]
+          [32m+[0m[0m resources = [
+              [32m+[0m[0m (known after apply),
+            ]
+
+          [32m+[0m[0m principals {
+              [32m+[0m[0m identifiers = [
+                  [32m+[0m[0m "events.amazonaws.com",
+                ]
+              [32m+[0m[0m type        = "Service"
+            }
+        }
+    }
+
+[1m  # aws_accessanalyzer_analyzer.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_accessanalyzer_analyzer" "main" {
+      [32m+[0m[0m analyzer_name = "devsecops-platform-account-analyzer"
+      [32m+[0m[0m arn           = (known after apply)
+      [32m+[0m[0m id            = (known after apply)
+      [32m+[0m[0m region        = "us-east-1"
+      [32m+[0m[0m tags          = {
+          [32m+[0m[0m "Project" = "devsecops-platform"
+        }
+      [32m+[0m[0m tags_all      = {
+          [32m+[0m[0m "Project" = "devsecops-platform"
+        }
+      [32m+[0m[0m type          = "ACCOUNT"
+    }
+
+[1m  # aws_acm_certificate.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_acm_certificate" "main" {
+      [32m+[0m[0m arn                       = (known after apply)
+      [32m+[0m[0m domain_name               = "minju-devsec.store"
+      [32m+[0m[0m domain_validation_options = [
+          [32m+[0m[0m {
+              [32m+[0m[0m domain_name           = "minju-devsec.store"
+              [32m+[0m[0m resource_record_name  = (known after apply)
+              [32m+[0m[0m resource_record_type  = (known after apply)
+              [32m+[0m[0m resource_record_value = (known after apply)
+            },
+        ]
+      [32m+[0m[0m id                        = (known after apply)
+      [32m+[0m[0m key_algorithm             = (known after apply)
+      [32m+[0m[0m not_after                 = (known after apply)
+      [32m+[0m[0m not_before                = (known after apply)
+      [32m+[0m[0m pending_renewal           = (known after apply)
+      [32m+[0m[0m private_key_wo            = (write-only attribute)
+      [32m+[0m[0m region                    = "us-east-1"
+      [32m+[0m[0m renewal_eligibility       = (known after apply)
+      [32m+[0m[0m renewal_summary           = (known after apply)
+      [32m+[0m[0m status                    = (known after apply)
+      [32m+[0m[0m subject_alternative_names = [
+          [32m+[0m[0m "minju-devsec.store",
+        ]
+      [32m+[0m[0m tags                      = {
+          [32m+[0m[0m "Name" = "devsecops-cert"
+        }
+      [32m+[0m[0m tags_all                  = {
+          [32m+[0m[0m "Name" = "devsecops-cert"
+        }
+      [32m+[0m[0m type                      = (known after apply)
+      [32m+[0m[0m validation_emails         = (known after apply)
+      [32m+[0m[0m validation_method         = "DNS"
+
+      [32m+[0m[0m options (known after apply)
+    }
+
+[1m  # aws_acm_certificate_validation.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_acm_certificate_validation" "main" {
+      [32m+[0m[0m certificate_arn         = (known after apply)
+      [32m+[0m[0m id                      = (known after apply)
+      [32m+[0m[0m region                  = "us-east-1"
+      [32m+[0m[0m validation_record_fqdns = (known after apply)
+    }
+
+[1m  # aws_api_gateway_account.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_api_gateway_account" "main" {
+      [32m+[0m[0m api_key_version     = (known after apply)
+      [32m+[0m[0m cloudwatch_role_arn = (known after apply)
+      [32m+[0m[0m features            = (known after apply)
+      [32m+[0m[0m id                  = (known after apply)
+      [32m+[0m[0m region              = "us-east-1"
+      [32m+[0m[0m throttle_settings   = (known after apply)
+    }
+
+[1m  # aws_api_gateway_base_path_mapping.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_api_gateway_base_path_mapping" "main" {
+      [32m+[0m[0m api_id      = (known after apply)
+      [32m+[0m[0m domain_name = "minju-devsec.store"
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m region      = "us-east-1"
+      [32m+[0m[0m stage_name  = "prod"
+    }
+
+[1m  # aws_api_gateway_deployment.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_api_gateway_deployment" "main" {
+      [32m+[0m[0m created_date = (known after apply)
+      [32m+[0m[0m id           = (known after apply)
+      [32m+[0m[0m region       = "us-east-1"
+      [32m+[0m[0m rest_api_id  = (known after apply)
+      [32m+[0m[0m triggers     = (known after apply)
+    }
+
+[1m  # aws_api_gateway_domain_name.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_api_gateway_domain_name" "main" {
+      [32m+[0m[0m arn                                    = (known after apply)
+      [32m+[0m[0m certificate_upload_date                = (known after apply)
+      [32m+[0m[0m cloudfront_domain_name                 = (known after apply)
+      [32m+[0m[0m cloudfront_zone_id                     = (known after apply)
+      [32m+[0m[0m domain_name                            = "minju-devsec.store"
+      [32m+[0m[0m domain_name_id                         = (known after apply)
+      [32m+[0m[0m id                                     = (known after apply)
+      [32m+[0m[0m ownership_verification_certificate_arn = (known after apply)
+      [32m+[0m[0m region                                 = "us-east-1"
+      [32m+[0m[0m regional_certificate_arn               = (known after apply)
+      [32m+[0m[0m regional_domain_name                   = (known after apply)
+      [32m+[0m[0m regional_zone_id                       = (known after apply)
+      [32m+[0m[0m routing_mode                           = (known after apply)
+      [32m+[0m[0m security_policy                        = "TLS_1_2"
+      [32m+[0m[0m tags_all                               = (known after apply)
+
+      [32m+[0m[0m endpoint_configuration {
+          [32m+[0m[0m ip_address_type = (known after apply)
+          [32m+[0m[0m types           = [
+              [32m+[0m[0m "REGIONAL",
+            ]
+        }
+    }
+
+[1m  # aws_api_gateway_integration.proxy_lambda[0m will be created
+[0m  [32m+[0m[0m resource "aws_api_gateway_integration" "proxy_lambda" {
+      [32m+[0m[0m cache_namespace         = (known after apply)
+      [32m+[0m[0m connection_type         = "INTERNET"
+      [32m+[0m[0m http_method             = "ANY"
+      [32m+[0m[0m id                      = (known after apply)
+      [32m+[0m[0m integration_http_method = "POST"
+      [32m+[0m[0m passthrough_behavior    = (known after apply)
+      [32m+[0m[0m region                  = "us-east-1"
+      [32m+[0m[0m resource_id             = (known after apply)
+      [32m+[0m[0m response_transfer_mode  = (known after apply)
+      [32m+[0m[0m rest_api_id             = (known after apply)
+      [32m+[0m[0m timeout_milliseconds    = 29000
+      [32m+[0m[0m type                    = "AWS_PROXY"
+      [32m+[0m[0m uri                     = (known after apply)
+    }
+
+[1m  # aws_api_gateway_integration.root_lambda[0m will be created
+[0m  [32m+[0m[0m resource "aws_api_gateway_integration" "root_lambda" {
+      [32m+[0m[0m cache_namespace         = (known after apply)
+      [32m+[0m[0m connection_type         = "INTERNET"
+      [32m+[0m[0m http_method             = "ANY"
+      [32m+[0m[0m id                      = (known after apply)
+      [32m+[0m[0m integration_http_method = "POST"
+      [32m+[0m[0m passthrough_behavior    = (known after apply)
+      [32m+[0m[0m region                  = "us-east-1"
+      [32m+[0m[0m resource_id             = (known after apply)
+      [32m+[0m[0m response_transfer_mode  = (known after apply)
+      [32m+[0m[0m rest_api_id             = (known after apply)
+      [32m+[0m[0m timeout_milliseconds    = 29000
+      [32m+[0m[0m type                    = "AWS_PROXY"
+      [32m+[0m[0m uri                     = (known after apply)
+    }
+
+[1m  # aws_api_gateway_method.proxy[0m will be created
+[0m  [32m+[0m[0m resource "aws_api_gateway_method" "proxy" {
+      [32m+[0m[0m api_key_required = false
+      [32m+[0m[0m authorization    = "NONE"
+      [32m+[0m[0m http_method      = "ANY"
+      [32m+[0m[0m id               = (known after apply)
+      [32m+[0m[0m region           = "us-east-1"
+      [32m+[0m[0m resource_id      = (known after apply)
+      [32m+[0m[0m rest_api_id      = (known after apply)
+    }
+
+[1m  # aws_api_gateway_method.root[0m will be created
+[0m  [32m+[0m[0m resource "aws_api_gateway_method" "root" {
+      [32m+[0m[0m api_key_required = false
+      [32m+[0m[0m authorization    = "NONE"
+      [32m+[0m[0m http_method      = "ANY"
+      [32m+[0m[0m id               = (known after apply)
+      [32m+[0m[0m region           = "us-east-1"
+      [32m+[0m[0m resource_id      = (known after apply)
+      [32m+[0m[0m rest_api_id      = (known after apply)
+    }
+
+[1m  # aws_api_gateway_resource.proxy[0m will be created
+[0m  [32m+[0m[0m resource "aws_api_gateway_resource" "proxy" {
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m parent_id   = (known after apply)
+      [32m+[0m[0m path        = (known after apply)
+      [32m+[0m[0m path_part   = "{proxy+}"
+      [32m+[0m[0m region      = "us-east-1"
+      [32m+[0m[0m rest_api_id = (known after apply)
+    }
+
+[1m  # aws_api_gateway_rest_api.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_api_gateway_rest_api" "main" {
+      [32m+[0m[0m api_key_source               = (known after apply)
+      [32m+[0m[0m arn                          = (known after apply)
+      [32m+[0m[0m binary_media_types           = (known after apply)
+      [32m+[0m[0m created_date                 = (known after apply)
+      [32m+[0m[0m description                  = (known after apply)
+      [32m+[0m[0m disable_execute_api_endpoint = (known after apply)
+      [32m+[0m[0m execution_arn                = (known after apply)
+      [32m+[0m[0m id                           = (known after apply)
+      [32m+[0m[0m minimum_compression_size     = (known after apply)
+      [32m+[0m[0m name                         = "devsecops-platform-api"
+      [32m+[0m[0m policy                       = (known after apply)
+      [32m+[0m[0m region                       = "us-east-1"
+      [32m+[0m[0m root_resource_id             = (known after apply)
+      [32m+[0m[0m tags_all                     = (known after apply)
+
+      [32m+[0m[0m endpoint_configuration (known after apply)
+    }
+
+[1m  # aws_api_gateway_stage.default[0m will be created
+[0m  [32m+[0m[0m resource "aws_api_gateway_stage" "default" {
+      [32m+[0m[0m arn           = (known after apply)
+      [32m+[0m[0m deployment_id = (known after apply)
+      [32m+[0m[0m execution_arn = (known after apply)
+      [32m+[0m[0m id            = (known after apply)
+      [32m+[0m[0m invoke_url    = (known after apply)
+      [32m+[0m[0m region        = "us-east-1"
+      [32m+[0m[0m rest_api_id   = (known after apply)
+      [32m+[0m[0m stage_name    = "prod"
+      [32m+[0m[0m tags_all      = (known after apply)
+      [32m+[0m[0m web_acl_arn   = (known after apply)
+
+      [32m+[0m[0m access_log_settings {
+          [32m+[0m[0m destination_arn = (known after apply)
+          [32m+[0m[0m format          = jsonencode(
+                {
+                  [32m+[0m[0m httpMethod     = "$context.httpMethod"
+                  [32m+[0m[0m ip             = "$context.identity.sourceIp"
+                  [32m+[0m[0m protocol       = "$context.protocol"
+                  [32m+[0m[0m requestId      = "$context.requestId"
+                  [32m+[0m[0m requestTime    = "$context.requestTime"
+                  [32m+[0m[0m resourcePath   = "$context.resourcePath"
+                  [32m+[0m[0m responseLength = "$context.responseLength"
+                  [32m+[0m[0m status         = "$context.status"
+                }
+            )
+        }
+    }
+
+[1m  # aws_budgets_budget.cost_limit[0m will be created
+[0m  [32m+[0m[0m resource "aws_budgets_budget" "cost_limit" {
+      [32m+[0m[0m account_id        = (known after apply)
+      [32m+[0m[0m arn               = (known after apply)
+      [32m+[0m[0m budget_type       = "COST"
+      [32m+[0m[0m id                = (known after apply)
+      [32m+[0m[0m limit_amount      = "10"
+      [32m+[0m[0m limit_unit        = "USD"
+      [32m+[0m[0m name              = "monthly-budget"
+      [32m+[0m[0m name_prefix       = (known after apply)
+      [32m+[0m[0m tags_all          = (known after apply)
+      [32m+[0m[0m time_period_end   = "2087-06-15_00:00"
+      [32m+[0m[0m time_period_start = (known after apply)
+      [32m+[0m[0m time_unit         = "MONTHLY"
+
+      [32m+[0m[0m cost_filter (known after apply)
+
+      [32m+[0m[0m cost_types (known after apply)
+
+      [32m+[0m[0m notification {
+          [32m+[0m[0m comparison_operator        = "GREATER_THAN"
+          [32m+[0m[0m notification_type          = "ACTUAL"
+          [32m+[0m[0m subscriber_email_addresses = [
+              [32m+[0m[0m "yapp9069@naver.com",
+            ]
+          [32m+[0m[0m subscriber_sns_topic_arns  = []
+          [32m+[0m[0m threshold                  = 80
+          [32m+[0m[0m threshold_type             = "PERCENTAGE"
+        }
+    }
+
+[1m  # aws_cloudfront_distribution.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_cloudfront_distribution" "main" {
+      [32m+[0m[0m arn                             = (known after apply)
+      [32m+[0m[0m caller_reference                = (known after apply)
+      [32m+[0m[0m comment                         = "DevSecOps 서버리스 보안 파이프라인 v1"
+      [32m+[0m[0m continuous_deployment_policy_id = (known after apply)
+      [32m+[0m[0m domain_name                     = (known after apply)
+      [32m+[0m[0m enabled                         = true
+      [32m+[0m[0m etag                            = (known after apply)
+      [32m+[0m[0m hosted_zone_id                  = (known after apply)
+      [32m+[0m[0m http_version                    = "http2"
+      [32m+[0m[0m id                              = (known after apply)
+      [32m+[0m[0m in_progress_validation_batches  = (known after apply)
+      [32m+[0m[0m is_ipv6_enabled                 = true
+      [32m+[0m[0m last_modified_time              = (known after apply)
+      [32m+[0m[0m logging_v1_enabled              = (known after apply)
+      [32m+[0m[0m price_class                     = "PriceClass_100"
+      [32m+[0m[0m retain_on_delete                = false
+      [32m+[0m[0m staging                         = false
+      [32m+[0m[0m status                          = (known after apply)
+      [32m+[0m[0m tags                            = {
+          [32m+[0m[0m "Project" = "devsecops-platform"
+          [32m+[0m[0m "Stage"   = "week1-edge-security"
+        }
+      [32m+[0m[0m tags_all                        = {
+          [32m+[0m[0m "Project" = "devsecops-platform"
+          [32m+[0m[0m "Stage"   = "week1-edge-security"
+        }
+      [32m+[0m[0m trusted_key_groups              = (known after apply)
+      [32m+[0m[0m trusted_signers                 = (known after apply)
+      [32m+[0m[0m wait_for_deployment             = true
+      [32m+[0m[0m web_acl_id                      = (known after apply)
+
+      [32m+[0m[0m default_cache_behavior {
+          [32m+[0m[0m allowed_methods        = [
+              [32m+[0m[0m "DELETE",
+              [32m+[0m[0m "GET",
+              [32m+[0m[0m "HEAD",
+              [32m+[0m[0m "OPTIONS",
+              [32m+[0m[0m "PATCH",
+              [32m+[0m[0m "POST",
+              [32m+[0m[0m "PUT",
+            ]
+          [32m+[0m[0m cached_methods         = [
+              [32m+[0m[0m "GET",
+              [32m+[0m[0m "HEAD",
+            ]
+          [32m+[0m[0m compress               = false
+          [32m+[0m[0m default_ttl            = (known after apply)
+          [32m+[0m[0m max_ttl                = (known after apply)
+          [32m+[0m[0m min_ttl                = 0
+          [32m+[0m[0m target_origin_id       = "primary-origin"
+          [32m+[0m[0m trusted_key_groups     = (known after apply)
+          [32m+[0m[0m trusted_signers        = (known after apply)
+          [32m+[0m[0m viewer_protocol_policy = "redirect-to-https"
+
+          [32m+[0m[0m forwarded_values {
+              [32m+[0m[0m headers                 = [
+                  [32m+[0m[0m "Authorization",
+                  [32m+[0m[0m "Content-Type",
+                  [32m+[0m[0m "User-Agent",
+                ]
+              [32m+[0m[0m query_string            = true
+              [32m+[0m[0m query_string_cache_keys = (known after apply)
+
+              [32m+[0m[0m cookies {
+                  [32m+[0m[0m forward           = "none"
+                  [32m+[0m[0m whitelisted_names = (known after apply)
+                }
+            }
+
+          [32m+[0m[0m function_association {
+              [32m+[0m[0m event_type   = "viewer-request"
+              [32m+[0m[0m function_arn = (known after apply)
+            }
+
+          [32m+[0m[0m grpc_config (known after apply)
+
+          [32m+[0m[0m lambda_function_association {
+              [32m+[0m[0m event_type   = "origin-request"
+              [32m+[0m[0m include_body = false
+              [32m+[0m[0m lambda_arn   = "arn:aws:lambda:us-east-1:095035153545:function:devsecops-edge-security:4"
+            }
+        }
+
+      [32m+[0m[0m origin {
+          [32m+[0m[0m connection_attempts         = 3
+          [32m+[0m[0m connection_timeout          = 10
+          [32m+[0m[0m domain_name                 = (known after apply)
+          [32m+[0m[0m origin_id                   = "primary-origin"
+          [32m+[0m[0m origin_path                 = "/prod"
+          [32m+[0m[0m response_completion_timeout = (known after apply)
+            [90m# (1 unchanged attribute hidden)[0m[0m
+
+          [32m+[0m[0m custom_origin_config {
+              [32m+[0m[0m http_port                = 80
+              [32m+[0m[0m https_port               = 443
+              [32m+[0m[0m origin_keepalive_timeout = 5
+              [32m+[0m[0m origin_protocol_policy   = "https-only"
+              [32m+[0m[0m origin_read_timeout      = 30
+              [32m+[0m[0m origin_ssl_protocols     = [
+                  [32m+[0m[0m "TLSv1.2",
+                ]
+                [90m# (1 unchanged attribute hidden)[0m[0m
+            }
+        }
+
+      [32m+[0m[0m restrictions {
+          [32m+[0m[0m geo_restriction {
+              [32m+[0m[0m locations        = [
+                  [32m+[0m[0m "KR",
+                ]
+              [32m+[0m[0m restriction_type = "whitelist"
+            }
+        }
+
+      [32m+[0m[0m viewer_certificate {
+          [32m+[0m[0m cloudfront_default_certificate = true
+          [32m+[0m[0m minimum_protocol_version       = "TLSv1"
+        }
+    }
+
+[1m  # aws_cloudfront_function.ip_block[0m will be created
+[0m  [32m+[0m[0m resource "aws_cloudfront_function" "ip_block" {
+      [32m+[0m[0m arn             = (known after apply)
+      [32m+[0m[0m code            = <<-EOT
+            // CloudFront Functions (Viewer Request) — IP 차단
+            // Geo-block은 CloudFront 기본 geo_restriction(whitelist KR)이 담당
+            // blocklist 갱신: Lambda Preventer → UpdateFunction API 호출로 재배포
+            
+            var BLOCKED_IPS = [];
+            
+            function handler(event) {
+                var clientIp = event.viewer.ip;
+            
+                if (BLOCKED_IPS.indexOf(clientIp) >= 0) {
+                    return {
+                        statusCode: 403,
+                        statusDescription: 'Forbidden',
+                        headers: {
+                            'x-blocked-by': { value: 'devsecops-ip-block' }
+                        }
+                    };
+                }
+            
+                return event.request;
+            }
+        EOT
+      [32m+[0m[0m etag            = (known after apply)
+      [32m+[0m[0m id              = (known after apply)
+      [32m+[0m[0m live_stage_etag = (known after apply)
+      [32m+[0m[0m name            = "devsecops-ip-block"
+      [32m+[0m[0m publish         = true
+      [32m+[0m[0m runtime         = "cloudfront-js-1.0"
+      [32m+[0m[0m status          = (known after apply)
+      [32m+[0m[0m tags_all        = (known after apply)
+    }
+
+[1m  # aws_cloudtrail.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_cloudtrail" "main" {
+      [32m+[0m[0m arn                           = (known after apply)
+      [32m+[0m[0m enable_log_file_validation    = true
+      [32m+[0m[0m enable_logging                = true
+      [32m+[0m[0m home_region                   = (known after apply)
+      [32m+[0m[0m id                            = (known after apply)
+      [32m+[0m[0m include_global_service_events = true
+      [32m+[0m[0m is_multi_region_trail         = true
+      [32m+[0m[0m is_organization_trail         = false
+      [32m+[0m[0m kms_key_id                    = (known after apply)
+      [32m+[0m[0m name                          = "devsecops-platform-trail"
+      [32m+[0m[0m region                        = "us-east-1"
+      [32m+[0m[0m s3_bucket_name                = (known after apply)
+      [32m+[0m[0m sns_topic_arn                 = (known after apply)
+      [32m+[0m[0m tags                          = {
+          [32m+[0m[0m "Project" = "devsecops-platform"
+        }
+      [32m+[0m[0m tags_all                      = {
+          [32m+[0m[0m "Project" = "devsecops-platform"
+        }
+
+      [32m+[0m[0m event_selector {
+          [32m+[0m[0m include_management_events = true
+          [32m+[0m[0m read_write_type           = "All"
+        }
+    }
+
+[1m  # aws_cloudwatch_event_rule.config_compliance[0m will be created
+[0m  [32m+[0m[0m resource "aws_cloudwatch_event_rule" "config_compliance" {
+      [32m+[0m[0m arn            = (known after apply)
+      [32m+[0m[0m description    = "Config 컴플라이언스 위반 시 알림"
+      [32m+[0m[0m event_bus_name = "default"
+      [32m+[0m[0m event_pattern  = jsonencode(
+            {
+              [32m+[0m[0m detail      = {
+                  [32m+[0m[0m newEvaluationResult = {
+                      [32m+[0m[0m complianceType = [
+                          [32m+[0m[0m "NON_COMPLIANT",
+                        ]
+                    }
+                }
+              [32m+[0m[0m detail-type = [
+                  [32m+[0m[0m "Config Rules Compliance Change",
+                ]
+              [32m+[0m[0m source      = [
+                  [32m+[0m[0m "aws.config",
+                ]
+            }
+        )
+      [32m+[0m[0m force_destroy  = false
+      [32m+[0m[0m id             = (known after apply)
+      [32m+[0m[0m name           = "config-compliance-change"
+      [32m+[0m[0m name_prefix    = (known after apply)
+      [32m+[0m[0m region         = "us-east-1"
+      [32m+[0m[0m tags_all       = (known after apply)
+    }
+
+[1m  # aws_cloudwatch_event_rule.traffic_generator_schedule[0m will be created
+[0m  [32m+[0m[0m resource "aws_cloudwatch_event_rule" "traffic_generator_schedule" {
+      [32m+[0m[0m arn                 = (known after apply)
+      [32m+[0m[0m description         = "6시간마다 정상 트래픽 생성하여 WAF ALLOW 로그 적재"
+      [32m+[0m[0m event_bus_name      = "default"
+      [32m+[0m[0m force_destroy       = false
+      [32m+[0m[0m id                  = (known after apply)
+      [32m+[0m[0m name                = "normal-traffic-generator-schedule"
+      [32m+[0m[0m name_prefix         = (known after apply)
+      [32m+[0m[0m region              = "us-east-1"
+      [32m+[0m[0m schedule_expression = "rate(6 hours)"
+      [32m+[0m[0m tags_all            = (known after apply)
+    }
+
+[1m  # aws_cloudwatch_event_rule.waf_block_event[0m will be created
+[0m  [32m+[0m[0m resource "aws_cloudwatch_event_rule" "waf_block_event" {
+      [32m+[0m[0m arn            = (known after apply)
+      [32m+[0m[0m description    = "Capture WAF Block events and send notification"
+      [32m+[0m[0m event_bus_name = "default"
+      [32m+[0m[0m event_pattern  = jsonencode(
+            {
+              [32m+[0m[0m detail      = {
+                  [32m+[0m[0m eventName = [
+                      [32m+[0m[0m "UpdateWebACL",
+                      [32m+[0m[0m "DeleteWebACL",
+                    ]
+                }
+              [32m+[0m[0m detail-type = [
+                  [32m+[0m[0m "WAF Configuration Change",
+                  [32m+[0m[0m "AWS API Call via CloudTrail",
+                ]
+              [32m+[0m[0m source      = [
+                  [32m+[0m[0m "aws.wafv2",
+                ]
+            }
+        )
+      [32m+[0m[0m force_destroy  = false
+      [32m+[0m[0m id             = (known after apply)
+      [32m+[0m[0m name           = "waf-block-detection"
+      [32m+[0m[0m name_prefix    = (known after apply)
+      [32m+[0m[0m region         = "us-east-1"
+      [32m+[0m[0m tags_all       = (known after apply)
+    }
+
+[1m  # aws_cloudwatch_event_target.config_sns[0m will be created
+[0m  [32m+[0m[0m resource "aws_cloudwatch_event_target" "config_sns" {
+      [32m+[0m[0m arn            = (known after apply)
+      [32m+[0m[0m event_bus_name = "default"
+      [32m+[0m[0m force_destroy  = false
+      [32m+[0m[0m id             = (known after apply)
+      [32m+[0m[0m region         = "us-east-1"
+      [32m+[0m[0m rule           = "config-compliance-change"
+      [32m+[0m[0m target_id      = "ConfigToSNS"
+    }
+
+[1m  # aws_cloudwatch_event_target.sns_target[0m will be created
+[0m  [32m+[0m[0m resource "aws_cloudwatch_event_target" "sns_target" {
+      [32m+[0m[0m arn            = (known after apply)
+      [32m+[0m[0m event_bus_name = "default"
+      [32m+[0m[0m force_destroy  = false
+      [32m+[0m[0m id             = (known after apply)
+      [32m+[0m[0m region         = "us-east-1"
+      [32m+[0m[0m rule           = "waf-block-detection"
+      [32m+[0m[0m target_id      = "SendToSNS"
+    }
+
+[1m  # aws_cloudwatch_event_target.traffic_generator_target[0m will be created
+[0m  [32m+[0m[0m resource "aws_cloudwatch_event_target" "traffic_generator_target" {
+      [32m+[0m[0m arn            = (known after apply)
+      [32m+[0m[0m event_bus_name = "default"
+      [32m+[0m[0m force_destroy  = false
+      [32m+[0m[0m id             = (known after apply)
+      [32m+[0m[0m region         = "us-east-1"
+      [32m+[0m[0m rule           = "normal-traffic-generator-schedule"
+      [32m+[0m[0m target_id      = "TrafficGeneratorLambda"
+    }
+
+[1m  # aws_cloudwatch_log_group.apigw_access[0m will be created
+[0m  [32m+[0m[0m resource "aws_cloudwatch_log_group" "apigw_access" {
+      [32m+[0m[0m arn                         = (known after apply)
+      [32m+[0m[0m deletion_protection_enabled = (known after apply)
+      [32m+[0m[0m id                          = (known after apply)
+      [32m+[0m[0m kms_key_id                  = (known after apply)
+      [32m+[0m[0m log_group_class             = (known after apply)
+      [32m+[0m[0m name                        = "/aws/apigateway/devsecops-platform-api"
+      [32m+[0m[0m name_prefix                 = (known after apply)
+      [32m+[0m[0m region                      = "us-east-1"
+      [32m+[0m[0m retention_in_days           = 30
+      [32m+[0m[0m skip_destroy                = false
+      [32m+[0m[0m tags_all                    = (known after apply)
+    }
+
+[1m  # aws_config_config_rule.cloudtrail_enabled[0m will be created
+[0m  [32m+[0m[0m resource "aws_config_config_rule" "cloudtrail_enabled" {
+      [32m+[0m[0m arn         = (known after apply)
+      [32m+[0m[0m description = "ISMS 2.9: CloudTrail 트레일 활성화 확인"
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = "isms-2-9-cloudtrail-enabled"
+      [32m+[0m[0m region      = "us-east-1"
+      [32m+[0m[0m rule_id     = (known after apply)
+      [32m+[0m[0m tags_all    = (known after apply)
+
+      [32m+[0m[0m evaluation_mode (known after apply)
+
+      [32m+[0m[0m source {
+          [32m+[0m[0m owner             = "AWS"
+          [32m+[0m[0m source_identifier = "CLOUD_TRAIL_ENABLED"
+        }
+    }
+
+[1m  # aws_config_config_rule.cloudtrail_log_validation[0m will be created
+[0m  [32m+[0m[0m resource "aws_config_config_rule" "cloudtrail_log_validation" {
+      [32m+[0m[0m arn         = (known after apply)
+      [32m+[0m[0m description = "ISMS 2.9: CloudTrail 로그 파일 무결성 검증 활성화 확인"
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = "isms-2-9-cloudtrail-log-validation"
+      [32m+[0m[0m region      = "us-east-1"
+      [32m+[0m[0m rule_id     = (known after apply)
+      [32m+[0m[0m tags_all    = (known after apply)
+
+      [32m+[0m[0m evaluation_mode (known after apply)
+
+      [32m+[0m[0m source {
+          [32m+[0m[0m owner             = "AWS"
+          [32m+[0m[0m source_identifier = "CLOUD_TRAIL_LOG_FILE_VALIDATION_ENABLED"
+        }
+    }
+
+[1m  # aws_config_config_rule.ebs_encrypted[0m will be created
+[0m  [32m+[0m[0m resource "aws_config_config_rule" "ebs_encrypted" {
+      [32m+[0m[0m arn         = (known after apply)
+      [32m+[0m[0m description = "ISMS 2.10: EC2 인스턴스 연결 EBS 볼륨 암호화 확인"
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = "isms-2-10-encrypted-volumes"
+      [32m+[0m[0m region      = "us-east-1"
+      [32m+[0m[0m rule_id     = (known after apply)
+      [32m+[0m[0m tags_all    = (known after apply)
+
+      [32m+[0m[0m evaluation_mode (known after apply)
+
+      [32m+[0m[0m source {
+          [32m+[0m[0m owner             = "AWS"
+          [32m+[0m[0m source_identifier = "ENCRYPTED_VOLUMES"
+        }
+    }
+
+[1m  # aws_config_config_rule.guardduty_enabled[0m will be created
+[0m  [32m+[0m[0m resource "aws_config_config_rule" "guardduty_enabled" {
+      [32m+[0m[0m arn         = (known after apply)
+      [32m+[0m[0m description = "ISMS 2.11: GuardDuty 위협 탐지 서비스 활성화 확인"
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = "isms-2-11-guardduty-enabled"
+      [32m+[0m[0m region      = "us-east-1"
+      [32m+[0m[0m rule_id     = (known after apply)
+      [32m+[0m[0m tags_all    = (known after apply)
+
+      [32m+[0m[0m evaluation_mode (known after apply)
+
+      [32m+[0m[0m source {
+          [32m+[0m[0m owner             = "AWS"
+          [32m+[0m[0m source_identifier = "GUARDDUTY_ENABLED_CENTRALIZED"
+        }
+    }
+
+[1m  # aws_config_config_rule.iam_password_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_config_config_rule" "iam_password_policy" {
+      [32m+[0m[0m arn              = (known after apply)
+      [32m+[0m[0m description      = "ISMS 2.5: IAM 패스워드 복잡성 정책 적용 확인"
+      [32m+[0m[0m id               = (known after apply)
+      [32m+[0m[0m input_parameters = jsonencode(
+            {
+              [32m+[0m[0m MaxPasswordAge             = "90"
+              [32m+[0m[0m MinimumPasswordLength      = "14"
+              [32m+[0m[0m PasswordReusePrevention    = "3"
+              [32m+[0m[0m RequireLowercaseCharacters = "true"
+              [32m+[0m[0m RequireNumbers             = "true"
+              [32m+[0m[0m RequireSymbols             = "true"
+              [32m+[0m[0m RequireUppercaseCharacters = "true"
+            }
+        )
+      [32m+[0m[0m name             = "isms-2-5-iam-password-policy"
+      [32m+[0m[0m region           = "us-east-1"
+      [32m+[0m[0m rule_id          = (known after apply)
+      [32m+[0m[0m tags_all         = (known after apply)
+
+      [32m+[0m[0m evaluation_mode (known after apply)
+
+      [32m+[0m[0m source {
+          [32m+[0m[0m owner             = "AWS"
+          [32m+[0m[0m source_identifier = "IAM_PASSWORD_POLICY"
+        }
+    }
+
+[1m  # aws_config_config_rule.iam_root_access_key[0m will be created
+[0m  [32m+[0m[0m resource "aws_config_config_rule" "iam_root_access_key" {
+      [32m+[0m[0m arn         = (known after apply)
+      [32m+[0m[0m description = "ISMS 2.5: root 계정 액세스 키 없는지 확인"
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = "isms-2-5-iam-root-access-key-check"
+      [32m+[0m[0m region      = "us-east-1"
+      [32m+[0m[0m rule_id     = (known after apply)
+      [32m+[0m[0m tags_all    = (known after apply)
+
+      [32m+[0m[0m evaluation_mode (known after apply)
+
+      [32m+[0m[0m source {
+          [32m+[0m[0m owner             = "AWS"
+          [32m+[0m[0m source_identifier = "IAM_ROOT_ACCESS_KEY_CHECK"
+        }
+    }
+
+[1m  # aws_config_config_rule.mfa_enabled[0m will be created
+[0m  [32m+[0m[0m resource "aws_config_config_rule" "mfa_enabled" {
+      [32m+[0m[0m arn         = (known after apply)
+      [32m+[0m[0m description = "ISMS 2.5: 콘솔 접근 IAM 사용자 MFA 활성화 확인"
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = "isms-2-5-mfa-enabled-for-iam-console"
+      [32m+[0m[0m region      = "us-east-1"
+      [32m+[0m[0m rule_id     = (known after apply)
+      [32m+[0m[0m tags_all    = (known after apply)
+
+      [32m+[0m[0m evaluation_mode (known after apply)
+
+      [32m+[0m[0m source {
+          [32m+[0m[0m owner             = "AWS"
+          [32m+[0m[0m source_identifier = "MFA_ENABLED_FOR_IAM_CONSOLE_ACCESS"
+        }
+    }
+
+[1m  # aws_config_config_rule.s3_no_public_read[0m will be created
+[0m  [32m+[0m[0m resource "aws_config_config_rule" "s3_no_public_read" {
+      [32m+[0m[0m arn         = (known after apply)
+      [32m+[0m[0m description = "ISMS 2.6: S3 버킷 퍼블릭 읽기 접근 차단 확인"
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = "isms-2-6-s3-public-read-prohibited"
+      [32m+[0m[0m region      = "us-east-1"
+      [32m+[0m[0m rule_id     = (known after apply)
+      [32m+[0m[0m tags_all    = (known after apply)
+
+      [32m+[0m[0m evaluation_mode (known after apply)
+
+      [32m+[0m[0m source {
+          [32m+[0m[0m owner             = "AWS"
+          [32m+[0m[0m source_identifier = "S3_BUCKET_PUBLIC_READ_PROHIBITED"
+        }
+    }
+
+[1m  # aws_config_config_rule.s3_no_public_write[0m will be created
+[0m  [32m+[0m[0m resource "aws_config_config_rule" "s3_no_public_write" {
+      [32m+[0m[0m arn         = (known after apply)
+      [32m+[0m[0m description = "ISMS 2.6: S3 버킷 퍼블릭 쓰기 접근 차단 확인"
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = "isms-2-6-s3-public-write-prohibited"
+      [32m+[0m[0m region      = "us-east-1"
+      [32m+[0m[0m rule_id     = (known after apply)
+      [32m+[0m[0m tags_all    = (known after apply)
+
+      [32m+[0m[0m evaluation_mode (known after apply)
+
+      [32m+[0m[0m source {
+          [32m+[0m[0m owner             = "AWS"
+          [32m+[0m[0m source_identifier = "S3_BUCKET_PUBLIC_WRITE_PROHIBITED"
+        }
+    }
+
+[1m  # aws_config_config_rule.s3_ssl_only[0m will be created
+[0m  [32m+[0m[0m resource "aws_config_config_rule" "s3_ssl_only" {
+      [32m+[0m[0m arn         = (known after apply)
+      [32m+[0m[0m description = "ISMS 2.10: S3 버킷 HTTPS 전용 접근 확인"
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = "isms-2-10-s3-ssl-requests-only"
+      [32m+[0m[0m region      = "us-east-1"
+      [32m+[0m[0m rule_id     = (known after apply)
+      [32m+[0m[0m tags_all    = (known after apply)
+
+      [32m+[0m[0m evaluation_mode (known after apply)
+
+      [32m+[0m[0m source {
+          [32m+[0m[0m owner             = "AWS"
+          [32m+[0m[0m source_identifier = "S3_BUCKET_SSL_REQUESTS_ONLY"
+        }
+    }
+
+[1m  # aws_config_config_rule.vpc_default_sg_closed[0m will be created
+[0m  [32m+[0m[0m resource "aws_config_config_rule" "vpc_default_sg_closed" {
+      [32m+[0m[0m arn         = (known after apply)
+      [32m+[0m[0m description = "ISMS 2.6: VPC 기본 보안그룹에 인바운드/아웃바운드 규칙 없는지 확인"
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = "isms-2-6-vpc-default-sg-closed"
+      [32m+[0m[0m region      = "us-east-1"
+      [32m+[0m[0m rule_id     = (known after apply)
+      [32m+[0m[0m tags_all    = (known after apply)
+
+      [32m+[0m[0m evaluation_mode (known after apply)
+
+      [32m+[0m[0m source {
+          [32m+[0m[0m owner             = "AWS"
+          [32m+[0m[0m source_identifier = "VPC_DEFAULT_SECURITY_GROUP_CLOSED"
+        }
+    }
+
+[1m  # aws_config_configuration_recorder.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_config_configuration_recorder" "main" {
+      [32m+[0m[0m id       = (known after apply)
+      [32m+[0m[0m name     = "devsecops-platform-config-recorder"
+      [32m+[0m[0m region   = "us-east-1"
+      [32m+[0m[0m role_arn = (known after apply)
+
+      [32m+[0m[0m recording_group {
+          [32m+[0m[0m all_supported                 = true
+          [32m+[0m[0m include_global_resource_types = true
+
+          [32m+[0m[0m exclusion_by_resource_types (known after apply)
+
+          [32m+[0m[0m recording_strategy (known after apply)
+        }
+
+      [32m+[0m[0m recording_mode (known after apply)
+    }
+
+[1m  # aws_config_configuration_recorder_status.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_config_configuration_recorder_status" "main" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m is_enabled = true
+      [32m+[0m[0m name       = "devsecops-platform-config-recorder"
+      [32m+[0m[0m region     = "us-east-1"
+    }
+
+[1m  # aws_config_delivery_channel.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_config_delivery_channel" "main" {
+      [32m+[0m[0m id             = (known after apply)
+      [32m+[0m[0m name           = "devsecops-platform-config-channel"
+      [32m+[0m[0m region         = "us-east-1"
+      [32m+[0m[0m s3_bucket_name = (known after apply)
+      [32m+[0m[0m s3_key_prefix  = "config"
+      [32m+[0m[0m sns_topic_arn  = (known after apply)
+
+      [32m+[0m[0m snapshot_delivery_properties {
+          [32m+[0m[0m delivery_frequency = "TwentyFour_Hours"
+        }
+    }
+
+[1m  # aws_flow_log.s3_archive[0m will be created
+[0m  [32m+[0m[0m resource "aws_flow_log" "s3_archive" {
+      [32m+[0m[0m arn                      = (known after apply)
+      [32m+[0m[0m id                       = (known after apply)
+      [32m+[0m[0m log_destination          = (known after apply)
+      [32m+[0m[0m log_destination_type     = "s3"
+      [32m+[0m[0m log_format               = (known after apply)
+      [32m+[0m[0m max_aggregation_interval = 600
+      [32m+[0m[0m region                   = "us-east-1"
+      [32m+[0m[0m tags                     = {
+          [32m+[0m[0m "Name"    = "devsecops-vpc-flow-s3"
+          [32m+[0m[0m "Project" = "devsecops-platform"
+        }
+      [32m+[0m[0m tags_all                 = {
+          [32m+[0m[0m "Name"    = "devsecops-vpc-flow-s3"
+          [32m+[0m[0m "Project" = "devsecops-platform"
+        }
+      [32m+[0m[0m traffic_type             = "ALL"
+      [32m+[0m[0m vpc_id                   = (known after apply)
+    }
+
+[1m  # aws_guardduty_detector.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_guardduty_detector" "main" {
+      [32m+[0m[0m account_id                   = (known after apply)
+      [32m+[0m[0m arn                          = (known after apply)
+      [32m+[0m[0m enable                       = true
+      [32m+[0m[0m finding_publishing_frequency = (known after apply)
+      [32m+[0m[0m id                           = (known after apply)
+      [32m+[0m[0m region                       = "us-east-1"
+      [32m+[0m[0m tags                         = {
+          [32m+[0m[0m "Project" = "devsecops-platform"
+        }
+      [32m+[0m[0m tags_all                     = {
+          [32m+[0m[0m "Project" = "devsecops-platform"
+        }
+
+      [32m+[0m[0m datasources (known after apply)
+    }
+
+[1m  # aws_iam_account_password_policy.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_account_password_policy" "main" {
+      [32m+[0m[0m allow_users_to_change_password = true
+      [32m+[0m[0m expire_passwords               = (known after apply)
+      [32m+[0m[0m hard_expiry                    = (known after apply)
+      [32m+[0m[0m id                             = (known after apply)
+      [32m+[0m[0m max_password_age               = 90
+      [32m+[0m[0m minimum_password_length        = 14
+      [32m+[0m[0m password_reuse_prevention      = 24
+      [32m+[0m[0m require_lowercase_characters   = true
+      [32m+[0m[0m require_numbers                = true
+      [32m+[0m[0m require_symbols                = true
+      [32m+[0m[0m require_uppercase_characters   = true
+    }
+
+[1m  # aws_iam_role.apigw_cloudwatch[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "apigw_cloudwatch" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "apigateway.amazonaws.com"
+                        }
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "api-gateway-cloudwatch-role"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags_all              = (known after apply)
+      [32m+[0m[0m unique_id             = (known after apply)
+
+      [32m+[0m[0m inline_policy (known after apply)
+    }
+
+[1m  # aws_iam_role.config[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "config" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "config.amazonaws.com"
+                        }
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "devsecops-platform-config-role"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags_all              = (known after apply)
+      [32m+[0m[0m unique_id             = (known after apply)
+
+      [32m+[0m[0m inline_policy (known after apply)
+    }
+
+[1m  # aws_iam_role.traffic_generator_role[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "traffic_generator_role" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "lambda.amazonaws.com"
+                        }
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "traffic-generator-lambda-role"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags_all              = (known after apply)
+      [32m+[0m[0m unique_id             = (known after apply)
+
+      [32m+[0m[0m inline_policy (known after apply)
+    }
+
+[1m  # aws_iam_role_policy.config_s3[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy" "config_s3" {
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = "config-s3-delivery"
+      [32m+[0m[0m name_prefix = (known after apply)
+      [32m+[0m[0m policy      = (known after apply)
+      [32m+[0m[0m role        = (known after apply)
+    }
+
+[1m  # aws_iam_role_policy.edge_model_read[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy" "edge_model_read" {
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = "edge-model-read"
+      [32m+[0m[0m name_prefix = (known after apply)
+      [32m+[0m[0m policy      = (known after apply)
+      [32m+[0m[0m role        = "devsecops-edge-lambda-role"
+    }
+
+[1m  # aws_iam_role_policy_attachment.apigw_cloudwatch[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "apigw_cloudwatch" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+      [32m+[0m[0m role       = "api-gateway-cloudwatch-role"
+    }
+
+[1m  # aws_iam_role_policy_attachment.config[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "config" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = "arn:aws:iam::aws:policy/service-role/AWS_ConfigRole"
+      [32m+[0m[0m role       = "devsecops-platform-config-role"
+    }
+
+[1m  # aws_iam_role_policy_attachment.edge_logs[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "edge_logs" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      [32m+[0m[0m role       = "devsecops-edge-lambda-role"
+    }
+
+[1m  # aws_iam_role_policy_attachment.traffic_generator_basic[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "traffic_generator_basic" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      [32m+[0m[0m role       = "traffic-generator-lambda-role"
+    }
+
+[1m  # aws_kms_key.shared_log_key[0m will be created
+[0m  [32m+[0m[0m resource "aws_kms_key" "shared_log_key" {
+      [32m+[0m[0m arn                                = (known after apply)
+      [32m+[0m[0m bypass_policy_lockout_safety_check = false
+      [32m+[0m[0m customer_master_key_spec           = "SYMMETRIC_DEFAULT"
+      [32m+[0m[0m deletion_window_in_days            = 7
+      [32m+[0m[0m description                        = "Centralized Shared KMS Key for Security Logs"
+      [32m+[0m[0m enable_key_rotation                = true
+      [32m+[0m[0m id                                 = (known after apply)
+      [32m+[0m[0m is_enabled                         = true
+      [32m+[0m[0m key_id                             = (known after apply)
+      [32m+[0m[0m key_usage                          = "ENCRYPT_DECRYPT"
+      [32m+[0m[0m multi_region                       = (known after apply)
+      [32m+[0m[0m policy                             = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "kms:*"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m AWS = "arn:aws:iam::095035153545:root"
+                        }
+                      [32m+[0m[0m Resource  = "*"
+                      [32m+[0m[0m Sid       = "EnableRootAccess"
+                    },
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = [
+                          [32m+[0m[0m "kms:GenerateDataKey*",
+                          [32m+[0m[0m "kms:DescribeKey",
+                        ]
+                      [32m+[0m[0m Condition = {
+                          [32m+[0m[0m StringLike = {
+                              [32m+[0m[0m "kms:EncryptionContext:aws:cloudtrail:arn" = "arn:aws:cloudtrail:us-east-1:095035153545:trail/devsecops-platform-trail"
+                            }
+                        }
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "cloudtrail.amazonaws.com"
+                        }
+                      [32m+[0m[0m Resource  = "*"
+                      [32m+[0m[0m Sid       = "AllowCloudTrailEncrypt"
+                    },
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = [
+                          [32m+[0m[0m "kms:Encrypt*",
+                          [32m+[0m[0m "kms:Decrypt*",
+                          [32m+[0m[0m "kms:ReEncrypt*",
+                          [32m+[0m[0m "kms:GenerateDataKey*",
+                          [32m+[0m[0m "kms:Describe*",
+                        ]
+                      [32m+[0m[0m Condition = {
+                          [32m+[0m[0m ArnLike = {
+                              [32m+[0m[0m "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:us-east-1:095035153545:*"
+                            }
+                        }
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "logs.us-east-1.amazonaws.com"
+                        }
+                      [32m+[0m[0m Resource  = "*"
+                      [32m+[0m[0m Sid       = "AllowCloudWatchLogs"
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m region                             = "us-east-1"
+      [32m+[0m[0m rotation_period_in_days            = (known after apply)
+      [32m+[0m[0m tags_all                           = (known after apply)
+    }
+
+[1m  # aws_lambda_function.analyzer[0m will be created
+[0m  [32m+[0m[0m resource "aws_lambda_function" "analyzer" {
+      [32m+[0m[0m architectures                  = (known after apply)
+      [32m+[0m[0m arn                            = (known after apply)
+      [32m+[0m[0m code_sha256                    = (known after apply)
+      [32m+[0m[0m filename                       = "./../lambda/analyzer.zip"
+      [32m+[0m[0m function_name                  = "SecurityAnalyzer"
+      [32m+[0m[0m handler                        = "lambda_security_analyzer.handler"
+      [32m+[0m[0m id                             = (known after apply)
+      [32m+[0m[0m invoke_arn                     = (known after apply)
+      [32m+[0m[0m last_modified                  = (known after apply)
+      [32m+[0m[0m memory_size                    = 128
+      [32m+[0m[0m package_type                   = "Zip"
+      [32m+[0m[0m publish                        = false
+      [32m+[0m[0m qualified_arn                  = (known after apply)
+      [32m+[0m[0m qualified_invoke_arn           = (known after apply)
+      [32m+[0m[0m region                         = "us-east-1"
+      [32m+[0m[0m reserved_concurrent_executions = -1
+      [32m+[0m[0m response_streaming_invoke_arn  = (known after apply)
+      [32m+[0m[0m role                           = (known after apply)
+      [32m+[0m[0m runtime                        = "python3.11"
+      [32m+[0m[0m signing_job_arn                = (known after apply)
+      [32m+[0m[0m signing_profile_version_arn    = (known after apply)
+      [32m+[0m[0m skip_destroy                   = false
+      [32m+[0m[0m source_code_hash               = "3poXVSUTjAqAm3LBQ7rxZzq5iY9chUXW53Lw8F27aO4="
+      [32m+[0m[0m source_code_size               = (known after apply)
+      [32m+[0m[0m tags_all                       = (known after apply)
+      [32m+[0m[0m timeout                        = 30
+      [32m+[0m[0m version                        = (known after apply)
+
+      [32m+[0m[0m environment {
+          [32m+[0m[0m variables = {
+              [32m+[0m[0m "ATHENA_DB"     = "monitoring_db"
+              [32m+[0m[0m "ATHENA_OUTPUT" = "s3://aws-waf-logs-minju-0417-project/athena-results/"
+              [32m+[0m[0m "ATHENA_TABLE"  = "aiops_results"
+              [32m+[0m[0m "PREVENTER_FN"  = "SecurityPreventer"
+            }
+        }
+
+      [32m+[0m[0m ephemeral_storage (known after apply)
+
+      [32m+[0m[0m logging_config (known after apply)
+
+      [32m+[0m[0m tracing_config (known after apply)
+    }
+
+[1m  # aws_lambda_function.preventer[0m will be created
+[0m  [32m+[0m[0m resource "aws_lambda_function" "preventer" {
+      [32m+[0m[0m architectures                  = (known after apply)
+      [32m+[0m[0m arn                            = (known after apply)
+      [32m+[0m[0m code_sha256                    = (known after apply)
+      [32m+[0m[0m filename                       = "./../lambda/preventer.zip"
+      [32m+[0m[0m function_name                  = "SecurityPreventer"
+      [32m+[0m[0m handler                        = "lambda_security_preventer.handler"
+      [32m+[0m[0m id                             = (known after apply)
+      [32m+[0m[0m invoke_arn                     = (known after apply)
+      [32m+[0m[0m last_modified                  = (known after apply)
+      [32m+[0m[0m memory_size                    = 128
+      [32m+[0m[0m package_type                   = "Zip"
+      [32m+[0m[0m publish                        = false
+      [32m+[0m[0m qualified_arn                  = (known after apply)
+      [32m+[0m[0m qualified_invoke_arn           = (known after apply)
+      [32m+[0m[0m region                         = "us-east-1"
+      [32m+[0m[0m reserved_concurrent_executions = -1
+      [32m+[0m[0m response_streaming_invoke_arn  = (known after apply)
+      [32m+[0m[0m role                           = (known after apply)
+      [32m+[0m[0m runtime                        = "python3.11"
+      [32m+[0m[0m signing_job_arn                = (known after apply)
+      [32m+[0m[0m signing_profile_version_arn    = (known after apply)
+      [32m+[0m[0m skip_destroy                   = false
+      [32m+[0m[0m source_code_hash               = "tg78/f87ddqOpazULlW1OiNSt6174CtRH2Pi7jisVVo="
+      [32m+[0m[0m source_code_size               = (known after apply)
+      [32m+[0m[0m tags_all                       = (known after apply)
+      [32m+[0m[0m timeout                        = 30
+      [32m+[0m[0m version                        = (known after apply)
+
+      [32m+[0m[0m environment {
+          [32m+[0m[0m variables = (known after apply)
+        }
+
+      [32m+[0m[0m ephemeral_storage (known after apply)
+
+      [32m+[0m[0m logging_config (known after apply)
+
+      [32m+[0m[0m tracing_config (known after apply)
+    }
+
+[1m  # aws_lambda_function.traffic_generator[0m will be created
+[0m  [32m+[0m[0m resource "aws_lambda_function" "traffic_generator" {
+      [32m+[0m[0m architectures                  = (known after apply)
+      [32m+[0m[0m arn                            = (known after apply)
+      [32m+[0m[0m code_sha256                    = (known after apply)
+      [32m+[0m[0m filename                       = "./../lambda/traffic_generator.zip"
+      [32m+[0m[0m function_name                  = "NormalTrafficGenerator"
+      [32m+[0m[0m handler                        = "handler.handler"
+      [32m+[0m[0m id                             = (known after apply)
+      [32m+[0m[0m invoke_arn                     = (known after apply)
+      [32m+[0m[0m last_modified                  = (known after apply)
+      [32m+[0m[0m memory_size                    = 128
+      [32m+[0m[0m package_type                   = "Zip"
+      [32m+[0m[0m publish                        = false
+      [32m+[0m[0m qualified_arn                  = (known after apply)
+      [32m+[0m[0m qualified_invoke_arn           = (known after apply)
+      [32m+[0m[0m region                         = "us-east-1"
+      [32m+[0m[0m reserved_concurrent_executions = -1
+      [32m+[0m[0m response_streaming_invoke_arn  = (known after apply)
+      [32m+[0m[0m role                           = (known after apply)
+      [32m+[0m[0m runtime                        = "python3.11"
+      [32m+[0m[0m signing_job_arn                = (known after apply)
+      [32m+[0m[0m signing_profile_version_arn    = (known after apply)
+      [32m+[0m[0m skip_destroy                   = false
+      [32m+[0m[0m source_code_hash               = "7Otn7xBYHlIx5urBGsaQVbxpRxYY/k7rGCchTQxBJjQ="
+      [32m+[0m[0m source_code_size               = (known after apply)
+      [32m+[0m[0m tags                           = {
+          [32m+[0m[0m "Project" = "devsecops-platform"
+          [32m+[0m[0m "Purpose" = "ml-data-collection"
+        }
+      [32m+[0m[0m tags_all                       = {
+          [32m+[0m[0m "Project" = "devsecops-platform"
+          [32m+[0m[0m "Purpose" = "ml-data-collection"
+        }
+      [32m+[0m[0m timeout                        = 300
+      [32m+[0m[0m version                        = (known after apply)
+
+      [32m+[0m[0m environment {
+          [32m+[0m[0m variables = {
+              [32m+[0m[0m "REQUEST_COUNT" = "300"
+              [32m+[0m[0m "TARGET_URL"    = "https://minju-devsec.store"
+            }
+        }
+
+      [32m+[0m[0m ephemeral_storage (known after apply)
+
+      [32m+[0m[0m logging_config (known after apply)
+
+      [32m+[0m[0m tracing_config (known after apply)
+    }
+
+[1m  # aws_lambda_permission.allow_eventbridge_traffic_gen[0m will be created
+[0m  [32m+[0m[0m resource "aws_lambda_permission" "allow_eventbridge_traffic_gen" {
+      [32m+[0m[0m action              = "lambda:InvokeFunction"
+      [32m+[0m[0m function_name       = "NormalTrafficGenerator"
+      [32m+[0m[0m id                  = (known after apply)
+      [32m+[0m[0m principal           = "events.amazonaws.com"
+      [32m+[0m[0m region              = "us-east-1"
+      [32m+[0m[0m source_arn          = (known after apply)
+      [32m+[0m[0m statement_id        = "AllowEventBridgeInvoke"
+      [32m+[0m[0m statement_id_prefix = (known after apply)
+    }
+
+[1m  # aws_lambda_permission.allow_s3[0m will be created
+[0m  [32m+[0m[0m resource "aws_lambda_permission" "allow_s3" {
+      [32m+[0m[0m action              = "lambda:InvokeFunction"
+      [32m+[0m[0m function_name       = "SecurityAnalyzer"
+      [32m+[0m[0m id                  = (known after apply)
+      [32m+[0m[0m principal           = "s3.amazonaws.com"
+      [32m+[0m[0m region              = "us-east-1"
+      [32m+[0m[0m source_arn          = "arn:aws:s3:::aws-waf-logs-minju-0417-project"
+      [32m+[0m[0m statement_id        = "AllowExecutionFromS3Bucket"
+      [32m+[0m[0m statement_id_prefix = (known after apply)
+    }
+
+[1m  # aws_lambda_permission.apigw_invoke_analyzer[0m will be created
+[0m  [32m+[0m[0m resource "aws_lambda_permission" "apigw_invoke_analyzer" {
+      [32m+[0m[0m action              = "lambda:InvokeFunction"
+      [32m+[0m[0m function_name       = "SecurityAnalyzer"
+      [32m+[0m[0m id                  = (known after apply)
+      [32m+[0m[0m principal           = "apigateway.amazonaws.com"
+      [32m+[0m[0m region              = "us-east-1"
+      [32m+[0m[0m source_arn          = (known after apply)
+      [32m+[0m[0m statement_id        = "AllowAPIGatewayInvoke"
+      [32m+[0m[0m statement_id_prefix = (known after apply)
+    }
+
+[1m  # aws_route53_record.api[0m will be created
+[0m  [32m+[0m[0m resource "aws_route53_record" "api" {
+      [32m+[0m[0m allow_overwrite = (known after apply)
+      [32m+[0m[0m fqdn            = (known after apply)
+      [32m+[0m[0m id              = (known after apply)
+      [32m+[0m[0m name            = "minju-devsec.store"
+      [32m+[0m[0m type            = "A"
+      [32m+[0m[0m zone_id         = "Z04690263FQ7USBL2HWDX"
+
+      [32m+[0m[0m alias {
+          [32m+[0m[0m evaluate_target_health = false
+          [32m+[0m[0m name                   = (known after apply)
+          [32m+[0m[0m zone_id                = (known after apply)
+        }
+    }
+
+[1m  # aws_route53_record.cert_validation["minju-devsec.store"][0m will be created
+[0m  [32m+[0m[0m resource "aws_route53_record" "cert_validation" {
+      [32m+[0m[0m allow_overwrite = (known after apply)
+      [32m+[0m[0m fqdn            = (known after apply)
+      [32m+[0m[0m id              = (known after apply)
+      [32m+[0m[0m name            = (known after apply)
+      [32m+[0m[0m records         = (known after apply)
+      [32m+[0m[0m ttl             = 60
+      [32m+[0m[0m type            = (known after apply)
+      [32m+[0m[0m zone_id         = "Z04690263FQ7USBL2HWDX"
+    }
+
+[1m  # aws_s3_bucket.cloudtrail_logs[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket" "cloudtrail_logs" {
+      [32m+[0m[0m acceleration_status         = (known after apply)
+      [32m+[0m[0m acl                         = (known after apply)
+      [32m+[0m[0m arn                         = (known after apply)
+      [32m+[0m[0m bucket                      = "devsecops-platform-cloudtrail-095035153545"
+      [32m+[0m[0m bucket_domain_name          = (known after apply)
+      [32m+[0m[0m bucket_namespace            = (known after apply)
+      [32m+[0m[0m bucket_prefix               = (known after apply)
+      [32m+[0m[0m bucket_region               = (known after apply)
+      [32m+[0m[0m bucket_regional_domain_name = (known after apply)
+      [32m+[0m[0m force_destroy               = true
+      [32m+[0m[0m hosted_zone_id              = (known after apply)
+      [32m+[0m[0m id                          = (known after apply)
+      [32m+[0m[0m object_lock_enabled         = (known after apply)
+      [32m+[0m[0m policy                      = (known after apply)
+      [32m+[0m[0m region                      = "us-east-1"
+      [32m+[0m[0m request_payer               = (known after apply)
+      [32m+[0m[0m tags                        = {
+          [32m+[0m[0m "Name"    = "cloudtrail-logs"
+          [32m+[0m[0m "Project" = "devsecops-platform"
+        }
+      [32m+[0m[0m tags_all                    = {
+          [32m+[0m[0m "Name"    = "cloudtrail-logs"
+          [32m+[0m[0m "Project" = "devsecops-platform"
+        }
+      [32m+[0m[0m website_domain              = (known after apply)
+      [32m+[0m[0m website_endpoint            = (known after apply)
+
+      [32m+[0m[0m cors_rule (known after apply)
+
+      [32m+[0m[0m grant (known after apply)
+
+      [32m+[0m[0m lifecycle_rule (known after apply)
+
+      [32m+[0m[0m logging (known after apply)
+
+      [32m+[0m[0m object_lock_configuration (known after apply)
+
+      [32m+[0m[0m replication_configuration (known after apply)
+
+      [32m+[0m[0m server_side_encryption_configuration (known after apply)
+
+      [32m+[0m[0m versioning (known after apply)
+
+      [32m+[0m[0m website (known after apply)
+    }
+
+[1m  # aws_s3_bucket.model_store[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket" "model_store" {
+      [32m+[0m[0m acceleration_status         = (known after apply)
+      [32m+[0m[0m acl                         = (known after apply)
+      [32m+[0m[0m arn                         = (known after apply)
+      [32m+[0m[0m bucket                      = "devsecops-edge-models-095035153545"
+      [32m+[0m[0m bucket_domain_name          = (known after apply)
+      [32m+[0m[0m bucket_namespace            = (known after apply)
+      [32m+[0m[0m bucket_prefix               = (known after apply)
+      [32m+[0m[0m bucket_region               = (known after apply)
+      [32m+[0m[0m bucket_regional_domain_name = (known after apply)
+      [32m+[0m[0m force_destroy               = true
+      [32m+[0m[0m hosted_zone_id              = (known after apply)
+      [32m+[0m[0m id                          = (known after apply)
+      [32m+[0m[0m object_lock_enabled         = (known after apply)
+      [32m+[0m[0m policy                      = (known after apply)
+      [32m+[0m[0m region                      = "us-east-1"
+      [32m+[0m[0m request_payer               = (known after apply)
+      [32m+[0m[0m tags                        = {
+          [32m+[0m[0m "Project" = "devsecops-platform"
+          [32m+[0m[0m "Purpose" = "ml-model-storage"
+        }
+      [32m+[0m[0m tags_all                    = {
+          [32m+[0m[0m "Project" = "devsecops-platform"
+          [32m+[0m[0m "Purpose" = "ml-model-storage"
+        }
+      [32m+[0m[0m website_domain              = (known after apply)
+      [32m+[0m[0m website_endpoint            = (known after apply)
+
+      [32m+[0m[0m cors_rule (known after apply)
+
+      [32m+[0m[0m grant (known after apply)
+
+      [32m+[0m[0m lifecycle_rule (known after apply)
+
+      [32m+[0m[0m logging (known after apply)
+
+      [32m+[0m[0m object_lock_configuration (known after apply)
+
+      [32m+[0m[0m replication_configuration (known after apply)
+
+      [32m+[0m[0m server_side_encryption_configuration (known after apply)
+
+      [32m+[0m[0m versioning (known after apply)
+
+      [32m+[0m[0m website (known after apply)
+    }
+
+[1m  # aws_s3_bucket_notification.bucket_notification[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket_notification" "bucket_notification" {
+      [32m+[0m[0m bucket      = "aws-waf-logs-minju-0417-project"
+      [32m+[0m[0m eventbridge = false
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m region      = "us-east-1"
+
+      [32m+[0m[0m lambda_function {
+          [32m+[0m[0m events              = [
+              [32m+[0m[0m "s3:ObjectCreated:*",
+            ]
+          [32m+[0m[0m filter_prefix       = "results/"
+          [32m+[0m[0m filter_suffix       = ".json"
+          [32m+[0m[0m id                  = (known after apply)
+          [32m+[0m[0m lambda_function_arn = (known after apply)
+        }
+    }
+
+[1m  # aws_s3_bucket_policy.cloudtrail_logs[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket_policy" "cloudtrail_logs" {
+      [32m+[0m[0m bucket = (known after apply)
+      [32m+[0m[0m id     = (known after apply)
+      [32m+[0m[0m policy = (known after apply)
+      [32m+[0m[0m region = "us-east-1"
+    }
+
+[1m  # aws_s3_bucket_policy.model_store_ssl[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket_policy" "model_store_ssl" {
+      [32m+[0m[0m bucket = (known after apply)
+      [32m+[0m[0m id     = (known after apply)
+      [32m+[0m[0m policy = (known after apply)
+      [32m+[0m[0m region = "us-east-1"
+    }
+
+[1m  # aws_s3_bucket_public_access_block.cloudtrail_logs[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket_public_access_block" "cloudtrail_logs" {
+      [32m+[0m[0m block_public_acls       = true
+      [32m+[0m[0m block_public_policy     = true
+      [32m+[0m[0m bucket                  = (known after apply)
+      [32m+[0m[0m id                      = (known after apply)
+      [32m+[0m[0m ignore_public_acls      = true
+      [32m+[0m[0m region                  = "us-east-1"
+      [32m+[0m[0m restrict_public_buckets = true
+    }
+
+[1m  # aws_s3_bucket_public_access_block.model_store[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket_public_access_block" "model_store" {
+      [32m+[0m[0m block_public_acls       = true
+      [32m+[0m[0m block_public_policy     = true
+      [32m+[0m[0m bucket                  = (known after apply)
+      [32m+[0m[0m id                      = (known after apply)
+      [32m+[0m[0m ignore_public_acls      = true
+      [32m+[0m[0m region                  = "us-east-1"
+      [32m+[0m[0m restrict_public_buckets = true
+    }
+
+[1m  # aws_s3_bucket_server_side_encryption_configuration.cloudtrail_logs[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket_server_side_encryption_configuration" "cloudtrail_logs" {
+      [32m+[0m[0m bucket = (known after apply)
+      [32m+[0m[0m id     = (known after apply)
+      [32m+[0m[0m region = "us-east-1"
+
+      [32m+[0m[0m rule {
+          [32m+[0m[0m blocked_encryption_types = (known after apply)
+          [32m+[0m[0m bucket_key_enabled       = true
+
+          [32m+[0m[0m apply_server_side_encryption_by_default {
+              [32m+[0m[0m kms_master_key_id = (known after apply)
+              [32m+[0m[0m sse_algorithm     = "aws:kms"
+            }
+        }
+    }
+
+[1m  # aws_s3_bucket_server_side_encryption_configuration.model_store[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket_server_side_encryption_configuration" "model_store" {
+      [32m+[0m[0m bucket = (known after apply)
+      [32m+[0m[0m id     = (known after apply)
+      [32m+[0m[0m region = "us-east-1"
+
+      [32m+[0m[0m rule {
+          [32m+[0m[0m blocked_encryption_types = (known after apply)
+          [32m+[0m[0m bucket_key_enabled       = true
+
+          [32m+[0m[0m apply_server_side_encryption_by_default {
+              [32m+[0m[0m kms_master_key_id = (known after apply)
+              [32m+[0m[0m sse_algorithm     = "aws:kms"
+            }
+        }
+    }
+
+[1m  # aws_sns_topic.security_alerts[0m will be created
+[0m  [32m+[0m[0m resource "aws_sns_topic" "security_alerts" {
+      [32m+[0m[0m arn                         = (known after apply)
+      [32m+[0m[0m beginning_archive_time      = (known after apply)
+      [32m+[0m[0m content_based_deduplication = false
+      [32m+[0m[0m fifo_throughput_scope       = (known after apply)
+      [32m+[0m[0m fifo_topic                  = false
+      [32m+[0m[0m id                          = (known after apply)
+      [32m+[0m[0m kms_master_key_id           = (known after apply)
+      [32m+[0m[0m name                        = "devsecops-security-alerts"
+      [32m+[0m[0m name_prefix                 = (known after apply)
+      [32m+[0m[0m owner                       = (known after apply)
+      [32m+[0m[0m policy                      = (known after apply)
+      [32m+[0m[0m region                      = "us-east-1"
+      [32m+[0m[0m signature_version           = (known after apply)
+      [32m+[0m[0m tags_all                    = (known after apply)
+      [32m+[0m[0m tracing_config              = (known after apply)
+    }
+
+[1m  # aws_sns_topic_policy.default[0m will be created
+[0m  [32m+[0m[0m resource "aws_sns_topic_policy" "default" {
+      [32m+[0m[0m arn    = (known after apply)
+      [32m+[0m[0m id     = (known after apply)
+      [32m+[0m[0m owner  = (known after apply)
+      [32m+[0m[0m policy = (known after apply)
+      [32m+[0m[0m region = "us-east-1"
+    }
+
+[1m  # aws_sns_topic_subscription.email_subscription[0m will be created
+[0m  [32m+[0m[0m resource "aws_sns_topic_subscription" "email_subscription" {
+      [32m+[0m[0m arn                             = (known after apply)
+      [32m+[0m[0m confirmation_timeout_in_minutes = 1
+      [32m+[0m[0m confirmation_was_authenticated  = (known after apply)
+      [32m+[0m[0m endpoint                        = "yapp9069@naver.com"
+      [32m+[0m[0m endpoint_auto_confirms          = false
+      [32m+[0m[0m filter_policy_scope             = (known after apply)
+      [32m+[0m[0m id                              = (known after apply)
+      [32m+[0m[0m owner_id                        = (known after apply)
+      [32m+[0m[0m pending_confirmation            = (known after apply)
+      [32m+[0m[0m protocol                        = "email"
+      [32m+[0m[0m raw_message_delivery            = false
+      [32m+[0m[0m region                          = "us-east-1"
+      [32m+[0m[0m topic_arn                       = (known after apply)
+    }
+
+[1m  # aws_wafv2_web_acl.cloudfront[0m will be created
+[0m  [32m+[0m[0m resource "aws_wafv2_web_acl" "cloudfront" {
+      [32m+[0m[0m application_integration_url = (known after apply)
+      [32m+[0m[0m arn                         = (known after apply)
+      [32m+[0m[0m capacity                    = (known after apply)
+      [32m+[0m[0m id                          = (known after apply)
+      [32m+[0m[0m lock_token                  = (known after apply)
+      [32m+[0m[0m name                        = "devsecops-cloudfront-waf"
+      [32m+[0m[0m name_prefix                 = (known after apply)
+      [32m+[0m[0m region                      = "us-east-1"
+      [32m+[0m[0m scope                       = "CLOUDFRONT"
+      [32m+[0m[0m tags                        = {
+          [32m+[0m[0m "Project" = "devsecops-platform"
+        }
+      [32m+[0m[0m tags_all                    = {
+          [32m+[0m[0m "Project" = "devsecops-platform"
+        }
+
+      [32m+[0m[0m default_action {
+          [32m+[0m[0m allow {
+            }
+        }
+
+      [32m+[0m[0m rule {
+          [32m+[0m[0m name     = "AWSManagedRulesAmazonIpReputationList"
+          [32m+[0m[0m priority = 3
+
+          [32m+[0m[0m override_action {
+              [32m+[0m[0m none {}
+            }
+
+          [32m+[0m[0m statement {
+              [32m+[0m[0m managed_rule_group_statement {
+                  [32m+[0m[0m name        = "AWSManagedRulesAmazonIpReputationList"
+                  [32m+[0m[0m vendor_name = "AWS"
+                    [90m# (1 unchanged attribute hidden)[0m[0m
+                }
+            }
+
+          [32m+[0m[0m visibility_config {
+              [32m+[0m[0m cloudwatch_metrics_enabled = true
+              [32m+[0m[0m metric_name                = "CloudFrontIPReputationMetric"
+              [32m+[0m[0m sampled_requests_enabled   = true
+            }
+        }
+      [32m+[0m[0m rule {
+          [32m+[0m[0m name     = "AWSManagedRulesCommonRuleSet"
+          [32m+[0m[0m priority = 1
+
+          [32m+[0m[0m override_action {
+              [32m+[0m[0m none {}
+            }
+
+          [32m+[0m[0m statement {
+              [32m+[0m[0m managed_rule_group_statement {
+                  [32m+[0m[0m name        = "AWSManagedRulesCommonRuleSet"
+                  [32m+[0m[0m vendor_name = "AWS"
+                    [90m# (1 unchanged attribute hidden)[0m[0m
+                }
+            }
+
+          [32m+[0m[0m visibility_config {
+              [32m+[0m[0m cloudwatch_metrics_enabled = true
+              [32m+[0m[0m metric_name                = "CloudFrontCRSMetric"
+              [32m+[0m[0m sampled_requests_enabled   = true
+            }
+        }
+      [32m+[0m[0m rule {
+          [32m+[0m[0m name     = "AWSManagedRulesSQLiRuleSet"
+          [32m+[0m[0m priority = 2
+
+          [32m+[0m[0m override_action {
+              [32m+[0m[0m none {}
+            }
+
+          [32m+[0m[0m statement {
+              [32m+[0m[0m managed_rule_group_statement {
+                  [32m+[0m[0m name        = "AWSManagedRulesSQLiRuleSet"
+                  [32m+[0m[0m vendor_name = "AWS"
+                    [90m# (1 unchanged attribute hidden)[0m[0m
+                }
+            }
+
+          [32m+[0m[0m visibility_config {
+              [32m+[0m[0m cloudwatch_metrics_enabled = true
+              [32m+[0m[0m metric_name                = "CloudFrontSQLiMetric"
+              [32m+[0m[0m sampled_requests_enabled   = true
+            }
+        }
+
+      [32m+[0m[0m visibility_config {
+          [32m+[0m[0m cloudwatch_metrics_enabled = true
+          [32m+[0m[0m metric_name                = "devsecops-cloudfront-waf"
+          [32m+[0m[0m sampled_requests_enabled   = true
+        }
+    }
+
+[1m  # aws_wafv2_web_acl_association.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_wafv2_web_acl_association" "main" {
+      [32m+[0m[0m id           = (known after apply)
+      [32m+[0m[0m region       = "us-east-1"
+      [32m+[0m[0m resource_arn = (known after apply)
+      [32m+[0m[0m web_acl_arn  = (known after apply)
+    }
+
+[1m  # module.eks.aws_eks_cluster.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_eks_cluster" "main" {
+      [32m+[0m[0m arn                           = (known after apply)
+      [32m+[0m[0m bootstrap_self_managed_addons = true
+      [32m+[0m[0m certificate_authority         = (known after apply)
+      [32m+[0m[0m cluster_id                    = (known after apply)
+      [32m+[0m[0m created_at                    = (known after apply)
+      [32m+[0m[0m deletion_protection           = (known after apply)
+      [32m+[0m[0m endpoint                      = (known after apply)
+      [32m+[0m[0m id                            = (known after apply)
+      [32m+[0m[0m identity                      = (known after apply)
+      [32m+[0m[0m name                          = "devsecops-eks"
+      [32m+[0m[0m platform_version              = (known after apply)
+      [32m+[0m[0m region                        = "us-east-1"
+      [32m+[0m[0m role_arn                      = (known after apply)
+      [32m+[0m[0m status                        = (known after apply)
+      [32m+[0m[0m tags_all                      = (known after apply)
+      [32m+[0m[0m version                       = "1.30"
+
+      [32m+[0m[0m access_config (known after apply)
+
+      [32m+[0m[0m compute_config (known after apply)
+
+      [32m+[0m[0m control_plane_scaling_config (known after apply)
+
+      [32m+[0m[0m kubernetes_network_config (known after apply)
+
+      [32m+[0m[0m storage_config (known after apply)
+
+      [32m+[0m[0m upgrade_policy (known after apply)
+
+      [32m+[0m[0m vpc_config {
+          [32m+[0m[0m cluster_security_group_id = (known after apply)
+          [32m+[0m[0m endpoint_private_access   = true
+          [32m+[0m[0m endpoint_public_access    = true
+          [32m+[0m[0m public_access_cidrs       = (known after apply)
+          [32m+[0m[0m subnet_ids                = (known after apply)
+          [32m+[0m[0m vpc_id                    = (known after apply)
+        }
+    }
+
+[1m  # module.eks.aws_eks_node_group.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_eks_node_group" "main" {
+      [32m+[0m[0m ami_type               = (known after apply)
+      [32m+[0m[0m arn                    = (known after apply)
+      [32m+[0m[0m capacity_type          = (known after apply)
+      [32m+[0m[0m cluster_name           = "devsecops-eks"
+      [32m+[0m[0m disk_size              = (known after apply)
+      [32m+[0m[0m id                     = (known after apply)
+      [32m+[0m[0m instance_types         = [
+          [32m+[0m[0m "t3.medium",
+        ]
+      [32m+[0m[0m node_group_name        = "platform-nodes"
+      [32m+[0m[0m node_group_name_prefix = (known after apply)
+      [32m+[0m[0m node_role_arn          = (known after apply)
+      [32m+[0m[0m region                 = "us-east-1"
+      [32m+[0m[0m release_version        = (known after apply)
+      [32m+[0m[0m resources              = (known after apply)
+      [32m+[0m[0m status                 = (known after apply)
+      [32m+[0m[0m subnet_ids             = (known after apply)
+      [32m+[0m[0m tags                   = {
+          [32m+[0m[0m "Name"    = "devsecops-node-group"
+          [32m+[0m[0m "Project" = "devsecops-platform"
+        }
+      [32m+[0m[0m tags_all               = {
+          [32m+[0m[0m "Name"    = "devsecops-node-group"
+          [32m+[0m[0m "Project" = "devsecops-platform"
+        }
+      [32m+[0m[0m version                = (known after apply)
+
+      [32m+[0m[0m node_repair_config (known after apply)
+
+      [32m+[0m[0m scaling_config {
+          [32m+[0m[0m desired_size = 2
+          [32m+[0m[0m max_size     = 3
+          [32m+[0m[0m min_size     = 1
+        }
+
+      [32m+[0m[0m update_config {
+          [32m+[0m[0m max_unavailable = 1
+        }
+    }
+
+[1m  # module.eks.aws_iam_role.cluster[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "cluster" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "eks.amazonaws.com"
+                        }
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "devsecops-eks-cluster-role"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags_all              = (known after apply)
+      [32m+[0m[0m unique_id             = (known after apply)
+
+      [32m+[0m[0m inline_policy (known after apply)
+    }
+
+[1m  # module.eks.aws_iam_role.node[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "node" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "ec2.amazonaws.com"
+                        }
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "devsecops-eks-node-role"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags_all              = (known after apply)
+      [32m+[0m[0m unique_id             = (known after apply)
+
+      [32m+[0m[0m inline_policy (known after apply)
+    }
+
+[1m  # module.eks.aws_iam_role_policy_attachment.cluster_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "cluster_policy" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+      [32m+[0m[0m role       = "devsecops-eks-cluster-role"
+    }
+
+[1m  # module.eks.aws_iam_role_policy_attachment.node_cni_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "node_cni_policy" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+      [32m+[0m[0m role       = "devsecops-eks-node-role"
+    }
+
+[1m  # module.eks.aws_iam_role_policy_attachment.node_ecr_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "node_ecr_policy" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+      [32m+[0m[0m role       = "devsecops-eks-node-role"
+    }
+
+[1m  # module.eks.aws_iam_role_policy_attachment.node_worker_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "node_worker_policy" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+      [32m+[0m[0m role       = "devsecops-eks-node-role"
+    }
+
+[1m  # module.network.aws_cloudwatch_log_group.vpc_flow_logs[0m will be created
+[0m  [32m+[0m[0m resource "aws_cloudwatch_log_group" "vpc_flow_logs" {
+      [32m+[0m[0m arn                         = (known after apply)
+      [32m+[0m[0m deletion_protection_enabled = (known after apply)
+      [32m+[0m[0m id                          = (known after apply)
+      [32m+[0m[0m log_group_class             = (known after apply)
+      [32m+[0m[0m name                        = "/aws/vpc/devsecops-flow-logs"
+      [32m+[0m[0m name_prefix                 = (known after apply)
+      [32m+[0m[0m region                      = "us-east-1"
+      [32m+[0m[0m retention_in_days           = 30
+      [32m+[0m[0m skip_destroy                = false
+      [32m+[0m[0m tags_all                    = (known after apply)
+    }
+
+[1m  # module.network.aws_default_security_group.default[0m will be created
+[0m  [32m+[0m[0m resource "aws_default_security_group" "default" {
+      [32m+[0m[0m arn                    = (known after apply)
+      [32m+[0m[0m description            = (known after apply)
+      [32m+[0m[0m egress                 = []
+      [32m+[0m[0m id                     = (known after apply)
+      [32m+[0m[0m ingress                = []
+      [32m+[0m[0m name                   = (known after apply)
+      [32m+[0m[0m name_prefix            = (known after apply)
+      [32m+[0m[0m owner_id               = (known after apply)
+      [32m+[0m[0m region                 = "us-east-1"
+      [32m+[0m[0m revoke_rules_on_delete = false
+      [32m+[0m[0m tags_all               = (known after apply)
+      [32m+[0m[0m vpc_id                 = (known after apply)
+    }
+
+[1m  # module.network.aws_eip.nat[0m will be created
+[0m  [32m+[0m[0m resource "aws_eip" "nat" {
+      [32m+[0m[0m allocation_id        = (known after apply)
+      [32m+[0m[0m arn                  = (known after apply)
+      [32m+[0m[0m association_id       = (known after apply)
+      [32m+[0m[0m carrier_ip           = (known after apply)
+      [32m+[0m[0m customer_owned_ip    = (known after apply)
+      [32m+[0m[0m domain               = "vpc"
+      [32m+[0m[0m id                   = (known after apply)
+      [32m+[0m[0m instance             = (known after apply)
+      [32m+[0m[0m ipam_pool_id         = (known after apply)
+      [32m+[0m[0m network_border_group = (known after apply)
+      [32m+[0m[0m network_interface    = (known after apply)
+      [32m+[0m[0m private_dns          = (known after apply)
+      [32m+[0m[0m private_ip           = (known after apply)
+      [32m+[0m[0m ptr_record           = (known after apply)
+      [32m+[0m[0m public_dns           = (known after apply)
+      [32m+[0m[0m public_ip            = (known after apply)
+      [32m+[0m[0m public_ipv4_pool     = (known after apply)
+      [32m+[0m[0m region               = "us-east-1"
+      [32m+[0m[0m tags                 = {
+          [32m+[0m[0m "Name" = "devsecops-nat-eip"
+        }
+      [32m+[0m[0m tags_all             = {
+          [32m+[0m[0m "Name" = "devsecops-nat-eip"
+        }
+    }
+
+[1m  # module.network.aws_flow_log.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_flow_log" "main" {
+      [32m+[0m[0m arn                      = (known after apply)
+      [32m+[0m[0m iam_role_arn             = (known after apply)
+      [32m+[0m[0m id                       = (known after apply)
+      [32m+[0m[0m log_destination          = (known after apply)
+      [32m+[0m[0m log_destination_type     = "cloud-watch-logs"
+      [32m+[0m[0m log_format               = (known after apply)
+      [32m+[0m[0m max_aggregation_interval = 600
+      [32m+[0m[0m region                   = "us-east-1"
+      [32m+[0m[0m tags                     = {
+          [32m+[0m[0m "Name"    = "devsecops-vpc-flow-log"
+          [32m+[0m[0m "Project" = "devsecops-platform"
+        }
+      [32m+[0m[0m tags_all                 = {
+          [32m+[0m[0m "Name"    = "devsecops-vpc-flow-log"
+          [32m+[0m[0m "Project" = "devsecops-platform"
+        }
+      [32m+[0m[0m traffic_type             = "ALL"
+      [32m+[0m[0m vpc_id                   = (known after apply)
+    }
+
+[1m  # module.network.aws_iam_instance_profile.ec2_profile[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_instance_profile" "ec2_profile" {
+      [32m+[0m[0m arn         = (known after apply)
+      [32m+[0m[0m create_date = (known after apply)
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = "devsecops-ec2-profile"
+      [32m+[0m[0m name_prefix = (known after apply)
+      [32m+[0m[0m path        = "/"
+      [32m+[0m[0m role        = "devsecops-ec2-ai-role"
+      [32m+[0m[0m tags_all    = (known after apply)
+      [32m+[0m[0m unique_id   = (known after apply)
+    }
+
+[1m  # module.network.aws_iam_openid_connect_provider.github[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_openid_connect_provider" "github" {
+      [32m+[0m[0m arn             = (known after apply)
+      [32m+[0m[0m client_id_list  = [
+          [32m+[0m[0m "sts.amazonaws.com",
+        ]
+      [32m+[0m[0m id              = (known after apply)
+      [32m+[0m[0m tags_all        = (known after apply)
+      [32m+[0m[0m thumbprint_list = [
+          [32m+[0m[0m "1c5877c10b42798e692138096e47c13459e984d7",
+        ]
+      [32m+[0m[0m url             = "https://token.actions.githubusercontent.com"
+    }
+
+[1m  # module.network.aws_iam_policy.ec2_ai_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_policy" "ec2_ai_policy" {
+      [32m+[0m[0m arn              = (known after apply)
+      [32m+[0m[0m attachment_count = (known after apply)
+      [32m+[0m[0m description      = "Least privilege policy for EC2 AI analysis engine"
+      [32m+[0m[0m id               = (known after apply)
+      [32m+[0m[0m name             = "devsecops-ec2-ai-policy"
+      [32m+[0m[0m name_prefix      = (known after apply)
+      [32m+[0m[0m path             = "/"
+      [32m+[0m[0m policy           = (known after apply)
+      [32m+[0m[0m policy_id        = (known after apply)
+      [32m+[0m[0m tags_all         = (known after apply)
+    }
+
+[1m  # module.network.aws_iam_policy.github_actions_minimal_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_policy" "github_actions_minimal_policy" {
+      [32m+[0m[0m arn              = (known after apply)
+      [32m+[0m[0m attachment_count = (known after apply)
+      [32m+[0m[0m description      = "Super-refined minimal permissions for DevSecOps"
+      [32m+[0m[0m id               = (known after apply)
+      [32m+[0m[0m name             = "github-actions-minimal-policy"
+      [32m+[0m[0m name_prefix      = (known after apply)
+      [32m+[0m[0m path             = "/"
+      [32m+[0m[0m policy           = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action   = [
+                          [32m+[0m[0m "ec2:Describe*",
+                          [32m+[0m[0m "ec2:CreateVpc",
+                          [32m+[0m[0m "ec2:ModifyVpcAttribute",
+                          [32m+[0m[0m "ec2:CreateSubnet",
+                          [32m+[0m[0m "ec2:CreateSecurityGroup",
+                          [32m+[0m[0m "ec2:AuthorizeSecurityGroupIngress",
+                          [32m+[0m[0m "ec2:RevokeSecurityGroupIngress",
+                        ]
+                      [32m+[0m[0m Effect   = "Allow"
+                      [32m+[0m[0m Resource = "*"
+                    },
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = [
+                          [32m+[0m[0m "ec2:RunInstances",
+                        ]
+                      [32m+[0m[0m Condition = {
+                          [32m+[0m[0m StringEquals = {
+                              [32m+[0m[0m "ec2:InstanceType" = [
+                                  [32m+[0m[0m "t3.micro",
+                                ]
+                            }
+                        }
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Resource  = "*"
+                    },
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = [
+                          [32m+[0m[0m "ec2:TerminateInstances",
+                          [32m+[0m[0m "ec2:StopInstances",
+                          [32m+[0m[0m "ec2:StartInstances",
+                        ]
+                      [32m+[0m[0m Condition = {
+                          [32m+[0m[0m StringEquals = {
+                              [32m+[0m[0m "aws:ResourceTag/Project" = "devsecops-platform"
+                            }
+                        }
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Resource  = "*"
+                    },
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action   = [
+                          [32m+[0m[0m "dynamodb:GetItem",
+                          [32m+[0m[0m "dynamodb:PutItem",
+                          [32m+[0m[0m "dynamodb:DeleteItem",
+                        ]
+                      [32m+[0m[0m Effect   = "Allow"
+                      [32m+[0m[0m Resource = "arn:aws:dynamodb:us-east-1:*:table/terraform-lock-table"
+                    },
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action   = [
+                          [32m+[0m[0m "s3:GetObject",
+                          [32m+[0m[0m "s3:PutObject",
+                          [32m+[0m[0m "s3:DeleteObject",
+                          [32m+[0m[0m "s3:ListBucket",
+                        ]
+                      [32m+[0m[0m Effect   = "Allow"
+                      [32m+[0m[0m Resource = [
+                          [32m+[0m[0m "arn:aws:s3:::minju-devsecops-tfstate-virginia",
+                          [32m+[0m[0m "arn:aws:s3:::minju-devsecops-tfstate-virginia/*",
+                        ]
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m policy_id        = (known after apply)
+      [32m+[0m[0m tags_all         = (known after apply)
+    }
+
+[1m  # module.network.aws_iam_policy.lambda_blocker_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_policy" "lambda_blocker_policy" {
+      [32m+[0m[0m arn              = (known after apply)
+      [32m+[0m[0m attachment_count = (known after apply)
+      [32m+[0m[0m description      = "Least privilege policy for Lambda WAF IPSet blocker"
+      [32m+[0m[0m id               = (known after apply)
+      [32m+[0m[0m name             = "devsecops-lambda-blocker-policy"
+      [32m+[0m[0m name_prefix      = (known after apply)
+      [32m+[0m[0m path             = "/"
+      [32m+[0m[0m policy           = (known after apply)
+      [32m+[0m[0m policy_id        = (known after apply)
+      [32m+[0m[0m tags_all         = (known after apply)
+    }
+
+[1m  # module.network.aws_iam_role.ec2_ai_role[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "ec2_ai_role" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "ec2.amazonaws.com"
+                        }
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "devsecops-ec2-ai-role"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags_all              = (known after apply)
+      [32m+[0m[0m unique_id             = (known after apply)
+
+      [32m+[0m[0m inline_policy (known after apply)
+    }
+
+[1m  # module.network.aws_iam_role.github_actions_role[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "github_actions_role" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = (known after apply)
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "github-actions-oidc-role"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags_all              = (known after apply)
+      [32m+[0m[0m unique_id             = (known after apply)
+
+      [32m+[0m[0m inline_policy (known after apply)
+    }
+
+[1m  # module.network.aws_iam_role.lambda_blocker_role[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "lambda_blocker_role" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "lambda.amazonaws.com"
+                        }
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "devsecops-lambda-blocker-role"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags_all              = (known after apply)
+      [32m+[0m[0m unique_id             = (known after apply)
+
+      [32m+[0m[0m inline_policy (known after apply)
+    }
+
+[1m  # module.network.aws_iam_role.vpc_flow_log_role[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "vpc_flow_log_role" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "vpc-flow-logs.amazonaws.com"
+                        }
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "devsecops-vpc-flow-log-role"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags_all              = (known after apply)
+      [32m+[0m[0m unique_id             = (known after apply)
+
+      [32m+[0m[0m inline_policy (known after apply)
+    }
+
+[1m  # module.network.aws_iam_role_policy.vpc_flow_log_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy" "vpc_flow_log_policy" {
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = "devsecops-vpc-flow-log-policy"
+      [32m+[0m[0m name_prefix = (known after apply)
+      [32m+[0m[0m policy      = (known after apply)
+      [32m+[0m[0m role        = (known after apply)
+    }
+
+[1m  # module.network.aws_iam_role_policy_attachment.ec2_ai_attach[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "ec2_ai_attach" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = (known after apply)
+      [32m+[0m[0m role       = "devsecops-ec2-ai-role"
+    }
+
+[1m  # module.network.aws_iam_role_policy_attachment.github_actions_admin[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "github_actions_admin" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+      [32m+[0m[0m role       = "github-actions-oidc-role"
+    }
+
+[1m  # module.network.aws_iam_role_policy_attachment.github_actions_attach[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "github_actions_attach" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = (known after apply)
+      [32m+[0m[0m role       = "github-actions-oidc-role"
+    }
+
+[1m  # module.network.aws_iam_role_policy_attachment.lambda_blocker_attach[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "lambda_blocker_attach" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = (known after apply)
+      [32m+[0m[0m role       = "devsecops-lambda-blocker-role"
+    }
+
+[1m  # module.network.aws_internet_gateway.igw[0m will be created
+[0m  [32m+[0m[0m resource "aws_internet_gateway" "igw" {
+      [32m+[0m[0m arn      = (known after apply)
+      [32m+[0m[0m id       = (known after apply)
+      [32m+[0m[0m owner_id = (known after apply)
+      [32m+[0m[0m region   = "us-east-1"
+      [32m+[0m[0m tags     = {
+          [32m+[0m[0m "Name" = "devsecops-igw"
+        }
+      [32m+[0m[0m tags_all = {
+          [32m+[0m[0m "Name" = "devsecops-igw"
+        }
+      [32m+[0m[0m vpc_id   = (known after apply)
+    }
+
+[1m  # module.network.aws_nat_gateway.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_nat_gateway" "main" {
+      [32m+[0m[0m allocation_id                      = (known after apply)
+      [32m+[0m[0m association_id                     = (known after apply)
+      [32m+[0m[0m auto_provision_zones               = (known after apply)
+      [32m+[0m[0m auto_scaling_ips                   = (known after apply)
+      [32m+[0m[0m availability_mode                  = (known after apply)
+      [32m+[0m[0m connectivity_type                  = "public"
+      [32m+[0m[0m id                                 = (known after apply)
+      [32m+[0m[0m network_interface_id               = (known after apply)
+      [32m+[0m[0m private_ip                         = (known after apply)
+      [32m+[0m[0m public_ip                          = (known after apply)
+      [32m+[0m[0m region                             = "us-east-1"
+      [32m+[0m[0m regional_nat_gateway_address       = (known after apply)
+      [32m+[0m[0m regional_nat_gateway_auto_mode     = (known after apply)
+      [32m+[0m[0m route_table_id                     = (known after apply)
+      [32m+[0m[0m secondary_allocation_ids           = (known after apply)
+      [32m+[0m[0m secondary_private_ip_address_count = (known after apply)
+      [32m+[0m[0m secondary_private_ip_addresses     = (known after apply)
+      [32m+[0m[0m subnet_id                          = (known after apply)
+      [32m+[0m[0m tags                               = {
+          [32m+[0m[0m "Name" = "devsecops-nat-gw"
+        }
+      [32m+[0m[0m tags_all                           = {
+          [32m+[0m[0m "Name" = "devsecops-nat-gw"
+        }
+      [32m+[0m[0m vpc_id                             = (known after apply)
+    }
+
+[1m  # module.network.aws_route_table.private[0m will be created
+[0m  [32m+[0m[0m resource "aws_route_table" "private" {
+      [32m+[0m[0m arn              = (known after apply)
+      [32m+[0m[0m id               = (known after apply)
+      [32m+[0m[0m owner_id         = (known after apply)
+      [32m+[0m[0m propagating_vgws = (known after apply)
+      [32m+[0m[0m region           = "us-east-1"
+      [32m+[0m[0m route            = [
+          [32m+[0m[0m {
+              [32m+[0m[0m cidr_block                 = "0.0.0.0/0"
+              [32m+[0m[0m nat_gateway_id             = (known after apply)
+                [90m# (12 unchanged attributes hidden)[0m[0m
+            },
+        ]
+      [32m+[0m[0m tags             = {
+          [32m+[0m[0m "Name" = "devsecops-private-rt"
+        }
+      [32m+[0m[0m tags_all         = {
+          [32m+[0m[0m "Name" = "devsecops-private-rt"
+        }
+      [32m+[0m[0m vpc_id           = (known after apply)
+    }
+
+[1m  # module.network.aws_route_table.public[0m will be created
+[0m  [32m+[0m[0m resource "aws_route_table" "public" {
+      [32m+[0m[0m arn              = (known after apply)
+      [32m+[0m[0m id               = (known after apply)
+      [32m+[0m[0m owner_id         = (known after apply)
+      [32m+[0m[0m propagating_vgws = (known after apply)
+      [32m+[0m[0m region           = "us-east-1"
+      [32m+[0m[0m route            = [
+          [32m+[0m[0m {
+              [32m+[0m[0m cidr_block                 = "0.0.0.0/0"
+              [32m+[0m[0m gateway_id                 = (known after apply)
+                [90m# (12 unchanged attributes hidden)[0m[0m
+            },
+        ]
+      [32m+[0m[0m tags_all         = (known after apply)
+      [32m+[0m[0m vpc_id           = (known after apply)
+    }
+
+[1m  # module.network.aws_route_table_association.private_app[0][0m will be created
+[0m  [32m+[0m[0m resource "aws_route_table_association" "private_app" {
+      [32m+[0m[0m id             = (known after apply)
+      [32m+[0m[0m region         = "us-east-1"
+      [32m+[0m[0m route_table_id = (known after apply)
+      [32m+[0m[0m subnet_id      = (known after apply)
+    }
+
+[1m  # module.network.aws_route_table_association.private_app[1][0m will be created
+[0m  [32m+[0m[0m resource "aws_route_table_association" "private_app" {
+      [32m+[0m[0m id             = (known after apply)
+      [32m+[0m[0m region         = "us-east-1"
+      [32m+[0m[0m route_table_id = (known after apply)
+      [32m+[0m[0m subnet_id      = (known after apply)
+    }
+
+[1m  # module.network.aws_route_table_association.private_db[0][0m will be created
+[0m  [32m+[0m[0m resource "aws_route_table_association" "private_db" {
+      [32m+[0m[0m id             = (known after apply)
+      [32m+[0m[0m region         = "us-east-1"
+      [32m+[0m[0m route_table_id = (known after apply)
+      [32m+[0m[0m subnet_id      = (known after apply)
+    }
+
+[1m  # module.network.aws_route_table_association.private_db[1][0m will be created
+[0m  [32m+[0m[0m resource "aws_route_table_association" "private_db" {
+      [32m+[0m[0m id             = (known after apply)
+      [32m+[0m[0m region         = "us-east-1"
+      [32m+[0m[0m route_table_id = (known after apply)
+      [32m+[0m[0m subnet_id      = (known after apply)
+    }
+
+[1m  # module.network.aws_route_table_association.public[0m will be created
+[0m  [32m+[0m[0m resource "aws_route_table_association" "public" {
+      [32m+[0m[0m id             = (known after apply)
+      [32m+[0m[0m region         = "us-east-1"
+      [32m+[0m[0m route_table_id = (known after apply)
+      [32m+[0m[0m subnet_id      = (known after apply)
+    }
+
+[1m  # module.network.aws_route_table_association.public_2[0m will be created
+[0m  [32m+[0m[0m resource "aws_route_table_association" "public_2" {
+      [32m+[0m[0m id             = (known after apply)
+      [32m+[0m[0m region         = "us-east-1"
+      [32m+[0m[0m route_table_id = (known after apply)
+      [32m+[0m[0m subnet_id      = (known after apply)
+    }
+
+[1m  # module.network.aws_security_group.main_sg[0m will be created
+[0m  [32m+[0m[0m resource "aws_security_group" "main_sg" {
+      [32m+[0m[0m arn                    = (known after apply)
+      [32m+[0m[0m description            = "DevSecOps platform main security group"
+      [32m+[0m[0m egress                 = [
+          [32m+[0m[0m {
+              [32m+[0m[0m cidr_blocks      = [
+                  [32m+[0m[0m "0.0.0.0/0",
+                ]
+              [32m+[0m[0m description      = "Allow outbound for AWS API, apt, and external services. Monitored via VPC Flow Logs."
+              [32m+[0m[0m from_port        = 0
+              [32m+[0m[0m ipv6_cidr_blocks = []
+              [32m+[0m[0m prefix_list_ids  = []
+              [32m+[0m[0m protocol         = "-1"
+              [32m+[0m[0m security_groups  = []
+              [32m+[0m[0m self             = false
+              [32m+[0m[0m to_port          = 0
+            },
+        ]
+      [32m+[0m[0m id                     = (known after apply)
+      [32m+[0m[0m ingress                = [
+          [32m+[0m[0m {
+              [32m+[0m[0m cidr_blocks      = [
+                  [32m+[0m[0m "49.143.64.148/32",
+                ]
+              [32m+[0m[0m description      = "Allow Grafana access from admin IP"
+              [32m+[0m[0m from_port        = 3000
+              [32m+[0m[0m ipv6_cidr_blocks = []
+              [32m+[0m[0m prefix_list_ids  = []
+              [32m+[0m[0m protocol         = "tcp"
+              [32m+[0m[0m security_groups  = []
+              [32m+[0m[0m self             = false
+              [32m+[0m[0m to_port          = 3000
+            },
+          [32m+[0m[0m {
+              [32m+[0m[0m cidr_blocks      = [
+                  [32m+[0m[0m "49.143.64.148/32",
+                ]
+              [32m+[0m[0m description      = "SSH access from admin IP only"
+              [32m+[0m[0m from_port        = 22
+              [32m+[0m[0m ipv6_cidr_blocks = []
+              [32m+[0m[0m prefix_list_ids  = []
+              [32m+[0m[0m protocol         = "tcp"
+              [32m+[0m[0m security_groups  = []
+              [32m+[0m[0m self             = false
+              [32m+[0m[0m to_port          = 22
+            },
+        ]
+      [32m+[0m[0m name                   = "devsecops-main-sg"
+      [32m+[0m[0m name_prefix            = (known after apply)
+      [32m+[0m[0m owner_id               = (known after apply)
+      [32m+[0m[0m region                 = "us-east-1"
+      [32m+[0m[0m revoke_rules_on_delete = false
+      [32m+[0m[0m tags_all               = (known after apply)
+      [32m+[0m[0m vpc_id                 = (known after apply)
+    }
+
+[1m  # module.network.aws_subnet.private_app[0][0m will be created
+[0m  [32m+[0m[0m resource "aws_subnet" "private_app" {
+      [32m+[0m[0m arn                                            = (known after apply)
+      [32m+[0m[0m assign_ipv6_address_on_creation                = false
+      [32m+[0m[0m availability_zone                              = "us-east-1a"
+      [32m+[0m[0m availability_zone_id                           = (known after apply)
+      [32m+[0m[0m cidr_block                                     = "10.0.11.0/24"
+      [32m+[0m[0m enable_dns64                                   = false
+      [32m+[0m[0m enable_resource_name_dns_a_record_on_launch    = false
+      [32m+[0m[0m enable_resource_name_dns_aaaa_record_on_launch = false
+      [32m+[0m[0m id                                             = (known after apply)
+      [32m+[0m[0m ipv6_cidr_block                                = (known after apply)
+      [32m+[0m[0m ipv6_cidr_block_association_id                 = (known after apply)
+      [32m+[0m[0m ipv6_native                                    = false
+      [32m+[0m[0m map_public_ip_on_launch                        = false
+      [32m+[0m[0m owner_id                                       = (known after apply)
+      [32m+[0m[0m private_dns_hostname_type_on_launch            = (known after apply)
+      [32m+[0m[0m region                                         = "us-east-1"
+      [32m+[0m[0m tags                                           = {
+          [32m+[0m[0m "Name" = "devsecops-private-app-1"
+        }
+      [32m+[0m[0m tags_all                                       = {
+          [32m+[0m[0m "Name" = "devsecops-private-app-1"
+        }
+      [32m+[0m[0m vpc_id                                         = (known after apply)
+    }
+
+[1m  # module.network.aws_subnet.private_app[1][0m will be created
+[0m  [32m+[0m[0m resource "aws_subnet" "private_app" {
+      [32m+[0m[0m arn                                            = (known after apply)
+      [32m+[0m[0m assign_ipv6_address_on_creation                = false
+      [32m+[0m[0m availability_zone                              = "us-east-1b"
+      [32m+[0m[0m availability_zone_id                           = (known after apply)
+      [32m+[0m[0m cidr_block                                     = "10.0.12.0/24"
+      [32m+[0m[0m enable_dns64                                   = false
+      [32m+[0m[0m enable_resource_name_dns_a_record_on_launch    = false
+      [32m+[0m[0m enable_resource_name_dns_aaaa_record_on_launch = false
+      [32m+[0m[0m id                                             = (known after apply)
+      [32m+[0m[0m ipv6_cidr_block                                = (known after apply)
+      [32m+[0m[0m ipv6_cidr_block_association_id                 = (known after apply)
+      [32m+[0m[0m ipv6_native                                    = false
+      [32m+[0m[0m map_public_ip_on_launch                        = false
+      [32m+[0m[0m owner_id                                       = (known after apply)
+      [32m+[0m[0m private_dns_hostname_type_on_launch            = (known after apply)
+      [32m+[0m[0m region                                         = "us-east-1"
+      [32m+[0m[0m tags                                           = {
+          [32m+[0m[0m "Name" = "devsecops-private-app-2"
+        }
+      [32m+[0m[0m tags_all                                       = {
+          [32m+[0m[0m "Name" = "devsecops-private-app-2"
+        }
+      [32m+[0m[0m vpc_id                                         = (known after apply)
+    }
+
+[1m  # module.network.aws_subnet.private_db[0][0m will be created
+[0m  [32m+[0m[0m resource "aws_subnet" "private_db" {
+      [32m+[0m[0m arn                                            = (known after apply)
+      [32m+[0m[0m assign_ipv6_address_on_creation                = false
+      [32m+[0m[0m availability_zone                              = "us-east-1a"
+      [32m+[0m[0m availability_zone_id                           = (known after apply)
+      [32m+[0m[0m cidr_block                                     = "10.0.21.0/24"
+      [32m+[0m[0m enable_dns64                                   = false
+      [32m+[0m[0m enable_resource_name_dns_a_record_on_launch    = false
+      [32m+[0m[0m enable_resource_name_dns_aaaa_record_on_launch = false
+      [32m+[0m[0m id                                             = (known after apply)
+      [32m+[0m[0m ipv6_cidr_block                                = (known after apply)
+      [32m+[0m[0m ipv6_cidr_block_association_id                 = (known after apply)
+      [32m+[0m[0m ipv6_native                                    = false
+      [32m+[0m[0m map_public_ip_on_launch                        = false
+      [32m+[0m[0m owner_id                                       = (known after apply)
+      [32m+[0m[0m private_dns_hostname_type_on_launch            = (known after apply)
+      [32m+[0m[0m region                                         = "us-east-1"
+      [32m+[0m[0m tags                                           = {
+          [32m+[0m[0m "Name" = "devsecops-private-db-1"
+        }
+      [32m+[0m[0m tags_all                                       = {
+          [32m+[0m[0m "Name" = "devsecops-private-db-1"
+        }
+      [32m+[0m[0m vpc_id                                         = (known after apply)
+    }
+
+[1m  # module.network.aws_subnet.private_db[1][0m will be created
+[0m  [32m+[0m[0m resource "aws_subnet" "private_db" {
+      [32m+[0m[0m arn                                            = (known after apply)
+      [32m+[0m[0m assign_ipv6_address_on_creation                = false
+      [32m+[0m[0m availability_zone                              = "us-east-1b"
+      [32m+[0m[0m availability_zone_id                           = (known after apply)
+      [32m+[0m[0m cidr_block                                     = "10.0.22.0/24"
+      [32m+[0m[0m enable_dns64                                   = false
+      [32m+[0m[0m enable_resource_name_dns_a_record_on_launch    = false
+      [32m+[0m[0m enable_resource_name_dns_aaaa_record_on_launch = false
+      [32m+[0m[0m id                                             = (known after apply)
+      [32m+[0m[0m ipv6_cidr_block                                = (known after apply)
+      [32m+[0m[0m ipv6_cidr_block_association_id                 = (known after apply)
+      [32m+[0m[0m ipv6_native                                    = false
+      [32m+[0m[0m map_public_ip_on_launch                        = false
+      [32m+[0m[0m owner_id                                       = (known after apply)
+      [32m+[0m[0m private_dns_hostname_type_on_launch            = (known after apply)
+      [32m+[0m[0m region                                         = "us-east-1"
+      [32m+[0m[0m tags                                           = {
+          [32m+[0m[0m "Name" = "devsecops-private-db-2"
+        }
+      [32m+[0m[0m tags_all                                       = {
+          [32m+[0m[0m "Name" = "devsecops-private-db-2"
+        }
+      [32m+[0m[0m vpc_id                                         = (known after apply)
+    }
+
+[1m  # module.network.aws_subnet.public[0m will be created
+[0m  [32m+[0m[0m resource "aws_subnet" "public" {
+      [32m+[0m[0m arn                                            = (known after apply)
+      [32m+[0m[0m assign_ipv6_address_on_creation                = false
+      [32m+[0m[0m availability_zone                              = "us-east-1a"
+      [32m+[0m[0m availability_zone_id                           = (known after apply)
+      [32m+[0m[0m cidr_block                                     = "10.0.1.0/24"
+      [32m+[0m[0m enable_dns64                                   = false
+      [32m+[0m[0m enable_resource_name_dns_a_record_on_launch    = false
+      [32m+[0m[0m enable_resource_name_dns_aaaa_record_on_launch = false
+      [32m+[0m[0m id                                             = (known after apply)
+      [32m+[0m[0m ipv6_cidr_block                                = (known after apply)
+      [32m+[0m[0m ipv6_cidr_block_association_id                 = (known after apply)
+      [32m+[0m[0m ipv6_native                                    = false
+      [32m+[0m[0m map_public_ip_on_launch                        = true
+      [32m+[0m[0m owner_id                                       = (known after apply)
+      [32m+[0m[0m private_dns_hostname_type_on_launch            = (known after apply)
+      [32m+[0m[0m region                                         = "us-east-1"
+      [32m+[0m[0m tags                                           = {
+          [32m+[0m[0m "Name" = "devsecops-public-1a"
+        }
+      [32m+[0m[0m tags_all                                       = {
+          [32m+[0m[0m "Name" = "devsecops-public-1a"
+        }
+      [32m+[0m[0m vpc_id                                         = (known after apply)
+    }
+
+[1m  # module.network.aws_subnet.public_2[0m will be created
+[0m  [32m+[0m[0m resource "aws_subnet" "public_2" {
+      [32m+[0m[0m arn                                            = (known after apply)
+      [32m+[0m[0m assign_ipv6_address_on_creation                = false
+      [32m+[0m[0m availability_zone                              = "us-east-1b"
+      [32m+[0m[0m availability_zone_id                           = (known after apply)
+      [32m+[0m[0m cidr_block                                     = "10.0.2.0/24"
+      [32m+[0m[0m enable_dns64                                   = false
+      [32m+[0m[0m enable_resource_name_dns_a_record_on_launch    = false
+      [32m+[0m[0m enable_resource_name_dns_aaaa_record_on_launch = false
+      [32m+[0m[0m id                                             = (known after apply)
+      [32m+[0m[0m ipv6_cidr_block                                = (known after apply)
+      [32m+[0m[0m ipv6_cidr_block_association_id                 = (known after apply)
+      [32m+[0m[0m ipv6_native                                    = false
+      [32m+[0m[0m map_public_ip_on_launch                        = true
+      [32m+[0m[0m owner_id                                       = (known after apply)
+      [32m+[0m[0m private_dns_hostname_type_on_launch            = (known after apply)
+      [32m+[0m[0m region                                         = "us-east-1"
+      [32m+[0m[0m tags                                           = {
+          [32m+[0m[0m "Name" = "devsecops-public-1b"
+        }
+      [32m+[0m[0m tags_all                                       = {
+          [32m+[0m[0m "Name" = "devsecops-public-1b"
+        }
+      [32m+[0m[0m vpc_id                                         = (known after apply)
+    }
+
+[1m  # module.network.aws_vpc.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_vpc" "main" {
+      [32m+[0m[0m arn                                  = (known after apply)
+      [32m+[0m[0m cidr_block                           = "10.0.0.0/16"
+      [32m+[0m[0m default_network_acl_id               = (known after apply)
+      [32m+[0m[0m default_route_table_id               = (known after apply)
+      [32m+[0m[0m default_security_group_id            = (known after apply)
+      [32m+[0m[0m dhcp_options_id                      = (known after apply)
+      [32m+[0m[0m enable_dns_hostnames                 = true
+      [32m+[0m[0m enable_dns_support                   = true
+      [32m+[0m[0m enable_network_address_usage_metrics = (known after apply)
+      [32m+[0m[0m id                                   = (known after apply)
+      [32m+[0m[0m instance_tenancy                     = "default"
+      [32m+[0m[0m ipv6_association_id                  = (known after apply)
+      [32m+[0m[0m ipv6_cidr_block                      = (known after apply)
+      [32m+[0m[0m ipv6_cidr_block_network_border_group = (known after apply)
+      [32m+[0m[0m main_route_table_id                  = (known after apply)
+      [32m+[0m[0m owner_id                             = (known after apply)
+      [32m+[0m[0m region                               = "us-east-1"
+      [32m+[0m[0m tags                                 = {
+          [32m+[0m[0m "Name" = "devsecops-vpc"
+        }
+      [32m+[0m[0m tags_all                             = {
+          [32m+[0m[0m "Name" = "devsecops-vpc"
+        }
+    }
+
+[1m  # module.security.aws_budgets_budget.s3_kms_monitor[0m will be created
+[0m  [32m+[0m[0m resource "aws_budgets_budget" "s3_kms_monitor" {
+      [32m+[0m[0m account_id        = (known after apply)
+      [32m+[0m[0m arn               = (known after apply)
+      [32m+[0m[0m budget_type       = "COST"
+      [32m+[0m[0m id                = (known after apply)
+      [32m+[0m[0m limit_amount      = "10"
+      [32m+[0m[0m limit_unit        = "USD"
+      [32m+[0m[0m name              = "monthly-devsecops-budget"
+      [32m+[0m[0m name_prefix       = (known after apply)
+      [32m+[0m[0m tags_all          = (known after apply)
+      [32m+[0m[0m time_period_end   = "2087-06-15_00:00"
+      [32m+[0m[0m time_period_start = (known after apply)
+      [32m+[0m[0m time_unit         = "MONTHLY"
+
+      [32m+[0m[0m cost_filter (known after apply)
+
+      [32m+[0m[0m cost_types (known after apply)
+
+      [32m+[0m[0m notification {
+          [32m+[0m[0m comparison_operator        = "GREATER_THAN"
+          [32m+[0m[0m notification_type          = "ACTUAL"
+          [32m+[0m[0m subscriber_email_addresses = [
+              [32m+[0m[0m "yapp9069@naver.com",
+            ]
+          [32m+[0m[0m subscriber_sns_topic_arns  = []
+          [32m+[0m[0m threshold                  = 80
+          [32m+[0m[0m threshold_type             = "PERCENTAGE"
+        }
+    }
+
+[1m  # module.security.aws_kms_key.waf_s3_key[0m will be created
+[0m  [32m+[0m[0m resource "aws_kms_key" "waf_s3_key" {
+      [32m+[0m[0m arn                                = (known after apply)
+      [32m+[0m[0m bypass_policy_lockout_safety_check = false
+      [32m+[0m[0m customer_master_key_spec           = "SYMMETRIC_DEFAULT"
+      [32m+[0m[0m deletion_window_in_days            = 7
+      [32m+[0m[0m description                        = "KMS key for WAF S3 bucket encryption"
+      [32m+[0m[0m enable_key_rotation                = true
+      [32m+[0m[0m id                                 = (known after apply)
+      [32m+[0m[0m is_enabled                         = true
+      [32m+[0m[0m key_id                             = (known after apply)
+      [32m+[0m[0m key_usage                          = "ENCRYPT_DECRYPT"
+      [32m+[0m[0m multi_region                       = (known after apply)
+      [32m+[0m[0m policy                             = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "kms:*"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m AWS = [
+                              [32m+[0m[0m "arn:aws:iam::095035153545:root",
+                              [32m+[0m[0m "arn:aws:iam::095035153545:user/system/devsecops-admin-user",
+                            ]
+                        }
+                      [32m+[0m[0m Resource  = "*"
+                      [32m+[0m[0m Sid       = "Enable Admin Privilege"
+                    },
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = [
+                          [32m+[0m[0m "kms:GenerateDataKey*",
+                          [32m+[0m[0m "kms:Decrypt",
+                        ]
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "delivery.logs.amazonaws.com"
+                        }
+                      [32m+[0m[0m Resource  = "*"
+                      [32m+[0m[0m Sid       = "Allow WAF Log Delivery to use the key"
+                    },
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = [
+                          [32m+[0m[0m "kms:Encrypt",
+                          [32m+[0m[0m "kms:Decrypt",
+                          [32m+[0m[0m "kms:ReEncrypt*",
+                          [32m+[0m[0m "kms:GenerateDataKey*",
+                          [32m+[0m[0m "kms:DescribeKey",
+                        ]
+                      [32m+[0m[0m Condition = {
+                          [32m+[0m[0m StringEquals = {
+                              [32m+[0m[0m "kms:CallerAccount" = "095035153545"
+                              [32m+[0m[0m "kms:ViaService"    = "s3.us-east-1.amazonaws.com"
+                            }
+                        }
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m AWS = "*"
+                        }
+                      [32m+[0m[0m Resource  = "*"
+                      [32m+[0m[0m Sid       = "Allow S3 Access"
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m region                             = "us-east-1"
+      [32m+[0m[0m rotation_period_in_days            = (known after apply)
+      [32m+[0m[0m tags_all                           = (known after apply)
+    }
+
+[1m  # module.security.aws_s3_bucket.waf_logs[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket" "waf_logs" {
+      [32m+[0m[0m acceleration_status         = (known after apply)
+      [32m+[0m[0m acl                         = (known after apply)
+      [32m+[0m[0m arn                         = (known after apply)
+      [32m+[0m[0m bucket                      = "aws-waf-logs-minju-0417-project"
+      [32m+[0m[0m bucket_domain_name          = (known after apply)
+      [32m+[0m[0m bucket_namespace            = (known after apply)
+      [32m+[0m[0m bucket_prefix               = (known after apply)
+      [32m+[0m[0m bucket_region               = (known after apply)
+      [32m+[0m[0m bucket_regional_domain_name = (known after apply)
+      [32m+[0m[0m force_destroy               = true
+      [32m+[0m[0m hosted_zone_id              = (known after apply)
+      [32m+[0m[0m id                          = (known after apply)
+      [32m+[0m[0m object_lock_enabled         = (known after apply)
+      [32m+[0m[0m policy                      = (known after apply)
+      [32m+[0m[0m region                      = "us-east-1"
+      [32m+[0m[0m request_payer               = (known after apply)
+      [32m+[0m[0m tags_all                    = (known after apply)
+      [32m+[0m[0m website_domain              = (known after apply)
+      [32m+[0m[0m website_endpoint            = (known after apply)
+
+      [32m+[0m[0m cors_rule (known after apply)
+
+      [32m+[0m[0m grant (known after apply)
+
+      [32m+[0m[0m lifecycle_rule (known after apply)
+
+      [32m+[0m[0m logging (known after apply)
+
+      [32m+[0m[0m object_lock_configuration (known after apply)
+
+      [32m+[0m[0m replication_configuration (known after apply)
+
+      [32m+[0m[0m server_side_encryption_configuration (known after apply)
+
+      [32m+[0m[0m versioning (known after apply)
+
+      [32m+[0m[0m website (known after apply)
+    }
+
+[1m  # module.security.aws_s3_bucket_policy.waf_logs_ssl[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket_policy" "waf_logs_ssl" {
+      [32m+[0m[0m bucket = (known after apply)
+      [32m+[0m[0m id     = (known after apply)
+      [32m+[0m[0m policy = (known after apply)
+      [32m+[0m[0m region = "us-east-1"
+    }
+
+[1m  # module.security.aws_s3_bucket_public_access_block.waf_logs_block[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket_public_access_block" "waf_logs_block" {
+      [32m+[0m[0m block_public_acls       = true
+      [32m+[0m[0m block_public_policy     = true
+      [32m+[0m[0m bucket                  = (known after apply)
+      [32m+[0m[0m id                      = (known after apply)
+      [32m+[0m[0m ignore_public_acls      = true
+      [32m+[0m[0m region                  = "us-east-1"
+      [32m+[0m[0m restrict_public_buckets = true
+    }
+
+[1m  # module.security.aws_s3_bucket_server_side_encryption_configuration.waf_logs_encryption[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket_server_side_encryption_configuration" "waf_logs_encryption" {
+      [32m+[0m[0m bucket = (known after apply)
+      [32m+[0m[0m id     = (known after apply)
+      [32m+[0m[0m region = "us-east-1"
+
+      [32m+[0m[0m rule {
+          [32m+[0m[0m blocked_encryption_types = (known after apply)
+          [32m+[0m[0m bucket_key_enabled       = true
+
+          [32m+[0m[0m apply_server_side_encryption_by_default {
+              [32m+[0m[0m kms_master_key_id = (known after apply)
+              [32m+[0m[0m sse_algorithm     = "aws:kms"
+            }
+        }
+    }
+
+[1m  # module.security.aws_wafv2_ip_set.ai_block_list[0m will be created
+[0m  [32m+[0m[0m resource "aws_wafv2_ip_set" "ai_block_list" {
+      [32m+[0m[0m arn                = (known after apply)
+      [32m+[0m[0m description        = "IP set managed by AI anomaly detection engine"
+      [32m+[0m[0m id                 = (known after apply)
+      [32m+[0m[0m ip_address_version = "IPV4"
+      [32m+[0m[0m lock_token         = (known after apply)
+      [32m+[0m[0m name               = "devsecops-ai-block-list"
+      [32m+[0m[0m name_prefix        = (known after apply)
+      [32m+[0m[0m region             = "us-east-1"
+      [32m+[0m[0m scope              = "REGIONAL"
+      [32m+[0m[0m tags_all           = (known after apply)
+    }
+
+[1m  # module.security.aws_wafv2_web_acl.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_wafv2_web_acl" "main" {
+      [32m+[0m[0m application_integration_url = (known after apply)
+      [32m+[0m[0m arn                         = (known after apply)
+      [32m+[0m[0m capacity                    = (known after apply)
+      [32m+[0m[0m description                 = "WAF with Geo-Blocking and AIOps SOAR"
+      [32m+[0m[0m id                          = (known after apply)
+      [32m+[0m[0m lock_token                  = (known after apply)
+      [32m+[0m[0m name                        = "devsecops-waf"
+      [32m+[0m[0m name_prefix                 = (known after apply)
+      [32m+[0m[0m region                      = "us-east-1"
+      [32m+[0m[0m scope                       = "REGIONAL"
+      [32m+[0m[0m tags_all                    = (known after apply)
+
+      [32m+[0m[0m default_action {
+          [32m+[0m[0m allow {
+            }
+        }
+
+      [32m+[0m[0m rule {
+          [32m+[0m[0m name     = "AI-RealTime-Block-Rule"
+          [32m+[0m[0m priority = 1
+
+          [32m+[0m[0m action {
+              [32m+[0m[0m block {
+                }
+            }
+
+          [32m+[0m[0m statement {
+              [32m+[0m[0m ip_set_reference_statement {
+                  [32m+[0m[0m arn = (known after apply)
+                }
+            }
+
+          [32m+[0m[0m visibility_config {
+              [32m+[0m[0m cloudwatch_metrics_enabled = true
+              [32m+[0m[0m metric_name                = "aiRealTimeBlock"
+              [32m+[0m[0m sampled_requests_enabled   = true
+            }
+        }
+      [32m+[0m[0m rule {
+          [32m+[0m[0m name     = "GeoBlock-Non-KR"
+          [32m+[0m[0m priority = 0
+
+          [32m+[0m[0m action {
+              [32m+[0m[0m block {
+                }
+            }
+
+          [32m+[0m[0m statement {
+              [32m+[0m[0m not_statement {
+                  [32m+[0m[0m statement {
+                      [32m+[0m[0m geo_match_statement {
+                          [32m+[0m[0m country_codes = [
+                              [32m+[0m[0m "KR",
+                            ]
+                        }
+                    }
+                }
+            }
+
+          [32m+[0m[0m visibility_config {
+              [32m+[0m[0m cloudwatch_metrics_enabled = true
+              [32m+[0m[0m metric_name                = "geoBlockNonKR"
+              [32m+[0m[0m sampled_requests_enabled   = true
+            }
+        }
+      [32m+[0m[0m rule {
+          [32m+[0m[0m name     = "AWS-AWSManagedRulesAmazonIpReputationList"
+          [32m+[0m[0m priority = 4
+
+          [32m+[0m[0m override_action {
+              [32m+[0m[0m none {}
+            }
+
+          [32m+[0m[0m statement {
+              [32m+[0m[0m managed_rule_group_statement {
+                  [32m+[0m[0m name        = "AWSManagedRulesAmazonIpReputationList"
+                  [32m+[0m[0m vendor_name = "AWS"
+                    [90m# (1 unchanged attribute hidden)[0m[0m
+                }
+            }
+
+          [32m+[0m[0m visibility_config {
+              [32m+[0m[0m cloudwatch_metrics_enabled = true
+              [32m+[0m[0m metric_name                = "awsReputationRules"
+              [32m+[0m[0m sampled_requests_enabled   = true
+            }
+        }
+      [32m+[0m[0m rule {
+          [32m+[0m[0m name     = "AWS-AWSManagedRulesCommonRuleSet"
+          [32m+[0m[0m priority = 3
+
+          [32m+[0m[0m override_action {
+              [32m+[0m[0m none {}
+            }
+
+          [32m+[0m[0m statement {
+              [32m+[0m[0m managed_rule_group_statement {
+                  [32m+[0m[0m name        = "AWSManagedRulesCommonRuleSet"
+                  [32m+[0m[0m vendor_name = "AWS"
+                    [90m# (1 unchanged attribute hidden)[0m[0m
+
+                  [32m+[0m[0m scope_down_statement {
+                      [32m+[0m[0m not_statement {
+                          [32m+[0m[0m statement {
+                              [32m+[0m[0m or_statement {
+                                  [32m+[0m[0m statement {
+                                      [32m+[0m[0m byte_match_statement {
+                                          [32m+[0m[0m positional_constraint = "STARTS_WITH"
+                                          [32m+[0m[0m search_string         = "/health"
+
+                                          [32m+[0m[0m field_to_match {
+                                              [32m+[0m[0m uri_path {}
+                                            }
+
+                                          [32m+[0m[0m text_transformation {
+                                              [32m+[0m[0m priority = 0
+                                              [32m+[0m[0m type     = "LOWERCASE"
+                                            }
+                                        }
+                                    }
+                                  [32m+[0m[0m statement {
+                                      [32m+[0m[0m byte_match_statement {
+                                          [32m+[0m[0m positional_constraint = "STARTS_WITH"
+                                          [32m+[0m[0m search_string         = "/metrics"
+
+                                          [32m+[0m[0m field_to_match {
+                                              [32m+[0m[0m uri_path {}
+                                            }
+
+                                          [32m+[0m[0m text_transformation {
+                                              [32m+[0m[0m priority = 0
+                                              [32m+[0m[0m type     = "LOWERCASE"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+          [32m+[0m[0m visibility_config {
+              [32m+[0m[0m cloudwatch_metrics_enabled = true
+              [32m+[0m[0m metric_name                = "awsCommonRules"
+              [32m+[0m[0m sampled_requests_enabled   = true
+            }
+        }
+      [32m+[0m[0m rule {
+          [32m+[0m[0m name     = "AWS-AWSManagedRulesSQLiRuleSet"
+          [32m+[0m[0m priority = 2
+
+          [32m+[0m[0m override_action {
+              [32m+[0m[0m none {}
+            }
+
+          [32m+[0m[0m statement {
+              [32m+[0m[0m managed_rule_group_statement {
+                  [32m+[0m[0m name        = "AWSManagedRulesSQLiRuleSet"
+                  [32m+[0m[0m vendor_name = "AWS"
+                    [90m# (1 unchanged attribute hidden)[0m[0m
+
+                  [32m+[0m[0m scope_down_statement {
+                      [32m+[0m[0m not_statement {
+                          [32m+[0m[0m statement {
+                              [32m+[0m[0m byte_match_statement {
+                                  [32m+[0m[0m positional_constraint = "STARTS_WITH"
+                                  [32m+[0m[0m search_string         = "/admin/"
+
+                                  [32m+[0m[0m field_to_match {
+                                      [32m+[0m[0m uri_path {}
+                                    }
+
+                                  [32m+[0m[0m text_transformation {
+                                      [32m+[0m[0m priority = 0
+                                      [32m+[0m[0m type     = "LOWERCASE"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+          [32m+[0m[0m visibility_config {
+              [32m+[0m[0m cloudwatch_metrics_enabled = true
+              [32m+[0m[0m metric_name                = "awsSQLiRules"
+              [32m+[0m[0m sampled_requests_enabled   = true
+            }
+        }
+
+      [32m+[0m[0m visibility_config {
+          [32m+[0m[0m cloudwatch_metrics_enabled = true
+          [32m+[0m[0m metric_name                = "devsecopsWAF"
+          [32m+[0m[0m sampled_requests_enabled   = true
+        }
+    }
+
+[1m  # module.security.aws_wafv2_web_acl_logging_configuration.main[0m will be created
+[0m  [32m+[0m[0m resource "aws_wafv2_web_acl_logging_configuration" "main" {
+      [32m+[0m[0m id                      = (known after apply)
+      [32m+[0m[0m log_destination_configs = (known after apply)
+      [32m+[0m[0m region                  = "us-east-1"
+      [32m+[0m[0m resource_arn            = (known after apply)
+
+      [32m+[0m[0m logging_filter {
+          [32m+[0m[0m default_behavior = "KEEP"
+
+          [32m+[0m[0m filter {
+              [32m+[0m[0m behavior    = "KEEP"
+              [32m+[0m[0m requirement = "MEETS_ANY"
+
+              [32m+[0m[0m condition {
+                  [32m+[0m[0m action_condition {
+                      [32m+[0m[0m action = "BLOCK"
+                    }
+                }
+            }
+        }
+    }
+
+[1mPlan:[0m [0m127 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  [32m+[0m[0m api_gateway_url         = (known after apply)
+  [32m+[0m[0m cloudfront_domain       = (known after apply)
+  [32m+[0m[0m custom_domain_url       = "https://minju-devsec.store"
+  [32m+[0m[0m ec2_profile_name        = "devsecops-ec2-profile"
+  [32m+[0m[0m edge_lambda_version_arn = "arn:aws:lambda:us-east-1:095035153545:function:devsecops-edge-security:4"
+  [32m+[0m[0m final_role_arn          = (known after apply)
+  [32m+[0m[0m waf_web_acl_arn         = (known after apply)
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mValue for undeclared variable[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe root module does not declare a variable named "instance_type" but a
+[33m│[0m [0mvalue was found in file "terraform.tfvars". If you meant to use this value,
+[33m│[0m [0madd a "variable" block to the configuration.
+[33m│[0m [0m
+[33m│[0m [0mTo silence these warnings, use TF_VAR_... environment variables to provide
+[33m│[0m [0mcertain "global" settings to all configurations in your organization. To
+[33m│[0m [0mreduce the verbosity of these warnings, use the -compact-warnings option.
+[33m╵[0m[0m
+[90m
+─────────────────────────────────────────────────────────────────────────────[0m
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"
+Releasing state lock. This may take a few moments...

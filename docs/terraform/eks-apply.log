@@ -1,0 +1,442 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mDeprecated Parameter[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe parameter "dynamodb_table" is deprecated. Use parameter "use_lockfile"
+[33m│[0m [0minstead.
+[33m╵[0m[0m
+Acquiring state lock. This may take a few moments...
+[0m[1maws_acm_certificate.main: Creating...[0m[0m
+[0m[1mmodule.network.aws_iam_role.lambda_blocker_role: Creating...[0m[0m
+[0m[1maws_cloudwatch_event_rule.traffic_generator_schedule: Creating...[0m[0m
+[0m[1maws_iam_role.config: Creating...[0m[0m
+[0m[1mmodule.security.aws_s3_bucket.waf_logs: Creating...[0m[0m
+[0m[1mmodule.network.aws_iam_role.ec2_ai_role: Creating...[0m[0m
+[0m[1maws_iam_account_password_policy.main: Creating...[0m[0m
+[0m[1mmodule.network.aws_iam_policy.github_actions_minimal_policy: Creating...[0m[0m
+[0m[1maws_budgets_budget.cost_limit: Creating...[0m[0m
+[0m[1maws_iam_account_password_policy.main: Creation complete after -15s [id=iam-account-password-policy][0m
+[0m[1maws_cloudwatch_event_rule.waf_block_event: Creating...[0m[0m
+[0m[1mmodule.network.aws_iam_policy.github_actions_minimal_policy: Creation complete after 1s [id=arn:aws:iam::095035153545:policy/github-actions-minimal-policy][0m
+[0m[1maws_iam_role.traffic_generator_role: Creating...[0m[0m
+[0m[1mmodule.network.aws_iam_role.ec2_ai_role: Creation complete after -15s [id=devsecops-ec2-ai-role][0m
+[0m[1mmodule.eks.aws_iam_role.node: Creating...[0m[0m
+[0m[1mmodule.network.aws_iam_role.lambda_blocker_role: Creation complete after -14s [id=devsecops-lambda-blocker-role][0m
+[0m[1maws_iam_role.config: Creation complete after -14s [id=devsecops-platform-config-role][0m
+[0m[1maws_cloudfront_function.ip_block: Creating...[0m[0m
+[0m[1maws_s3_bucket.cloudtrail_logs: Creating...[0m[0m
+[0m[1maws_cloudwatch_event_rule.traffic_generator_schedule: Creation complete after -13s [id=normal-traffic-generator-schedule][0m
+[0m[1maws_guardduty_detector.main: Creating...[0m[0m
+[0m[1maws_cloudwatch_event_rule.waf_block_event: Creation complete after 1s [id=waf-block-detection][0m
+[0m[1maws_api_gateway_rest_api.main: Creating...[0m[0m
+[0m[1maws_iam_role.traffic_generator_role: Creation complete after 1s [id=traffic-generator-lambda-role][0m
+[0m[1mmodule.network.aws_eip.nat: Creating...[0m[0m
+[0m[1mmodule.eks.aws_iam_role.node: Creation complete after 1s [id=devsecops-eks-node-role][0m
+[0m[1maws_kms_key.shared_log_key: Creating...[0m[0m
+[0m[1maws_guardduty_detector.main: Creation complete after 1s [id=67e4087a78724ff987bac71aeef1af7c][0m
+[0m[1maws_s3_bucket.model_store: Creating...[0m[0m
+[0m[1maws_api_gateway_rest_api.main: Creation complete after 2s [id=zsvzi4yb10][0m
+[0m[1mmodule.security.aws_kms_key.waf_s3_key: Creating...[0m[0m
+[0m[1maws_wafv2_web_acl.cloudfront: Creating...[0m[0m
+[0m[1mmodule.security.aws_s3_bucket.waf_logs: Creation complete after -11s [id=aws-waf-logs-minju-0417-project][0m
+[0m[1mmodule.network.aws_vpc.main: Creating...[0m[0m
+[0m[1maws_acm_certificate.main: Creation complete after -11s [id=arn:aws:acm:us-east-1:095035153545:certificate/e59e2443-0937-43da-9d39-6620084f5df6][0m
+[0m[1mmodule.security.aws_budgets_budget.s3_kms_monitor: Creating...[0m[0m
+[0m[1maws_s3_bucket.cloudtrail_logs: Creation complete after 5s [id=devsecops-platform-cloudtrail-095035153545][0m
+[0m[1maws_iam_role.apigw_cloudwatch: Creating...[0m[0m
+[0m[1mmodule.network.aws_eip.nat: Creation complete after 4s [id=eipalloc-0b5ed3a40243550e2][0m
+[0m[1mmodule.network.aws_iam_openid_connect_provider.github: Creating...[0m[0m
+[0m[1maws_cloudfront_function.ip_block: Creation complete after 5s [id=devsecops-ip-block][0m
+[0m[1mmodule.network.aws_cloudwatch_log_group.vpc_flow_logs: Creating...[0m[0m
+[0m[1mmodule.network.aws_iam_openid_connect_provider.github: Creation complete after 0s [id=arn:aws:iam::095035153545:oidc-provider/token.actions.githubusercontent.com][0m
+[0m[1mmodule.eks.aws_iam_role.cluster: Creating...[0m[0m
+[0m[1maws_iam_role.apigw_cloudwatch: Creation complete after 1s [id=api-gateway-cloudwatch-role][0m
+[0m[1maws_iam_role_policy_attachment.edge_logs: Creating...[0m[0m
+[0m[1mmodule.eks.aws_iam_role.cluster: Creation complete after 1s [id=devsecops-eks-cluster-role][0m
+[0m[1mmodule.network.aws_iam_role.vpc_flow_log_role: Creating...[0m[0m
+[0m[1maws_wafv2_web_acl.cloudfront: Creation complete after 3s [id=3a47a7e4-dc7a-434a-86c3-98baeb05b6ec][0m
+[0m[1mmodule.security.aws_wafv2_ip_set.ai_block_list: Creating...[0m[0m
+[0m[1maws_iam_role_policy_attachment.edge_logs: Creation complete after 0s [id=devsecops-edge-lambda-role/arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole][0m
+[0m[1maws_cloudwatch_event_rule.config_compliance: Creating...[0m[0m
+[0m[1maws_s3_bucket.model_store: Creation complete after 4s [id=devsecops-edge-models-095035153545][0m
+[0m[1maws_accessanalyzer_analyzer.main: Creating...[0m[0m
+[0m[1mmodule.network.aws_cloudwatch_log_group.vpc_flow_logs: Creation complete after 2s [id=/aws/vpc/devsecops-flow-logs][0m
+[0m[1mmodule.network.aws_iam_instance_profile.ec2_profile: Creating...[0m[0m
+[0m[1maws_budgets_budget.cost_limit: Creation complete after 8s [id=095035153545:monthly-budget][0m
+[0m[1maws_config_configuration_recorder.main: Creating...[0m[0m
+[0m[1mmodule.security.aws_wafv2_ip_set.ai_block_list: Creation complete after 1s [id=22586690-4c56-4e7c-aa05-f94ec8ca5469][0m
+[0m[1maws_iam_role_policy_attachment.config: Creating...[0m[0m
+[0m[1mmodule.network.aws_iam_role.vpc_flow_log_role: Creation complete after 1s [id=devsecops-vpc-flow-log-role][0m
+[0m[1maws_lambda_function.traffic_generator: Creating...[0m[0m
+[0m[1maws_cloudwatch_event_rule.config_compliance: Creation complete after 1s [id=config-compliance-change][0m
+[0m[1maws_iam_role_policy_attachment.traffic_generator_basic: Creating...[0m[0m
+[0m[1maws_iam_role_policy_attachment.config: Creation complete after 1s [id=devsecops-platform-config-role/arn:aws:iam::aws:policy/service-role/AWS_ConfigRole][0m
+[0m[1mmodule.eks.aws_iam_role_policy_attachment.node_ecr_policy: Creating...[0m[0m
+[0m[1maws_accessanalyzer_analyzer.main: Creation complete after 1s [id=devsecops-platform-account-analyzer][0m
+[0m[1mmodule.eks.aws_iam_role_policy_attachment.node_cni_policy: Creating...[0m[0m
+[0m[1maws_config_configuration_recorder.main: Creation complete after 1s [id=devsecops-platform-config-recorder][0m
+[0m[1mmodule.eks.aws_iam_role_policy_attachment.node_worker_policy: Creating...[0m[0m
+[0m[1maws_iam_role_policy_attachment.traffic_generator_basic: Creation complete after 1s [id=traffic-generator-lambda-role/arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole][0m
+[0m[1maws_api_gateway_method.root: Creating...[0m[0m
+[0m[1mmodule.eks.aws_iam_role_policy_attachment.node_ecr_policy: Creation complete after 0s [id=devsecops-eks-node-role/arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly][0m
+[0m[1maws_api_gateway_resource.proxy: Creating...[0m[0m
+[0m[1mmodule.eks.aws_iam_role_policy_attachment.node_cni_policy: Creation complete after 0s [id=devsecops-eks-node-role/arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy][0m
+[0m[1mmodule.security.aws_s3_bucket_public_access_block.waf_logs_block: Creating...[0m[0m
+[0m[1maws_api_gateway_method.root: Creation complete after 0s [id=agm-zsvzi4yb10-nt1gmyw5m9-ANY][0m
+[0m[1maws_route53_record.cert_validation["minju-devsec.store"]: Creating...[0m[0m
+[0m[1mmodule.network.aws_vpc.main: Creation complete after 20s [id=vpc-030cb14205f0d9941][0m
+[0m[1maws_iam_role_policy.config_s3: Creating...[0m[0m
+[0m[1mmodule.eks.aws_iam_role_policy_attachment.node_worker_policy: Creation complete after 17s [id=devsecops-eks-node-role/arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy][0m
+[0m[1maws_s3_bucket_public_access_block.cloudtrail_logs: Creating...[0m[0m
+[0m[1maws_api_gateway_resource.proxy: Creation complete after 1s [id=bmktym][0m
+[0m[1mmodule.network.aws_iam_role.github_actions_role: Creating...[0m[0m
+[0m[1mmodule.security.aws_s3_bucket_public_access_block.waf_logs_block: Creation complete after 1s [id=aws-waf-logs-minju-0417-project][0m
+[0m[1maws_iam_role_policy_attachment.apigw_cloudwatch: Creating...[0m[0m
+[0m[1maws_iam_role_policy.config_s3: Creation complete after -15s [id=devsecops-platform-config-role:config-s3-delivery][0m
+[0m[1maws_api_gateway_account.main: Creating...[0m[0m
+[0m[1maws_s3_bucket_public_access_block.cloudtrail_logs: Creation complete after -16s [id=devsecops-platform-cloudtrail-095035153545][0m
+[0m[1mmodule.eks.aws_iam_role_policy_attachment.cluster_policy: Creating...[0m[0m
+[0m[1maws_iam_role_policy_attachment.apigw_cloudwatch: Creation complete after 0s [id=api-gateway-cloudwatch-role/arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs][0m
+[0m[1maws_iam_role_policy.edge_model_read: Creating...[0m[0m
+[0m[1mmodule.network.aws_iam_role.github_actions_role: Creation complete after 1s [id=github-actions-oidc-role][0m
+[0m[1maws_s3_bucket_public_access_block.model_store: Creating...[0m[0m
+[0m[1mmodule.eks.aws_iam_role_policy_attachment.cluster_policy: Creation complete after 1s [id=devsecops-eks-cluster-role/arn:aws:iam::aws:policy/AmazonEKSClusterPolicy][0m
+[0m[1maws_lambda_function.analyzer: Creating...[0m[0m
+[0m[1maws_iam_role_policy.edge_model_read: Creation complete after 1s [id=devsecops-edge-lambda-role:edge-model-read][0m
+[0m[1maws_s3_bucket_public_access_block.model_store: Creation complete after 0s [id=devsecops-edge-models-095035153545][0m
+[0m[1mmodule.network.aws_iam_role_policy.vpc_flow_log_policy: Creating...[0m[0m
+[0m[1mmodule.network.aws_iam_role_policy.vpc_flow_log_policy: Creation complete after 1s [id=devsecops-vpc-flow-log-role:devsecops-vpc-flow-log-policy][0m
+[0m[1mmodule.network.aws_security_group.main_sg: Creating...[0m[0m
+[0m[1maws_kms_key.shared_log_key: Still creating... [00m10s elapsed][0m[0m
+[0m[1mmodule.security.aws_budgets_budget.s3_kms_monitor: Creation complete after 8s [id=095035153545:monthly-devsecops-budget][0m
+[0m[1mmodule.network.aws_internet_gateway.igw: Creating...[0m[0m
+[0m[1mmodule.security.aws_kms_key.waf_s3_key: Still creating... [00m10s elapsed][0m[0m
+[0m[1mmodule.network.aws_internet_gateway.igw: Creation complete after 1s [id=igw-012e0642741f402e9][0m
+[0m[1mmodule.network.aws_default_security_group.default: Creating...[0m[0m
+[0m[1maws_kms_key.shared_log_key: Creation complete after 29s [id=ad96dba4-2e4f-4c53-85b6-f8258f289af4][0m
+[0m[1mmodule.network.aws_subnet.public_2: Creating...[0m[0m
+[0m[1mmodule.network.aws_iam_instance_profile.ec2_profile: Creation complete after 7s [id=devsecops-ec2-profile][0m
+[0m[1mmodule.network.aws_subnet.public: Creating...[0m[0m
+[0m[1mmodule.security.aws_wafv2_web_acl.main: Creating...[0m[0m
+[0m[1maws_lambda_function.traffic_generator: Creation complete after 8s [id=NormalTrafficGenerator][0m
+[0m[1mmodule.network.aws_flow_log.main: Creating...[0m[0m
+[0m[1mmodule.network.aws_flow_log.main: Creation complete after 0s [id=fl-0fef95ee6e2b74f08][0m
+[0m[1mmodule.network.aws_subnet.private_app[0]: Creating...[0m[0m
+[0m[1mmodule.network.aws_security_group.main_sg: Creation complete after 5s [id=sg-0df956eee6078e51c][0m
+[0m[1mmodule.network.aws_subnet.private_app[1]: Creating...[0m[0m
+[0m[1mmodule.network.aws_default_security_group.default: Creation complete after 3s [id=sg-07c96332bfb7067d0][0m
+[0m[1mmodule.network.aws_subnet.private_db[1]: Creating...[0m[0m
+[0m[1mmodule.network.aws_subnet.private_app[0]: Creation complete after 2s [id=subnet-008c9a9d82564af9f][0m
+[0m[1mmodule.network.aws_subnet.private_db[0]: Creating...[0m[0m
+[0m[1mmodule.security.aws_wafv2_web_acl.main: Creation complete after 3s [id=669962f9-98fa-4f19-98d0-773ede1e13d4][0m
+[0m[1maws_api_gateway_method.proxy: Creating...[0m[0m
+[0m[1maws_api_gateway_method.proxy: Creation complete after 0s [id=agm-zsvzi4yb10-bmktym-ANY][0m
+[0m[1mmodule.security.aws_s3_bucket_policy.waf_logs_ssl: Creating...[0m[0m
+[0m[1mmodule.network.aws_subnet.private_app[1]: Creation complete after 1s [id=subnet-0ca5f648df9b76675][0m
+[0m[1maws_s3_bucket_policy.cloudtrail_logs: Creating...[0m[0m
+[0m[1mmodule.network.aws_subnet.private_db[1]: Creation complete after 2s [id=subnet-0abf25ba52ddec89b][0m
+[0m[1mmodule.network.aws_iam_role_policy_attachment.github_actions_attach: Creating...[0m[0m
+[0m[1mmodule.network.aws_subnet.private_db[0]: Creation complete after 1s [id=subnet-01b8325727f8c04a1][0m
+[0m[1mmodule.network.aws_iam_role_policy_attachment.github_actions_admin: Creating...[0m[0m
+[0m[1mmodule.network.aws_iam_role_policy_attachment.github_actions_attach: Creation complete after 0s [id=github-actions-oidc-role/arn:aws:iam::095035153545:policy/github-actions-minimal-policy][0m
+[0m[1maws_s3_bucket_policy.model_store_ssl: Creating...[0m[0m
+[0m[1maws_route53_record.cert_validation["minju-devsec.store"]: Still creating... [00m10s elapsed][0m[0m
+[0m[1mmodule.network.aws_iam_role_policy_attachment.github_actions_admin: Creation complete after 16s [id=github-actions-oidc-role/arn:aws:iam::aws:policy/AdministratorAccess][0m
+[0m[1maws_lambda_function.preventer: Creating...[0m[0m
+[0m[1maws_s3_bucket_policy.cloudtrail_logs: Creation complete after 17s [id=devsecops-platform-cloudtrail-095035153545][0m
+[0m[1mmodule.network.aws_route_table.public: Creating...[0m[0m
+[0m[1mmodule.security.aws_s3_bucket_policy.waf_logs_ssl: Creation complete after 18s [id=aws-waf-logs-minju-0417-project][0m
+[0m[1maws_sns_topic.security_alerts: Creating...[0m[0m
+[0m[1maws_api_gateway_account.main: Still creating... [00m10s elapsed][0m[0m
+[0m[1maws_s3_bucket_policy.model_store_ssl: Creation complete after 1s [id=devsecops-edge-models-095035153545][0m
+[0m[1maws_cloudwatch_log_group.apigw_access: Creating...[0m[0m
+[0m[1maws_lambda_function.analyzer: Still creating... [00m10s elapsed][0m[0m
+[0m[1mmodule.network.aws_route_table.public: Creation complete after -14s [id=rtb-010fa29e13729e87e][0m
+[0m[1maws_cloudwatch_log_group.apigw_access: Creation complete after 3s [id=/aws/apigateway/devsecops-platform-api][0m
+[0m[1maws_sns_topic.security_alerts: Creation complete after -13s [id=arn:aws:sns:us-east-1:095035153545:devsecops-security-alerts][0m
+[0m[1maws_lambda_function.analyzer: Creation complete after 12s [id=SecurityAnalyzer][0m
+[0m[1maws_s3_bucket_server_side_encryption_configuration.model_store: Creating...[0m[0m
+[0m[1maws_lambda_permission.allow_eventbridge_traffic_gen: Creating...[0m[0m
+[0m[1maws_s3_bucket_server_side_encryption_configuration.cloudtrail_logs: Creating...[0m[0m
+[0m[1maws_cloudwatch_event_target.traffic_generator_target: Creating...[0m[0m
+[0m[1mmodule.security.aws_kms_key.waf_s3_key: Still creating... [00m20s elapsed][0m[0m
+[0m[1maws_lambda_permission.allow_eventbridge_traffic_gen: Creation complete after 1s [id=AllowEventBridgeInvoke][0m
+[0m[1maws_cloudwatch_event_target.traffic_generator_target: Creation complete after 1s [id=normal-traffic-generator-schedule-TrafficGeneratorLambda][0m
+[0m[1maws_s3_bucket_server_side_encryption_configuration.cloudtrail_logs: Creation complete after 1s [id=devsecops-platform-cloudtrail-095035153545][0m
+[0m[1mmodule.security.aws_wafv2_web_acl_logging_configuration.main: Creating...[0m[0m
+[0m[1maws_s3_bucket_server_side_encryption_configuration.model_store: Creation complete after 1s [id=devsecops-edge-models-095035153545][0m
+[0m[1mmodule.network.aws_iam_policy.lambda_blocker_policy: Creating...[0m[0m
+[0m[1maws_cloudtrail.main: Creating...[0m[0m
+[0m[1maws_flow_log.s3_archive: Creating...[0m[0m
+[0m[1mmodule.network.aws_subnet.public_2: Still creating... [00m10s elapsed][0m[0m
+[0m[1mmodule.network.aws_subnet.public: Still creating... [00m10s elapsed][0m[0m
+[0m[1mmodule.security.aws_wafv2_web_acl_logging_configuration.main: Creation complete after 1s [id=arn:aws:wafv2:us-east-1:095035153545:regional/webacl/devsecops-waf/669962f9-98fa-4f19-98d0-773ede1e13d4][0m
+[0m[1maws_cloudwatch_event_target.config_sns: Creating...[0m[0m
+[0m[1mmodule.network.aws_iam_policy.lambda_blocker_policy: Creation complete after 1s [id=arn:aws:iam::095035153545:policy/devsecops-lambda-blocker-policy][0m
+[0m[1maws_cloudwatch_event_target.sns_target: Creating...[0m[0m
+[0m[1maws_flow_log.s3_archive: Creation complete after 1s [id=fl-06bfb1c7c78617ffd][0m
+[0m[1maws_config_delivery_channel.main: Creating...[0m[0m
+[0m[1maws_cloudwatch_event_target.config_sns: Creation complete after 1s [id=config-compliance-change-ConfigToSNS][0m
+[0m[1mdata.aws_iam_policy_document.sns_topic_policy: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.sns_topic_policy: Read complete after 0s [id=1211407414][0m
+[0m[1maws_sns_topic_subscription.email_subscription: Creating...[0m[0m
+[0m[1maws_cloudwatch_event_target.sns_target: Creation complete after 1s [id=waf-block-detection-SendToSNS][0m
+[0m[1maws_lambda_permission.apigw_invoke_analyzer: Creating...[0m[0m
+[0m[1maws_lambda_permission.apigw_invoke_analyzer: Creation complete after 0s [id=AllowAPIGatewayInvoke][0m
+[0m[1maws_sns_topic_subscription.email_subscription: Creation complete after 0s [id=arn:aws:sns:us-east-1:095035153545:devsecops-security-alerts:efe1b79a-1da8-4c25-a0a8-ac70f3be7d68][0m
+[0m[1maws_lambda_permission.allow_s3: Creating...[0m[0m
+[0m[1maws_api_gateway_integration.proxy_lambda: Creating...[0m[0m
+[0m[1maws_config_delivery_channel.main: Creation complete after 2s [id=devsecops-platform-config-channel][0m
+[0m[1maws_cloudtrail.main: Creation complete after 3s [id=arn:aws:cloudtrail:us-east-1:095035153545:trail/devsecops-platform-trail][0m
+[0m[1maws_api_gateway_integration.root_lambda: Creating...[0m[0m
+[0m[1mmodule.network.aws_iam_role_policy_attachment.lambda_blocker_attach: Creating...[0m[0m
+[0m[1maws_api_gateway_integration.proxy_lambda: Creation complete after 1s [id=agi-zsvzi4yb10-bmktym-ANY][0m
+[0m[1maws_sns_topic_policy.default: Creating...[0m[0m
+[0m[1maws_lambda_permission.allow_s3: Creation complete after 1s [id=AllowExecutionFromS3Bucket][0m
+[0m[1maws_config_configuration_recorder_status.main: Creating...[0m[0m
+[0m[1mmodule.network.aws_subnet.public: Creation complete after 12s [id=subnet-034c4aef199b07758][0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Creating...[0m[0m
+[0m[1mmodule.network.aws_subnet.public_2: Creation complete after -4s [id=subnet-0d29a940ba2af473e][0m
+[0m[1maws_s3_bucket_notification.bucket_notification: Creating...[0m[0m
+[0m[1mmodule.network.aws_iam_role_policy_attachment.lambda_blocker_attach: Creation complete after 0s [id=devsecops-lambda-blocker-role/arn:aws:iam::095035153545:policy/devsecops-lambda-blocker-policy][0m
+[0m[1mmodule.network.aws_route_table_association.public: Creating...[0m[0m
+[0m[1maws_api_gateway_integration.root_lambda: Creation complete after 0s [id=agi-zsvzi4yb10-nt1gmyw5m9-ANY][0m
+[0m[1mmodule.network.aws_nat_gateway.main: Creating...[0m[0m
+[0m[1maws_sns_topic_policy.default: Creation complete after 0s [id=arn:aws:sns:us-east-1:095035153545:devsecops-security-alerts][0m
+[0m[1mmodule.network.aws_route_table_association.public_2: Creating...[0m[0m
+[0m[1maws_config_configuration_recorder_status.main: Creation complete after 0s [id=devsecops-platform-config-recorder][0m
+[0m[1maws_api_gateway_deployment.main: Creating...[0m[0m
+[0m[1maws_api_gateway_deployment.main: Creation complete after 1s [id=o8qbk7][0m
+[0m[1maws_config_config_rule.iam_password_policy: Creating...[0m[0m
+[0m[1mmodule.network.aws_route_table_association.public: Creation complete after 1s [id=rtbassoc-07fa23d3e38d735e7][0m
+[0m[1maws_config_config_rule.mfa_enabled: Creating...[0m[0m
+[0m[1mmodule.network.aws_route_table_association.public_2: Creation complete after 1s [id=rtbassoc-06c72fbca73a15d1e][0m
+[0m[1maws_config_config_rule.cloudtrail_enabled: Creating...[0m[0m
+[0m[1maws_s3_bucket_notification.bucket_notification: Creation complete after 2s [id=aws-waf-logs-minju-0417-project][0m
+[0m[1maws_config_config_rule.iam_root_access_key: Creating...[0m[0m
+[0m[1maws_config_config_rule.iam_password_policy: Creation complete after 1s [id=isms-2-5-iam-password-policy][0m
+[0m[1maws_config_config_rule.ebs_encrypted: Creating...[0m[0m
+[0m[1maws_config_config_rule.mfa_enabled: Creation complete after 1s [id=isms-2-5-mfa-enabled-for-iam-console][0m
+[0m[1maws_config_config_rule.cloudtrail_log_validation: Creating...[0m[0m
+[0m[1maws_route53_record.cert_validation["minju-devsec.store"]: Still creating... [00m20s elapsed][0m[0m
+[0m[1maws_config_config_rule.cloudtrail_enabled: Creation complete after 17s [id=isms-2-9-cloudtrail-enabled][0m
+[0m[1maws_config_config_rule.s3_no_public_read: Creating...[0m[0m
+[0m[1maws_lambda_function.preventer: Still creating... [00m10s elapsed][0m[0m
+[0m[1maws_config_config_rule.iam_root_access_key: Creation complete after 17s [id=isms-2-5-iam-root-access-key-check][0m
+[0m[1maws_config_config_rule.vpc_default_sg_closed: Creating...[0m[0m
+[0m[1maws_lambda_function.preventer: Creation complete after -5s [id=SecurityPreventer][0m
+[0m[1maws_config_config_rule.s3_no_public_write: Creating...[0m[0m
+[0m[1maws_config_config_rule.ebs_encrypted: Creation complete after 1s [id=isms-2-10-encrypted-volumes][0m
+[0m[1maws_config_config_rule.guardduty_enabled: Creating...[0m[0m
+[0m[1maws_config_config_rule.cloudtrail_log_validation: Creation complete after 1s [id=isms-2-9-cloudtrail-log-validation][0m
+[0m[1maws_config_config_rule.s3_ssl_only: Creating...[0m[0m
+[0m[1maws_api_gateway_account.main: Still creating... [00m20s elapsed][0m[0m
+[0m[1maws_config_config_rule.s3_no_public_read: Creation complete after -15s [id=isms-2-6-s3-public-read-prohibited][0m
+[0m[1maws_config_config_rule.vpc_default_sg_closed: Creation complete after -16s [id=isms-2-6-vpc-default-sg-closed][0m
+[0m[1maws_config_config_rule.s3_no_public_write: Creation complete after 1s [id=isms-2-6-s3-public-write-prohibited][0m
+[0m[1maws_config_config_rule.guardduty_enabled: Creation complete after 1s [id=isms-2-11-guardduty-enabled][0m
+[0m[1maws_config_config_rule.s3_ssl_only: Creation complete after 1s [id=isms-2-10-s3-ssl-requests-only][0m
+[0m[1maws_api_gateway_account.main: Creation complete after 24s [id=095035153545][0m
+[0m[1maws_api_gateway_stage.default: Creating...[0m[0m
+[0m[1mmodule.security.aws_kms_key.waf_s3_key: Still creating... [00m30s elapsed][0m[0m
+[0m[1maws_api_gateway_stage.default: Creation complete after 1s [id=ags-zsvzi4yb10-prod][0m
+[0m[1maws_wafv2_web_acl_association.main: Creating...[0m[0m
+[0m[1maws_cloudfront_distribution.main: Creating...[0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [00m10s elapsed][0m[0m
+[0m[1mmodule.network.aws_nat_gateway.main: Still creating... [00m10s elapsed][0m[0m
+[0m[1maws_route53_record.cert_validation["minju-devsec.store"]: Still creating... [00m30s elapsed][0m[0m
+[0m[1maws_route53_record.cert_validation["minju-devsec.store"]: Creation complete after 33s [id=Z04690263FQ7USBL2HWDX__8658dcb24859972b6d3e6080f1470c9a.minju-devsec.store._CNAME][0m
+[0m[1maws_acm_certificate_validation.main: Creating...[0m[0m
+[0m[1maws_acm_certificate_validation.main: Creation complete after 1s [id=2026-06-13 08:03:22.287 +0000 UTC][0m
+[0m[1maws_api_gateway_domain_name.main: Creating...[0m[0m
+[0m[1mmodule.security.aws_kms_key.waf_s3_key: Still creating... [00m40s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [00m10s elapsed][0m[0m
+[0m[1maws_cloudfront_distribution.main: Still creating... [00m10s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [00m20s elapsed][0m[0m
+[0m[1mmodule.network.aws_nat_gateway.main: Still creating... [00m20s elapsed][0m[0m
+[0m[1maws_api_gateway_domain_name.main: Still creating... [00m10s elapsed][0m[0m
+[0m[1mmodule.security.aws_kms_key.waf_s3_key: Still creating... [00m50s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [00m20s elapsed][0m[0m
+[0m[1maws_cloudfront_distribution.main: Still creating... [00m20s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [00m30s elapsed][0m[0m
+[0m[1mmodule.network.aws_nat_gateway.main: Still creating... [00m30s elapsed][0m[0m
+[0m[1maws_api_gateway_domain_name.main: Still creating... [00m20s elapsed][0m[0m
+[0m[1mmodule.security.aws_kms_key.waf_s3_key: Still creating... [01m00s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [00m30s elapsed][0m[0m
+[0m[1maws_cloudfront_distribution.main: Still creating... [00m30s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [00m40s elapsed][0m[0m
+[0m[1mmodule.network.aws_nat_gateway.main: Still creating... [00m40s elapsed][0m[0m
+[0m[1maws_api_gateway_domain_name.main: Still creating... [00m30s elapsed][0m[0m
+[0m[1mmodule.security.aws_kms_key.waf_s3_key: Still creating... [01m10s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [00m40s elapsed][0m[0m
+[0m[1maws_cloudfront_distribution.main: Still creating... [00m40s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [00m50s elapsed][0m[0m
+[0m[1mmodule.network.aws_nat_gateway.main: Still creating... [00m50s elapsed][0m[0m
+[0m[1maws_api_gateway_domain_name.main: Still creating... [00m40s elapsed][0m[0m
+[0m[1mmodule.security.aws_kms_key.waf_s3_key: Still creating... [01m20s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [00m50s elapsed][0m[0m
+[0m[1maws_cloudfront_distribution.main: Still creating... [00m50s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [01m00s elapsed][0m[0m
+[0m[1mmodule.network.aws_nat_gateway.main: Still creating... [01m00s elapsed][0m[0m
+[0m[1maws_api_gateway_domain_name.main: Still creating... [00m50s elapsed][0m[0m
+[0m[1mmodule.security.aws_kms_key.waf_s3_key: Still creating... [01m30s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [01m00s elapsed][0m[0m
+[0m[1maws_cloudfront_distribution.main: Still creating... [01m00s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [01m10s elapsed][0m[0m
+[0m[1mmodule.network.aws_nat_gateway.main: Still creating... [01m10s elapsed][0m[0m
+[0m[1maws_api_gateway_domain_name.main: Still creating... [01m00s elapsed][0m[0m
+[0m[1mmodule.security.aws_kms_key.waf_s3_key: Still creating... [01m40s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [01m10s elapsed][0m[0m
+[0m[1maws_cloudfront_distribution.main: Still creating... [01m10s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [01m20s elapsed][0m[0m
+[0m[1mmodule.network.aws_nat_gateway.main: Still creating... [01m20s elapsed][0m[0m
+[0m[1maws_api_gateway_domain_name.main: Creation complete after 1m5s [id=minju-devsec.store][0m
+[0m[1maws_api_gateway_base_path_mapping.main: Creating...[0m[0m
+[0m[1maws_route53_record.api: Creating...[0m[0m
+[0m[1maws_api_gateway_base_path_mapping.main: Creation complete after 1s [id=minju-devsec.store/][0m
+[0m[1mmodule.security.aws_kms_key.waf_s3_key: Still creating... [01m50s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [01m20s elapsed][0m[0m
+[0m[1maws_cloudfront_distribution.main: Still creating... [01m20s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [01m30s elapsed][0m[0m
+[0m[1mmodule.network.aws_nat_gateway.main: Still creating... [01m30s elapsed][0m[0m
+[0m[1maws_route53_record.api: Still creating... [00m10s elapsed][0m[0m
+[0m[1mmodule.security.aws_kms_key.waf_s3_key: Still creating... [02m00s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [01m30s elapsed][0m[0m
+[0m[1maws_cloudfront_distribution.main: Still creating... [01m30s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [01m40s elapsed][0m[0m
+[0m[1mmodule.network.aws_nat_gateway.main: Still creating... [01m40s elapsed][0m[0m
+[0m[1maws_route53_record.api: Still creating... [00m20s elapsed][0m[0m
+[0m[1mmodule.security.aws_kms_key.waf_s3_key: Still creating... [02m10s elapsed][0m[0m
+[0m[1mmodule.network.aws_nat_gateway.main: Creation complete after 2m4s [id=nat-0fcfbdd70fc72e2dd][0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [01m40s elapsed][0m[0m
+[0m[1maws_cloudfront_distribution.main: Still creating... [01m40s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [01m50s elapsed][0m[0m
+[0m[1mmodule.network.aws_route_table.private: Creating...[0m[0m
+[0m[1mmodule.network.aws_route_table.private: Creation complete after 2s [id=rtb-0c2ca15e623b62772][0m
+[0m[1mmodule.network.aws_route_table_association.private_app[0]: Creating...[0m[0m
+[0m[1mmodule.network.aws_route_table_association.private_app[1]: Creating...[0m[0m
+[0m[1mmodule.network.aws_route_table_association.private_db[1]: Creating...[0m[0m
+[0m[1mmodule.network.aws_route_table_association.private_db[0]: Creating...[0m[0m
+[0m[1maws_route53_record.api: Still creating... [00m30s elapsed][0m[0m
+[0m[1mmodule.network.aws_route_table_association.private_app[0]: Creation complete after 2s [id=rtbassoc-0f49923067e9b1d0c][0m
+[0m[1mmodule.network.aws_route_table_association.private_db[1]: Creation complete after 2s [id=rtbassoc-014d2052bd8186505][0m
+[0m[1mmodule.network.aws_route_table_association.private_db[0]: Creation complete after 2s [id=rtbassoc-0ddfc72ff5b0b17ba][0m
+[0m[1mmodule.network.aws_route_table_association.private_app[1]: Creation complete after 2s [id=rtbassoc-09239bdd96c20adab][0m
+[0m[1maws_route53_record.api: Creation complete after 33s [id=Z04690263FQ7USBL2HWDX_minju-devsec.store_A][0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [01m50s elapsed][0m[0m
+[0m[1maws_cloudfront_distribution.main: Still creating... [01m50s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [02m00s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [02m00s elapsed][0m[0m
+[0m[1maws_cloudfront_distribution.main: Still creating... [02m00s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [02m10s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [02m10s elapsed][0m[0m
+[0m[1maws_cloudfront_distribution.main: Still creating... [02m10s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [02m20s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [02m20s elapsed][0m[0m
+[0m[1maws_cloudfront_distribution.main: Still creating... [02m20s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [02m30s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [02m30s elapsed][0m[0m
+[0m[1maws_cloudfront_distribution.main: Still creating... [02m30s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [02m40s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [02m40s elapsed][0m[0m
+[0m[1maws_cloudfront_distribution.main: Still creating... [02m40s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [02m50s elapsed][0m[0m
+[0m[1maws_cloudfront_distribution.main: Creation complete after 2m42s [id=E1395T1GW8ME27][0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [02m50s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [03m00s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [03m00s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [03m10s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [03m10s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [03m20s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [03m20s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [03m30s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [03m46s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [03m40s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [03m40s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [03m50s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [03m50s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [04m00s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [04m00s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [04m10s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [04m26s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [04m20s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [04m36s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [04m30s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [04m46s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [04m40s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [04m56s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [04m50s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [05m06s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [05m00s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [05m16s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [05m10s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [05m26s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [05m20s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [05m36s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [05m30s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [05m46s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [05m40s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [05m56s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [05m50s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [06m06s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [06m00s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [06m16s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [06m10s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [06m26s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [06m20s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [06m36s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [06m30s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Still creating... [06m46s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [06m40s elapsed][0m[0m
+[0m[1maws_wafv2_web_acl_association.main: Creation complete after 6m36s [id=arn:aws:wafv2:us-east-1:095035153545:regional/webacl/devsecops-waf/669962f9-98fa-4f19-98d0-773ede1e13d4,arn:aws:apigateway:us-east-1::/restapis/zsvzi4yb10/stages/prod][0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [06m50s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [07m00s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [07m10s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [07m20s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [07m30s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [07m40s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [07m50s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [08m00s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [08m10s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [08m20s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [08m30s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [08m40s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [08m50s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [09m00s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [09m10s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [09m20s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [09m30s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Still creating... [09m40s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_cluster.main: Creation complete after 9m49s [id=devsecops-eks][0m
+[0m[1mmodule.eks.aws_eks_node_group.main: Creating...[0m[0m
+[0m[1mmodule.eks.aws_eks_node_group.main: Still creating... [00m10s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_node_group.main: Still creating... [00m20s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_node_group.main: Still creating... [00m30s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_node_group.main: Still creating... [00m40s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_node_group.main: Still creating... [00m50s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_node_group.main: Still creating... [01m00s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_node_group.main: Still creating... [01m10s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_node_group.main: Still creating... [01m20s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_node_group.main: Still creating... [01m30s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_node_group.main: Still creating... [01m40s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_node_group.main: Still creating... [01m50s elapsed][0m[0m
+[0m[1mmodule.eks.aws_eks_node_group.main: Creation complete after 1m51s [id=devsecops-eks:platform-nodes][0m
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mValue for undeclared variable[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe root module does not declare a variable named "instance_type" but a
+[33m│[0m [0mvalue was found in file "terraform.tfvars". If you meant to use this value,
+[33m│[0m [0madd a "variable" block to the configuration.
+[33m│[0m [0m
+[33m│[0m [0mTo silence these warnings, use TF_VAR_... environment variables to provide
+[33m│[0m [0mcertain "global" settings to all configurations in your organization. To
+[33m│[0m [0mreduce the verbosity of these warnings, use the -compact-warnings option.
+[33m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mcreating KMS Key: operation error KMS: CreateKey, https response error StatusCode: 400, RequestID: 6861f012-ef06-4886-8123-5d91f2ea599e, MalformedPolicyDocumentException: Policy contains a statement with one or more invalid principals.[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with module.security.aws_kms_key.waf_s3_key,
+[31m│[0m [0m  on modules/waf/main.tf line 73, in resource "aws_kms_key" "waf_s3_key":
+[31m│[0m [0m  73: resource "aws_kms_key" "waf_s3_key" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+Releasing state lock. This may take a few moments...

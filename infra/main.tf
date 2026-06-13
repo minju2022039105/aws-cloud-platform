@@ -90,7 +90,7 @@ resource "aws_kms_key" "shared_log_key" {
 # ==========================================
 
 resource "aws_sns_topic" "security_alerts" {
-  name              = "devsecops-security-alerts"
+  name = "devsecops-security-alerts"
   # AWS-0095: 전송 중 및 저장 데이터 암호화 — 알림 내용(IP, 공격 유형) 보호
   kms_master_key_id = aws_kms_key.shared_log_key.id
 }

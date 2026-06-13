@@ -1,0 +1,17 @@
+=== terraform apply ===
+Apply complete! Resources: 4 added, 1 changed, 0 destroyed.
+
+=== kubectl version ===
+Client Version: v1.30.0
+Kustomize Version: v5.0.4-0.20230601165947-6ce0bf390ce3
+
+=== aws eks update-kubeconfig ===
+Updated context arn:aws:eks:us-east-1:095035153545:cluster/devsecops-eks in /home/march/.kube/config
+
+=== kubectl get nodes -o wide ===
+NAME                          STATUS   ROLES    AGE    VERSION                INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                        KERNEL-VERSION                    CONTAINER-RUNTIME
+ip-10-0-11-119.ec2.internal   Ready    <none>   101m   v1.30.14-eks-3385e9b   10.0.11.119   <none>        Amazon Linux 2023.11.20260526   6.1.172-216.329.amzn2023.x86_64   containerd://2.2.3+unknown
+ip-10-0-12-232.ec2.internal   Ready    <none>   101m   v1.30.14-eks-3385e9b   10.0.12.232   <none>        Amazon Linux 2023.11.20260526   6.1.172-216.329.amzn2023.x86_64   containerd://2.2.3+unknown
+
+=== timestamp ===
+Sat Jun 13 18:55:35 KST 2026

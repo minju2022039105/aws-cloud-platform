@@ -6,7 +6,7 @@ resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
   enable_dns_support   = true
-  tags = { Name = "devsecops-vpc" }
+  tags                 = { Name = "devsecops-vpc" }
 }
 
 # tfsec:ignore:aws-ec2-no-public-ip-subnet
@@ -15,7 +15,7 @@ resource "aws_subnet" "public" {
   cidr_block              = "10.0.1.0/24"
   availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
-  tags = { Name = "devsecops-public-1a" }
+  tags                    = { Name = "devsecops-public-1a" }
 }
 
 # tfsec:ignore:aws-ec2-no-public-ip-subnet
@@ -24,12 +24,12 @@ resource "aws_subnet" "public_2" {
   cidr_block              = "10.0.2.0/24"
   availability_zone       = "us-east-1b"
   map_public_ip_on_launch = true
-  tags = { Name = "devsecops-public-1b" }
+  tags                    = { Name = "devsecops-public-1b" }
 }
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
-  tags = { Name = "devsecops-igw" }
+  tags   = { Name = "devsecops-igw" }
 }
 
 resource "aws_route_table" "public" {
@@ -48,6 +48,63 @@ resource "aws_route_table_association" "public" {
 resource "aws_route_table_association" "public_2" {
   subnet_id      = aws_subnet.public_2.id
   route_table_id = aws_route_table.public.id
+}
+
+# ==========================================
+# 3-Tier: Private App / DB Subnets
+# ==========================================
+
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
+resource "aws_eip" "nat" {
+  domain = "vpc"
+  tags   = { Name = "devsecops-nat-eip" }
+}
+
+resource "aws_nat_gateway" "main" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public.id
+  depends_on    = [aws_internet_gateway.igw]
+  tags          = { Name = "devsecops-nat-gw" }
+}
+
+resource "aws_subnet" "private_app" {
+  count             = length(var.private_app_subnet_cidrs)
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = var.private_app_subnet_cidrs[count.index]
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+  tags              = { Name = "devsecops-private-app-${count.index + 1}" }
+}
+
+resource "aws_subnet" "private_db" {
+  count             = length(var.private_db_subnet_cidrs)
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = var.private_db_subnet_cidrs[count.index]
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+  tags              = { Name = "devsecops-private-db-${count.index + 1}" }
+}
+
+resource "aws_route_table" "private" {
+  vpc_id = aws_vpc.main.id
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.main.id
+  }
+  tags = { Name = "devsecops-private-rt" }
+}
+
+resource "aws_route_table_association" "private_app" {
+  count          = length(var.private_app_subnet_cidrs)
+  subnet_id      = aws_subnet.private_app[count.index].id
+  route_table_id = aws_route_table.private.id
+}
+
+resource "aws_route_table_association" "private_db" {
+  count          = length(var.private_db_subnet_cidrs)
+  subnet_id      = aws_subnet.private_db[count.index].id
+  route_table_id = aws_route_table.private.id
 }
 
 # EC2 보안 그룹 (port 80 ALB→EC2 ingress는 루트 모듈의 aws_security_group_rule로 분리)
@@ -169,9 +226,9 @@ resource "aws_iam_policy" "ec2_ai_policy" {
         Resource = "*"
       },
       {
-        Sid    = "WriteCloudWatchLogs"
-        Effect = "Allow"
-        Action = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+        Sid      = "WriteCloudWatchLogs"
+        Effect   = "Allow"
+        Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
         Resource = "*"
       }
     ]
@@ -192,21 +249,21 @@ resource "aws_iam_policy" "lambda_blocker_policy" {
         Resource = "arn:aws:s3:::${var.s3_bucket_name}/results/*"
       },
       {
-        Sid    = "UpdateWAFIPSet"
-        Effect = "Allow"
-        Action = ["wafv2:GetIPSet", "wafv2:UpdateIPSet"]
+        Sid      = "UpdateWAFIPSet"
+        Effect   = "Allow"
+        Action   = ["wafv2:GetIPSet", "wafv2:UpdateIPSet"]
         Resource = var.waf_ipset_arn
       },
       {
-        Sid    = "WriteLambdaLogs"
-        Effect = "Allow"
-        Action = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+        Sid      = "WriteLambdaLogs"
+        Effect   = "Allow"
+        Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
         Resource = "*"
       },
       {
-        Sid    = "PutAIOpsMetrics"
-        Effect = "Allow"
-        Action = ["cloudwatch:PutMetricData"]
+        Sid      = "PutAIOpsMetrics"
+        Effect   = "Allow"
+        Action   = ["cloudwatch:PutMetricData"]
         Resource = "*"
       }
     ]
@@ -278,8 +335,8 @@ resource "aws_iam_policy" "github_actions_minimal_policy" {
     Statement = [
       {
         # 기초 인프라 조회 및 VPC 관리
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "ec2:Describe*",
           "ec2:CreateVpc",
           "ec2:ModifyVpcAttribute",
@@ -341,53 +398,53 @@ resource "aws_iam_policy" "github_actions_minimal_policy" {
 }
 
 # ==========================================
-  # VPC Flow Logs (네트워크 감사 로그)
-  # ==========================================
+# VPC Flow Logs (네트워크 감사 로그)
+# ==========================================
 
-  resource "aws_cloudwatch_log_group" "vpc_flow_logs" {
-    name              = "/aws/vpc/devsecops-flow-logs"
-    retention_in_days = 30  # 보안 감사 최소 기간 / 비용 절충점  
-  }
+resource "aws_cloudwatch_log_group" "vpc_flow_logs" {
+  name              = "/aws/vpc/devsecops-flow-logs"
+  retention_in_days = 30 # 보안 감사 최소 기간 / 비용 절충점  
+}
 
-  resource "aws_iam_role" "vpc_flow_log_role" {
-    name = "devsecops-vpc-flow-log-role"
+resource "aws_iam_role" "vpc_flow_log_role" {
+  name = "devsecops-vpc-flow-log-role"
 
-    assume_role_policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [{
-        Effect    = "Allow"
-        Action    = "sts:AssumeRole"
-        Principal = { Service = "vpc-flow-logs.amazonaws.com" }  
-      }]
-    })
-  }
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Action    = "sts:AssumeRole"
+      Principal = { Service = "vpc-flow-logs.amazonaws.com" }
+    }]
+  })
+}
 
-  # tfsec:ignore:aws-iam-no-policy-wildcards
-  resource "aws_iam_role_policy" "vpc_flow_log_policy" {
-    name = "devsecops-vpc-flow-log-policy"
-    role = aws_iam_role.vpc_flow_log_role.id
+# tfsec:ignore:aws-iam-no-policy-wildcards
+resource "aws_iam_role_policy" "vpc_flow_log_policy" {
+  name = "devsecops-vpc-flow-log-policy"
+  role = aws_iam_role.vpc_flow_log_role.id
 
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [{
-        Effect = "Allow"
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
-          "logs:DescribeLogGroups",
-          "logs:DescribeLogStreams"
-        ]
-        Resource = "${aws_cloudwatch_log_group.vpc_flow_logs.arn}:*"
-      }]
-    })
-  }
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams"
+      ]
+      Resource = "${aws_cloudwatch_log_group.vpc_flow_logs.arn}:*"
+    }]
+  })
+}
 
-  resource "aws_flow_log" "main" {
-    vpc_id          = aws_vpc.main.id
-    traffic_type    = "ALL"  # REJECT=포트스캔 탐지, ACCEPT=lateral movement 탐지
-    iam_role_arn    = aws_iam_role.vpc_flow_log_role.arn
-    log_destination = aws_cloudwatch_log_group.vpc_flow_logs.arn 
+resource "aws_flow_log" "main" {
+  vpc_id          = aws_vpc.main.id
+  traffic_type    = "ALL" # REJECT=포트스캔 탐지, ACCEPT=lateral movement 탐지
+  iam_role_arn    = aws_iam_role.vpc_flow_log_role.arn
+  log_destination = aws_cloudwatch_log_group.vpc_flow_logs.arn
 
-    tags = { Name = "devsecops-vpc-flow-log", Project = "devsecops-platform" }
-  }
+  tags = { Name = "devsecops-vpc-flow-log", Project = "devsecops-platform" }
+}

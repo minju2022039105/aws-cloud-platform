@@ -35,3 +35,18 @@ output "github_actions_role_arn" {
   value       = aws_iam_role.github_actions_role.arn
   description = "ARN of GitHub Actions OIDC Role"
 }
+
+output "private_app_subnet_ids" {
+  value       = aws_subnet.private_app[*].id
+  description = "Private App Subnet IDs (EKS 노드 그룹용)"
+}
+
+output "private_db_subnet_ids" {
+  value       = aws_subnet.private_db[*].id
+  description = "Private DB Subnet IDs (RDS용)"
+}
+
+output "nat_gateway_id" {
+  value       = aws_nat_gateway.main.id
+  description = "NAT Gateway ID"
+}

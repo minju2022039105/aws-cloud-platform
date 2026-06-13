@@ -48,7 +48,7 @@ resource "aws_s3_bucket_policy" "model_store_ssl" {
       Effect    = "Deny"
       Principal = "*"
       Action    = "s3:*"
-      Resource  = [
+      Resource = [
         aws_s3_bucket.model_store.arn,
         "${aws_s3_bucket.model_store.arn}/*"
       ]
@@ -85,7 +85,7 @@ resource "aws_iam_role" "edge_lambda" {
 }
 
 resource "aws_iam_role_policy_attachment" "edge_logs" {
-  role       = aws_iam_role.edge_lambda.name
+  role = aws_iam_role.edge_lambda.name
   # CloudWatch Logs 쓰기 권한 — Lambda@Edge 로그는 각 엣지 리전에 분산 저장됨
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
@@ -114,9 +114,9 @@ resource "aws_lambda_function" "edge_security" {
   handler          = "handler.lambda_handler"
   runtime          = "python3.11"
   source_code_hash = data.archive_file.edge_security_zip.output_base64sha256
-  publish          = true   # Lambda@Edge는 $LATEST 사용 불가 — qualified_arn(버전 ARN) 필수
-  memory_size      = 256    # JSON 모델 역직렬화 + boto3 로드 여유분 (Cold Start ~3~5s)
-  timeout          = 15     # S3 다운로드 Cold Start 최대 ~8s 고려, Origin Request 한도 30s
+  publish          = true # Lambda@Edge는 $LATEST 사용 불가 — qualified_arn(버전 ARN) 필수
+  memory_size      = 256  # JSON 모델 역직렬화 + boto3 로드 여유분 (Cold Start ~3~5s)
+  timeout          = 15   # S3 다운로드 Cold Start 최대 ~8s 고려, Origin Request 한도 30s
 
   # Lambda@Edge 제약: 환경변수 미지원 → handler.py 내 상수(_S3_BUCKET 등)로 관리
 }
@@ -229,19 +229,19 @@ resource "aws_cloudfront_distribution" "main" {
     custom_origin_config {
       http_port              = 80
       https_port             = 443
-      origin_protocol_policy = "https-only"   # 오리진 통신 암호화 강제
+      origin_protocol_policy = "https-only" # 오리진 통신 암호화 강제
       origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
 
   default_cache_behavior {
     target_origin_id       = "primary-origin"
-    viewer_protocol_policy = "redirect-to-https"  # HTTP → HTTPS 강제 리다이렉트
+    viewer_protocol_policy = "redirect-to-https" # HTTP → HTTPS 강제 리다이렉트
     allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods         = ["GET", "HEAD"]
 
     forwarded_values {
-      query_string = true                                  # 이상 탐지 피처로 QS 필요
+      query_string = true # 이상 탐지 피처로 QS 필요
       headers      = ["Authorization", "Content-Type", "User-Agent"]
       cookies { forward = "none" }
     }
@@ -257,7 +257,7 @@ resource "aws_cloudfront_distribution" "main" {
     # - Origin Request: 30s 제한, 50MB 패키지 → Cold Start 여유 확보
     lambda_function_association {
       event_type   = "origin-request"
-      lambda_arn   = aws_lambda_function.edge_security.qualified_arn  # 버전 포함 ARN
+      lambda_arn   = aws_lambda_function.edge_security.qualified_arn # 버전 포함 ARN
       include_body = false
     }
   }

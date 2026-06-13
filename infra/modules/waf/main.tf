@@ -26,7 +26,7 @@ resource "aws_s3_bucket_policy" "waf_logs_ssl" {
         Effect    = "Deny"
         Principal = "*"
         Action    = "s3:*"
-        Resource  = [
+        Resource = [
           aws_s3_bucket.waf_logs.arn,
           "${aws_s3_bucket.waf_logs.arn}/*"
         ]
@@ -85,7 +85,7 @@ resource "aws_kms_key" "waf_s3_key" {
         Principal = {
           AWS = [
             "arn:aws:iam::${var.account_id}:root",
-            "arn:aws:iam::${var.account_id}:user/system/devsecops-admin-user"
+            "arn:aws:iam::${var.account_id}:user/devsecops_admin_user"
           ]
         }
         Action   = "kms:*"
@@ -137,11 +137,11 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "waf_logs_encrypti
   rule {
     apply_server_side_encryption_by_default {
       # 변수 대신 위에서 정의한 키의 ARN을 직접 참조하여 오류 방지
-      kms_master_key_id = aws_kms_key.waf_s3_key.arn 
+      kms_master_key_id = aws_kms_key.waf_s3_key.arn
       sse_algorithm     = "aws:kms"
     }
     # S3 Bucket Key 활성화로 KMS 호출 비용 최적화[cite: 1]
-    bucket_key_enabled = true 
+    bucket_key_enabled = true
   }
 }
 
@@ -152,10 +152,10 @@ resource "aws_wafv2_web_acl" "main" {
   scope       = "REGIONAL"
 
   default_action {
-    allow {} 
+    allow {}
   }
 
-# [Priority 0] Geo-Blocking (KR 전용) - 한국 외 IP 차단
+  # [Priority 0] Geo-Blocking (KR 전용) - 한국 외 IP 차단
   rule {
     name     = "GeoBlock-Non-KR"
     priority = 0
@@ -177,13 +177,13 @@ resource "aws_wafv2_web_acl" "main" {
       sampled_requests_enabled   = true
     }
   }
-    
+
   # [Priority 1] AI 기반 실시간 차단 (SOAR 자동 대응)
   rule {
     name     = "AI-RealTime-Block-Rule"
     priority = 1
     action {
-      block {} 
+      block {}
     }
     statement {
       ip_set_reference_statement {
@@ -359,7 +359,7 @@ resource "aws_wafv2_web_acl_logging_configuration" "main" {
       behavior = "KEEP"
       condition {
         action_condition {
-          action = "BLOCK" 
+          action = "BLOCK"
         }
       }
       requirement = "MEETS_ANY"
@@ -374,7 +374,7 @@ resource "aws_wafv2_ip_set" "trusted_ips" {
   description        = "WAF Scope-down 검사 제외 신뢰 IP 대역"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
- terraform apply -target=aws_iam_policy.lambda_blocker_policy addresses          = var.trusted_ip_ranges
+  addresses          = var.trusted_ip_ranges
 }
 
 # 5-b. AI 차단용 IP Set 생성
@@ -383,20 +383,20 @@ resource "aws_wafv2_ip_set" "ai_block_list" {
   description        = "IP set managed by AI anomaly detection engine"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
-  addresses          = [] 
+  addresses          = []
 }
 
 # 6. 비용 거버넌스 알람 (KMS/S3 예산 관리)
 resource "aws_budgets_budget" "s3_kms_monitor" {
-  name              = "monthly-devsecops-budget"
-  budget_type       = "COST"
-  limit_amount      = "10"
-  limit_unit        = "USD"
-  time_unit         = "MONTHLY"
+  name         = "monthly-devsecops-budget"
+  budget_type  = "COST"
+  limit_amount = "10"
+  limit_unit   = "USD"
+  time_unit    = "MONTHLY"
 
   notification {
     comparison_operator        = "GREATER_THAN"
-    threshold                  = 80 
+    threshold                  = 80
     threshold_type             = "PERCENTAGE"
     notification_type          = "ACTUAL"
     subscriber_email_addresses = [var.alert_email]
