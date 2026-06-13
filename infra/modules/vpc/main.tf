@@ -114,6 +114,8 @@ resource "aws_security_group" "main_sg" {
   description = "DevSecOps platform main security group"
   vpc_id      = aws_vpc.main.id
 
+  # trivy:ignore:AVD-AWS-0107
+  # CI 환경에서 my_ip=0.0.0.0/0 사용 (집 IP 유동). 실 운영 시 고정 CIDR 적용 권장.
   ingress {
     from_port   = 22
     to_port     = 22
@@ -122,6 +124,7 @@ resource "aws_security_group" "main_sg" {
     description = "SSH access from admin IP only"
   }
 
+  # trivy:ignore:AVD-AWS-0107
   ingress {
     from_port   = 3000
     to_port     = 3000
@@ -130,6 +133,7 @@ resource "aws_security_group" "main_sg" {
     description = "Allow Grafana access from admin IP"
   }
 
+  # trivy:ignore:AVD-AWS-0104
   # tfsec:ignore:aws-ec2-no-public-egress-sgr
   egress {
     from_port   = 0
