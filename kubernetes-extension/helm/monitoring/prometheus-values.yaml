@@ -1,0 +1,27 @@
+grafana:
+  enabled: true
+  adminPassword: "devsecops1234!"
+  service:
+    type: LoadBalancer
+  persistence:
+    enabled: false
+
+prometheus:
+  prometheusSpec:
+    retention: 3d
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 250m
+      limits:
+        memory: 1Gi
+        cpu: 500m
+
+alertmanager:
+  enabled: false
+
+nodeExporter:
+  enabled: true
+
+kubeStateMetrics:
+  enabled: true
