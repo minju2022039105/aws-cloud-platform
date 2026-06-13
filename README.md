@@ -1,4 +1,4 @@
-# AWS Cloud Platform — Terraform · EKS · GitOps · DevSecOps
+# AWS Cloud Platform
 
 > Terraform 기반 AWS 인프라와 Amazon EKS 플랫폼을 구축하고,
 > GitOps·자동 확장·관측성·보안 자동화를 구현한 프로젝트
