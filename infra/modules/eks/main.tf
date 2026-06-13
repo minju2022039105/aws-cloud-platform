@@ -29,6 +29,8 @@ resource "aws_eks_cluster" "main" {
   version  = var.cluster_version
   role_arn = aws_iam_role.cluster.arn
 
+  # trivy:ignore:AVD-AWS-0038
+  # 포트폴리오/학습 환경 — WSL 로컬에서 kubectl 접근 필요, 집 IP 유동이라 CIDR 제한 불가
   vpc_config {
     subnet_ids              = var.private_app_subnet_ids
     endpoint_private_access = true
