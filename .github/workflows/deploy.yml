@@ -39,6 +39,7 @@ jobs:
           scan-ref: ./infra
           severity: HIGH,CRITICAL
           exit-code: 1
+          trivyignores: ./infra/.trivyignore
 
       - name: Bandit Python Scan
         run: |

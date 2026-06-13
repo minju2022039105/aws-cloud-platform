@@ -13,3 +13,11 @@ AVD-AWS-0104
 # AVD-AWS-0041: EKS control plane logging disabled
 # 포트폴리오/학습 환경 — CloudWatch 로그 비용 절감. 실 운영 시 활성화 권장.
 AVD-AWS-0041
+
+# AVD-AWS-0039: EKS secrets encryption not configured
+# 포트폴리오/학습 환경 — KMS 암호화 비용 절감. 실 운영 시 encryption_config 추가 권장.
+AVD-AWS-0039
+
+# AVD-AWS-0040: EKS endpoint_public_access = true
+# 포트폴리오/학습 환경 — WSL 로컬 kubectl 접근 필요. 실 운영 시 false 권장.
+AVD-AWS-0040
