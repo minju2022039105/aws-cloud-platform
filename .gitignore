@@ -22,3 +22,4 @@ docs/portfolio/
 ai/results/*.png
 ai/results/gen_*.py
 infra/tfplan
+.venv/
