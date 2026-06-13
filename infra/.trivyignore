@@ -9,3 +9,7 @@ AVD-AWS-0107
 # AVD-AWS-0104: Security group egress to 0.0.0.0/0
 # AWS API / apt 등 외부 통신 필요. VPC Flow Logs로 모니터링.
 AVD-AWS-0104
+
+# AVD-AWS-0041: EKS control plane logging disabled
+# 포트폴리오/학습 환경 — CloudWatch 로그 비용 절감. 실 운영 시 활성화 권장.
+AVD-AWS-0041

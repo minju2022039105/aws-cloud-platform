@@ -24,6 +24,7 @@ resource "aws_iam_role_policy_attachment" "cluster_policy" {
 # EKS Cluster
 # ==========================================
 
+# trivy:ignore:AVD-AWS-0041
 resource "aws_eks_cluster" "main" {
   name     = var.cluster_name
   version  = var.cluster_version
