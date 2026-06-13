@@ -1,8 +1,7 @@
 # AWS Cloud Platform — Terraform · EKS · GitOps · DevSecOps
 
-> Terraform으로 3-Tier VPC와 EKS 클러스터를 코드화하고, ArgoCD GitOps로 배포를 자동화하며,
-> Prometheus + Grafana로 관측성을 확보한 클라우드 플랫폼 구축 프로젝트
-> GitHub Actions OIDC 기반 무자격증명 CI/CD · HPA + Cluster Autoscaler 자동 확장 · Serverless SOAR 보안 자동화까지 통합 구현
+> Terraform 기반 AWS 인프라와 Amazon EKS 플랫폼을 구축하고,
+> GitOps·자동 확장·관측성·보안 자동화를 구현한 프로젝트
 
 ---
 
