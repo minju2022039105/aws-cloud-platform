@@ -130,6 +130,58 @@ SNS=$(aws sns list-topics --region "$REGION" \
 [ -z "$SNS" ] && green "SNS Topic" || red "SNS Topic"
 
 echo ""
+echo "[ EKS ]"
+EKS=$(aws eks describe-cluster --name "${PROJECT}-eks" --region "$REGION" \
+  --query 'cluster.status' --output text 2>&1)
+if echo "$EKS" | grep -q "ResourceNotFoundException\|No cluster"; then
+  green "EKS Cluster (${PROJECT}-eks)"
+else
+  red "EKS Cluster (${PROJECT}-eks · 상태: $EKS)"
+fi
+
+echo ""
+echo "[ NAT Gateway ]"
+NAT=$(aws ec2 describe-nat-gateways --region "$REGION" \
+  --filter "Name=tag:Name,Values=*devsecops*" \
+  --query "NatGateways[?State!='deleted'].NatGatewayId" --output text 2>/dev/null)
+[ -z "$NAT" ] && green "NAT Gateway" || red "NAT Gateway ($NAT)"
+
+echo ""
+echo "[ ELB (Load Balancer) ]"
+ELB=$(aws elbv2 describe-load-balancers --region "$REGION" \
+  --query "LoadBalancers[?contains(LoadBalancerName,'devsecops') || contains(LoadBalancerName,'k8s')].LoadBalancerName" \
+  --output text 2>/dev/null)
+[ -z "$ELB" ] && green "ELB / NLB" || red "ELB / NLB ($ELB)"
+
+echo ""
+echo "[ IAM Role (Cluster Autoscaler) ]"
+ROLE=$(aws iam get-role --role-name "${PROJECT}-cluster-autoscaler-role" \
+  --query 'Role.RoleName' --output text 2>&1)
+if echo "$ROLE" | grep -q "NoSuchEntity"; then
+  green "IAM Role (${PROJECT}-cluster-autoscaler-role)"
+else
+  red "IAM Role ($ROLE)"
+fi
+
+echo ""
+echo "[ OIDC Provider ]"
+OIDC=$(aws iam list-open-id-connect-providers \
+  --query "OpenIDConnectProviderList[?contains(Arn,'oidc.eks.${REGION}')].Arn" \
+  --output text 2>/dev/null)
+[ -z "$OIDC" ] && green "OIDC Provider" || red "OIDC Provider ($OIDC)"
+
+echo ""
+echo "[ Lambda@Edge 복제본 ]"
+EDGE=$(aws lambda get-function --function-name "${PROJECT}-edge-security" \
+  --region "$REGION" --query 'Configuration.FunctionName' --output text 2>&1)
+if echo "$EDGE" | grep -q "ResourceNotFoundException"; then
+  green "Lambda@Edge (${PROJECT}-edge-security)"
+else
+  echo -e "\e[33m[대기중]  Lambda@Edge — CloudFront 복제 해제 후 수동 삭제 필요\e[0m"
+  echo "          aws lambda delete-function --function-name ${PROJECT}-edge-security --qualifier 4 --region ${REGION}"
+fi
+
+echo ""
 echo "=============================="
 echo " 결과: 삭제됨 ${PASS}개 / 잔존중 ${FAIL}개"
 echo "=============================="
