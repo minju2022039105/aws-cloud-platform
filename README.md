@@ -154,13 +154,9 @@ gitops/apps/app-of-apps.yaml   ← 루트 Application
 ![ArgoCD App Tree (HPA 포함)](docs/architecture/스크린샷/3tier_0613/24_argocd_nginx_final_tree_with_hpa.png)
 
 
-**Project minju 설정 확인**
+**AppProject minju 설정**
 
-| project_default | project_minju |
-|:---:|:---:|
-| ![project default](docs/architecture/스크린샷/3tier_0613/17_argocd_nginx_details_project_default.png) | ![project minju](docs/architecture/스크린샷/3tier_0613/19_argocd_nginx_details_project_minju.png) |
-
-![ArgoCD minju patch 터미널](docs/architecture/스크린샷/3tier_0613/20_argocd_project_minju_patch_terminal.png)
+![project minju](docs/architecture/스크린샷/3tier_0613/19_argocd_nginx_details_project_minju.png)
 
 ![ArgoCD 네트워크 — ELB + Pod 연결](docs/architecture/스크린샷/3tier_0613/18_argocd_nginx_network_elb_pods.png)
 
