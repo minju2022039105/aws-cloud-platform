@@ -1,9 +1,10 @@
+# 대규모 웹 애플리케이션 위협 분석 및 AWS WAF 기반의 정적 가드레일 설계
 
-
-> 이 글은 **AWS DevSecOps 플랫폼 구축기** 시리즈의 1편입니다.  
-> Terraform IaC → WAF 룰 설계 → Isolation Forest 이상 탐지 → Federated Learning까지,  
-> 실제 운영 비용·보안 지표를 기준으로 의사결정한 과정을 기록합니다.  
-> 전체 코드는 [GitHub](https://github.com/minju2022039105/aws-devsecops-platform)에서 확인할 수 있습니다.
+> 이 글은 **AWS Cloud Infrastructure Platform 구축기** 시리즈의 6편입니다.
+> AWS WAF의 패턴 기반 탐지가 가진 구조적 한계를 분석하고, Prevention/Detection/Response 3계층 아키텍처와 GeoBlock 우선순위 설계로 정적 가드레일을 구성한 과정을 다룹니다.
+>
+> 이전 글: [5편 — GitHub Actions OIDC 기반의 무자격증명(Credentialless) CI/CD 인프라 구축](https://velog.io/@yapp/%EB%B3%B4%EC%95%88%EC%9D%80-%EB%B0%B0%ED%8F%AC-%EC%A0%84%EC%97%90-%EC%8B%9C%EC%9E%91%EB%90%9C%EB%8B%A4-AWS-DevSecOps-CICD-%EC%84%A4%EA%B3%84%EA%B8%B0)
+> 다음 글: [7편 — WAF 로그 데이터 기반의 이상 탐지 엔진 설계 및 Isolation Forest 모델링](https://velog.io/@yapp/WAF%EA%B0%80-%EB%86%93%EC%B9%9C-%EA%B2%83%EC%9D%84-AI%EA%B0%80-%EC%9E%A1%EB%8A%94-%EB%B2%95-Isolation-Forest-Shannon-Entropy-%EA%B7%B8%EB%A6%AC%EA%B3%A0-%EC%A0%95%EC%A7%81%ED%95%9C-%ED%95%9C%EA%B3%84)
 
 ---
 
@@ -243,16 +244,13 @@ rule {
 
 ---
 
-# 이 시리즈에서 다룰 내용
+다음 편에서는 이 WAF 로그를 기반으로 이상 탐지 엔진을 어떻게 설계했는지, Isolation Forest 모델링 과정을 다룬다.
 
-- **1편**: WAF의 한계와 AI 이상 탐지 도입 배경 ← 현재 글
-- **2편**: 보안은 배포 전에 시작된다 — DevSecOps CI/CD 설계기
-- **3편**: WAF 룰 5단계를 Terraform으로 코드화하다 — tfsec이 잡아낸 것들
-- **4편**: AI 이상 탐지 엔진 — Isolation Forest, Shannon Entropy, Federated Learning
-- **5편**: 트러블슈팅 — KMS 비용 폭증 사고
+---
 
-다음 편에서는 Terraform으로 WAF 인프라를 어떻게 코드화했고,  
-tfsec으로 어떤 취약점을 사전에 차단했는지 실제 코드 기준으로 정리해보겠습니다.
+**시리즈 네비게이션**
+이전 글: [5편 — GitHub Actions OIDC 기반의 무자격증명(Credentialless) CI/CD 인프라 구축](https://velog.io/@yapp/%EB%B3%B4%EC%95%88%EC%9D%80-%EB%B0%B0%ED%8F%AC-%EC%A0%84%EC%97%90-%EC%8B%9C%EC%9E%91%EB%90%9C%EB%8B%A4-AWS-DevSecOps-CICD-%EC%84%A4%EA%B3%84%EA%B8%B0)
+다음 글: [7편 — WAF 로그 데이터 기반의 이상 탐지 엔진 설계 및 Isolation Forest 모델링](https://velog.io/@yapp/WAF%EA%B0%80-%EB%86%93%EC%B9%9C-%EA%B2%83%EC%9D%84-AI%EA%B0%80-%EC%9E%A1%EB%8A%94-%EB%B2%95-Isolation-Forest-Shannon-Entropy-%EA%B7%B8%EB%A6%AC%EA%B3%A0-%EC%A0%95%EC%A7%81%ED%95%9C-%ED%95%9C%EA%B3%84)
 
 ---
 

@@ -1,10 +1,13 @@
+# 이벤트 기반 인프라를 활용한 실시간 위협 탐지 및 SOAR 자동 차단 파이프라인
 
-> 이 글은 AWS DevSecOps 플랫폼 구축기 시리즈의 5편입니다.  
-> 4편: [WAF가 놓친 것을 AI가 잡는 법](https://velog.io/@yapp/WAF%EA%B0%80-%EB%86%93%EC%B9%9C-%EA%B2%83%EC%9D%84-AI%EA%B0%80-%EC%9E%A1%EB%8A%94-%EB%B2%95-Isolation-Forest-Shannon-Entropy-%EA%B7%B8%EB%A6%AC%EA%B3%A0-%EC%A0%95%EC%A7%81%ED%95%9C-%ED%95%9C%EA%B3%84)
+> 이 글은 **AWS Cloud Infrastructure Platform 구축기** 시리즈의 마지막, 8편입니다.
+> S3 이벤트를 트리거로 Lambda · Athena · WAF를 연결한 이벤트 기반 SOAR 파이프라인을 완성하고, Grafana 운영 대시보드까지 구축한 과정을 다룹니다.
+>
+> 이전 글: [7편 — WAF 로그 데이터 기반의 이상 탐지 엔진 설계 및 Isolation Forest 모델링](https://velog.io/@yapp/WAF%EA%B0%80-%EB%86%93%EC%B9%9C-%EA%B2%83%EC%9D%84-AI%EA%B0%80-%EC%9E%A1%EB%8A%94-%EB%B2%95-Isolation-Forest-Shannon-Entropy-%EA%B7%B8%EB%A6%AC%EA%B3%A0-%EC%A0%95%EC%A7%81%ED%95%9C-%ED%95%9C%EA%B3%84)
 
 ---
 
-4편에서 Isolation Forest 엔진을 만들고, IP Set에 차단 IP를 추가하는 흐름을 설계했습니다.
+이전 편에서 Isolation Forest 엔진을 만들고, IP Set에 차단 IP를 추가하는 흐름을 설계했습니다.
 
 그런데 당시 파이프라인에 구멍이 있었습니다.
 
@@ -281,6 +284,14 @@ eval_model_v2.py 평가 결과 → S3 → Athena → Grafana (정적 KPI)
 그렇지만 실제 WAF 로그 기반으로 수치를 검증했고, 파이프라인을 실제로 end-to-end로 동작시켰으며, 한계를 숨기지 않았습니다.
 
 향후에는 `monitor.py` 대신 실제 WAF 로그를 Lambda 추론 입력으로 연결하고, 더 큰 운영 환경에서는 Kinesis Firehose나 SageMaker 엔드포인트로 확장할 수 있습니다.
+
+이 시리즈를 통해 만든 것은 결국 하나의 탐지 알고리즘이 아니라, Terraform으로 코드화한 인프라 위에서 GitOps로 배포되고, FinOps로 비용을 통제하며, 이벤트가 발생하면 사람 개입 없이 스스로 반응하는 운영 자동화 체계였습니다. Infrastructure Engineer로서 이 프로젝트에서 가장 중요했던 건 각 구성 요소 자체보다, 그것들을 하나의 일관된 운영 흐름으로 통합하는 설계였습니다.
+
+---
+
+**시리즈 네비게이션**
+이전 글: [7편 — WAF 로그 데이터 기반의 이상 탐지 엔진 설계 및 Isolation Forest 모델링](https://velog.io/@yapp/WAF%EA%B0%80-%EB%86%93%EC%B9%9C-%EA%B2%83%EC%9D%84-AI%EA%B0%80-%EC%9E%A1%EB%8A%94-%EB%B2%95-Isolation-Forest-Shannon-Entropy-%EA%B7%B8%EB%A6%AC%EA%B3%A0-%EC%A0%95%EC%A7%81%ED%95%9C-%ED%95%9C%EA%B3%84)
+시리즈 처음으로: [1편 — Terraform IaC로 구현한 탄력적 EKS 3-Tier 아키텍처 및 GitOps 파이프라인 구축](https://velog.io/@yapp/08.-Terraform%EC%9C%BC%EB%A1%9C-EKS-3-Tier-%ED%94%8C%EB%9E%AB%ED%8F%BC-%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0-ArgoCD-GitOps%EB%B6%80%ED%84%B0-IRSA-%ED%8A%B8%EB%9F%AC%EB%B8%94%EC%8A%88%ED%8C%85)
 
 ---
 

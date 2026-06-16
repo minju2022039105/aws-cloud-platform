@@ -1,8 +1,10 @@
+# [FinOps] 614만 건의 KMS API 호출 분석을 통한 아키텍처 재설계 및 인프라 비용 92% 절감
 
-
-> 이 글은 **AWS WAF + AI 이상 탐지 플랫폼 구축기** 시리즈의 6편입니다.
-> 실습 중 발생한 비용 사고의 원인 분석부터 긴급 대응, 재발 방지까지 기록합니다.
-> 전체 코드는 [GitHub](https://github.com/minju2022039105/aws-devsecops-platform)에서 확인할 수 있습니다.
+> 이 글은 **AWS Cloud Infrastructure Platform 구축기** 시리즈의 3편입니다.
+> KMS API 호출 614만 건이 만든 비용 폭증의 원인을 Cost Explorer · CloudTrail로 역추적하고, 공유 키 아키텍처로 재설계해 비용을 92% 절감한 FinOps 사례를 다룹니다.
+>
+> 이전 글: [2편 — Kubernetes 환경에서의 컨테이너 애플리케이션 배포 자동화 및 Helm 기반 패키지 관리](https://velog.io/@yapp/07.-1.-%EC%84%9C%EB%B2%84%EB%A6%AC%EC%8A%A4-%ED%8F%AC%ED%8A%B8%ED%8F%B4%EB%A6%AC%EC%98%A4%EC%97%90-Kubernetes-%EB%8D%94%ED%95%98%EA%B8%B0-kind%EB%B6%80%ED%84%B0-EKS%EA%B9%8C%EC%A7%80)
+> 다음 글: [4편 — AWS WAF v2 인프라 코드화(IaC) 및 tfsec 정적 분석 기반의 컴플라이언스 자동화](https://velog.io/@yapp/03WAF-%EB%A3%B0-5%EB%8B%A8%EA%B3%84%EB%A5%BC-Terraform%EC%9C%BC%EB%A1%9C-%EC%BD%94%EB%93%9C%ED%99%94%ED%95%98%EB%8B%A4)
 
 ---
 
@@ -311,3 +313,11 @@ Geo-Blocking을 가장 앞에 두면 해외 트래픽이 뒤의 룰까지 도달
 $30짜리 청구서 하나가 SSE-KMS의 과금 구조, Key Policy 권한 관리, 클라우드 비용 모니터링의 중요성을 한 번에 가르쳐줬습니다.
 
 비용 사고를 수습하는 과정에서 IAM 권한 파편화, Terraform 상태 관리 허점, WAF 우선순위 설계까지 덩달아 드러났습니다. 보안 프로젝트를 하면서 정작 비용 보안은 놓쳤다는 게 아이러니였습니다. 클라우드에서 비용 통제는 보안의 일부입니다. 이후로는 새 리소스를 띄울 때마다 "이게 얼마나 호출될 수 있는가"를 먼저 따지게 됐습니다.
+
+다음 편에서는 이 인프라의 앞단 보안 레이어인 AWS WAF를 Terraform으로 코드화하고, tfsec 정적 분석으로 컴플라이언스를 자동화한 과정을 다룬다.
+
+---
+
+**시리즈 네비게이션**
+이전 글: [2편 — Kubernetes 환경에서의 컨테이너 애플리케이션 배포 자동화 및 Helm 기반 패키지 관리](https://velog.io/@yapp/07.-1.-%EC%84%9C%EB%B2%84%EB%A6%AC%EC%8A%A4-%ED%8F%AC%ED%8A%B8%ED%8F%B4%EB%A6%AC%EC%98%A4%EC%97%90-Kubernetes-%EB%8D%94%ED%95%98%EA%B8%B0-kind%EB%B6%80%ED%84%B0-EKS%EA%B9%8C%EC%A7%80)
+다음 글: [4편 — AWS WAF v2 인프라 코드화(IaC) 및 tfsec 정적 분석 기반의 컴플라이언스 자동화](https://velog.io/@yapp/03WAF-%EB%A3%B0-5%EB%8B%A8%EA%B3%84%EB%A5%BC-Terraform%EC%9C%BC%EB%A1%9C-%EC%BD%94%EB%93%9C%ED%99%94%ED%95%98%EB%8B%A4)

@@ -1,10 +1,13 @@
+# Kubernetes 환경에서의 컨테이너 애플리케이션 배포 자동화 및 Helm 기반 패키지 관리
 
-> 이 글은 **AWS WAF + AI 이상 탐지 플랫폼 구축기** 시리즈의 7편입니다.
-> 기존 서버리스 구조를 유지하면서 Kubernetes 역량을 보완한 미니 확장 프로젝트를 기록합니다.
-> 전체 코드는 [GitHub](https://github.com/minju2022039105/aws-devsecops-platform)에서 확인할 수 있습니다.
+> 이 글은 **AWS Cloud Infrastructure Platform 구축기** 시리즈의 2편입니다.
+> 컨테이너 이미지 빌드부터 kind 로컬 클러스터 배포, Rolling Update/Rollback, Trivy 이미지 스캔, Helm 패키징, EKS 실배포까지 컨테이너 운영 자동화 과정을 다룹니다.
+>
+> 이전 글: [1편 — Terraform IaC로 구현한 탄력적 EKS 3-Tier 아키텍처 및 GitOps 파이프라인 구축](https://velog.io/@yapp/08.-Terraform%EC%9C%BC%EB%A1%9C-EKS-3-Tier-%ED%94%8C%EB%9E%AB%ED%8F%BC-%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0-ArgoCD-GitOps%EB%B6%80%ED%84%B0-IRSA-%ED%8A%B8%EB%9F%AC%EB%B8%94%EC%8A%88%ED%8C%85)
+> 다음 글: [3편 — [FinOps] 614만 건의 KMS API 호출 분석을 통한 아키텍처 재설계 및 인프라 비용 92% 절감](https://velog.io/@yapp/5.-614%EB%A7%8C-%EA%B1%B4%EC%9D%98-KMS-%ED%98%B8%EC%B6%9C-%EB%AC%B4%ED%95%9C%EB%A3%A8%ED%94%84%EA%B0%80-30-%EC%B2%AD%EA%B5%AC%EC%84%9C%EB%A5%BC-%EB%A7%8C%EB%93%A0-%EB%82%A0)
 
 ---
-
+## 
 ## 왜 Kubernetes를 추가했나
 
 이 프로젝트는 AWS Lambda + API Gateway 기반 서버리스 구조로 설계되어 있습니다. 서버리스는 인프라 관리 부담이 없고 비용 효율이 좋아 AI 추론 엔진 배포에 적합한 선택이었습니다.
@@ -141,6 +144,7 @@ curl -X POST http://localhost:8080/predict \
   내용: 터미널에서 kubectl get pods 결과 (1/1 Running)
   효과: 로컬 kind 클러스터에서 실제 동작함을 증명
 -->
+![](https://velog.velcdn.com/images/yapp/post/1c1fab52-1e89-48f7-8281-4dc94269f78d/image.png)
 
 ---
 
@@ -225,6 +229,9 @@ starlette (METADATA)  CVE-2025-62727  HIGH  fixed  0.41.3  →  0.49.1
   내용: trivy image 명령어 결과 터미널 화면 (Python 섹션 clean, ncurses HIGH만 남은 상태)
   효과: "CVE를 인식하고 조치했다"는 것을 실제 스캔 결과로 증명
 -->
+---
+**Trivy 최종 스캔 결과**![](https://velog.velcdn.com/images/yapp/post/4969d68c-d28d-4614-ad06-8af240eebfe3/image.png)
+
 
 ---
 
@@ -265,6 +272,7 @@ REVISION: 1
 ```
 
 `/predict` 호출로 동작을 재확인했습니다.
+
 
 ---
 
@@ -311,10 +319,9 @@ kubectl apply -f kubernetes-extension/k8s/
 kubectl get pods
 ```
 
-```
-NAME                           READY   STATUS    RESTARTS   AGE
-ai-inference-cd57845f7-c87g8   1/1     Running   0          19s
-```
+
+**EKS kubectl get pods Running 상태**![](https://velog.velcdn.com/images/yapp/post/7d87d646-3ae5-40ec-a61a-f259b4bb7fd7/image.png)
+
 
 ```bash
 kubectl port-forward svc/ai-inference 8080:80
@@ -327,6 +334,7 @@ curl -X POST http://localhost:8080/predict \
 {"anomaly": 1, "score": -0.0988}
 ```
 
+
 kind와 EKS에서 동일한 결과가 나왔습니다. 로컬에서 검증한 배포 구조가 실제 클라우드에서도 그대로 동작함을 확인했습니다.
 
 ### 클러스터 삭제
@@ -338,15 +346,13 @@ aws ecr delete-repository --repository-name ai-inference --region us-east-1 --fo
 
 비용 발생 시간은 약 30분으로 제한했고, 실습 직후 클러스터와 ECR 레포지토리를 삭제했습니다.
 
-<!-- 📸 스크린샷 #3 — EKS kubectl get pods Running 상태
-  내용: EKS 클러스터에서 kubectl get pods 결과 (1/1 Running)
-  효과: 로컬이 아닌 실제 AWS EKS에서 동작함을 증명
--->
+---
+**레포지토리 삭제**![](https://velog.velcdn.com/images/yapp/post/4d5e5536-e834-4306-9fc2-dbe7d0d2a921/image.png)
 
-<!-- 📸 스크린샷 #4 — EKS /predict 호출 결과
-  내용: curl /predict 결과 터미널 화면 ({"anomaly":1,"score":-0.0988})
-  효과: 엔드포인트까지 실제 동작 검증
--->
+**EKS kubectl get nodes Running 상태**![](https://velog.velcdn.com/images/yapp/post/573537d6-e6cc-40d2-b4f2-cbee47f065c1/image.png)
+
+
+
 
 ---
 
@@ -356,4 +362,10 @@ aws ecr delete-repository --repository-name ai-inference --region us-east-1 --fo
 
 오늘 배포 과정에서 인상적이었던 건 Trivy였습니다. IaC 스캔에서 이미 써본 도구인데, 이미지 스캔으로 확장하는 것이 자연스러웠습니다. 스캔을 돌리자마자 starlette CVE가 두 개 나왔고, 버전을 올리고 재스캔하는 흐름이 보안 게이트를 파이프라인에 넣는 실제 감각을 줬습니다.
 
-다음 편은 이 시리즈의 마무리로, 전체 아키텍처와 회고를 정리할 예정입니다.
+다음 편에서는 이 인프라를 운영하며 마주한 비용 문제 — KMS API 호출 614만 건이 만든 비용 폭증과, 이를 구조적으로 재설계해 92% 절감한 과정을 다룬다.
+
+---
+
+**시리즈 네비게이션**
+이전 글: [1편 — Terraform IaC로 구현한 탄력적 EKS 3-Tier 아키텍처 및 GitOps 파이프라인 구축](https://velog.io/@yapp/08.-Terraform%EC%9C%BC%EB%A1%9C-EKS-3-Tier-%ED%94%8C%EB%9E%AB%ED%8F%BC-%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0-ArgoCD-GitOps%EB%B6%80%ED%84%B0-IRSA-%ED%8A%B8%EB%9F%AC%EB%B8%94%EC%8A%88%ED%8C%85)
+다음 글: [3편 — [FinOps] 614만 건의 KMS API 호출 분석을 통한 아키텍처 재설계 및 인프라 비용 92% 절감](https://velog.io/@yapp/5.-614%EB%A7%8C-%EA%B1%B4%EC%9D%98-KMS-%ED%98%B8%EC%B6%9C-%EB%AC%B4%ED%95%9C%EB%A3%A8%ED%94%84%EA%B0%80-30-%EC%B2%AD%EA%B5%AC%EC%84%9C%EB%A5%BC-%EB%A7%8C%EB%93%A0-%EB%82%A0)
