@@ -21,8 +21,9 @@
 
 ## Project Overview
 
-Terraform IaC로 AWS 인프라 전체를 코드화하고, Amazon EKS 위에 GitOps 기반 Platform Engineering 스택을 구축했습니다.  
-인프라 배포부터 애플리케이션 운영, 자동 확장, 모니터링, 보안 자동화까지 수동 개입 없이 동작하는 파이프라인을 목표로 설계했습니다.
+Terraform으로 AWS 인프라를 코드화하고 Amazon EKS 기반 클라우드 플랫폼을 구축했습니다.
+
+GitOps 기반 배포 자동화, 자동 확장(HPA·Cluster Autoscaler), 관측성(Prometheus·Grafana), 보안 자동화를 통합 구현했습니다.
 
 | 레이어 | 구성 | 핵심 기술 |
 | :--- | :--- | :--- |
