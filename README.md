@@ -287,8 +287,8 @@ github-actions-oidc-role → Terraform apply / Lambda deploy
 Condition = {
   StringLike = {
     "token.actions.githubusercontent.com:sub" = [
-      "repo:minju2022039105/aws-devsecops-platform:ref:refs/heads/main",
-      "repo:minju2022039105/aws-devsecops-platform:ref:refs/pull/*"
+      "repo:minju2022039105/aws-cloud-platform:ref:refs/heads/main",
+      "repo:minju2022039105/aws-cloud-platform:ref:refs/pull/*"
     ]
   }
 }
