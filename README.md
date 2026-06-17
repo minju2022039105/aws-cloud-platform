@@ -285,15 +285,17 @@ github-actions-oidc-role → Terraform apply / Lambda deploy
 
 ```hcl
 Condition = {
-  StringEquals = {
-    "token.actions.githubusercontent.com:sub" =
-      "repo:minju2022039105/aws-devsecops-platform:ref:refs/heads/main"
+  StringLike = {
+    "token.actions.githubusercontent.com:sub" = [
+      "repo:minju2022039105/aws-devsecops-platform:ref:refs/heads/main",
+      "repo:minju2022039105/aws-devsecops-platform:ref:refs/pull/*"
+    ]
   }
 }
 ```
 
-초기 `StringLike` → `StringEquals` 재설계로 main 브랜치 push에만 배포 권한을 한정했습니다.  
-GitHub Secrets가 유출되어도 이 Condition이 없는 외부 환경에서는 AWS 접근이 불가능합니다.
+main 브랜치 push와 PR 이벤트만 허용하고 다른 브랜치 push는 차단합니다.  
+GitHub Secrets가 유출되어도 이 Condition 범위 밖의 컨텍스트에서는 AWS 접근이 불가능합니다.
 
 ### Security Gates
 

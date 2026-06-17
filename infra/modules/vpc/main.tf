@@ -320,7 +320,10 @@ resource "aws_iam_role" "github_actions_role" {
       }
       Condition = {
         StringLike = {
-          "token.actions.githubusercontent.com:sub" = "repo:minju2022039105/aws-devsecops-platform:*"
+          "token.actions.githubusercontent.com:sub" = [
+            "repo:minju2022039105/aws-devsecops-platform:ref:refs/heads/main",
+            "repo:minju2022039105/aws-devsecops-platform:ref:refs/pull/*"
+          ]
         }
       }
     }]
