@@ -3,7 +3,7 @@
 > Terraform으로 3-Tier VPC와 EKS 클러스터를 코드화하고, ArgoCD GitOps로 배포를 자동화하며, Prometheus + Grafana로 관측성을 확보한 클라우드 플랫폼 구축 프로젝트.  
 > GitHub Actions OIDC 기반 무자격증명 CI/CD · HPA + Cluster Autoscaler 자동 확장 · 구조적 비용 최적화까지 통합 구현. (WAF/SOAR 보안 자동화는 하단에 별도 기록)
 
-**개인 프로젝트** | 2026.04 ~ 진행중 | [블로그 시리즈](https://velog.io/@yapp/series/AWS-Cloud-Infrastructure-Platform-%EA%B5%AC%EC%B6%95%EA%B8%B0)
+**개인 프로젝트** | 2026.04 ~ 진행중 | [블로그 시리즈](https://velog.io/@yapp/series/WAF%EA%B0%80-%EB%AA%BB-%EC%9E%A1%EB%8A%94-%EA%B3%B5%EA%B2%A9-AI%EB%A1%9C-%EC%9E%A1%EA%B8%B0)
 
 ---
 
