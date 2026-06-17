@@ -299,27 +299,7 @@ GitHub Secrets가 유출되어도 이 Condition이 없는 외부 환경에서는
 
 코드 변경 시 Trivy · Bandit이 자동 실행되며, 통과하지 못하면 Terraform apply가 차단됩니다.
 
-```
-[Push to main]
-      │
-      ▼
-┌─────────────────────┐
-│   Security Gates    │  Trivy IaC scan (HIGH/CRITICAL 차단)
-│                     │  Bandit Python 코드 분석
-└─────────┬───────────┘
-          │ 통과 시
-          ▼
-┌─────────────────────┐
-│  Terraform Apply    │  init → plan → apply
-│                     │  PR에 Plan 결과 자동 코멘트
-└─────────┬───────────┘
-          │
-          ▼
-┌─────────────────────┐
-│  Lambda Deploy      │  SecurityAnalyzer / SecurityPreventer
-│  + ECR Push         │  NormalTrafficGenerator / Docker Image
-└─────────────────────┘
-```
+Push to main → **Security Gates** (Trivy IaC + Bandit) → 통과 시 **Terraform Apply** (init → plan → apply, PR에 Plan 자동 코멘트) → **Lambda Deploy** (SecurityAnalyzer / SecurityPreventer / NormalTrafficGenerator)
 
 | 도구 | 검사 대상 | 기준 |
 | :--- | :--- | :--- |
@@ -504,14 +484,9 @@ NON_COMPLIANT 감지 → EventBridge → SNS 알림
 | :--- | :--- | :--- | :--- |
 | 1 | KMS 비용 $30/일 급증 | 리소스별 개별 KMS 키 → API 호출 폭증 | 공유 KMS 키 + S3 Bucket Key 전환 |
 | 2 | IAM AccessDenied (OIDC) | StringLike Condition → 모든 브랜치 Assume 가능 | OIDC Trust Policy 권한 최소화 검토 |
-| 3 | WAF WebACL $5.33/월 누수 | cleanup.sh 의존성 순서 무시 | 삭제 순서 재구성 |
-| 4 | sklearn 1.8.0 Private 속성 오류 | 버전 업데이트로 내부 속성 변경 | getattr 기반 안전한 속성 추출 |
+| 3 | HPA TARGETS `<unknown>` | Metrics Server 미설치 | components.yaml 적용 |
+| 4 | Cluster Autoscaler CrashLoopBackOff | IMDSv2 hop limit으로 IMDS 접근 불가 | IRSA(OIDC 기반 STS) 방식으로 전환 |
 | 5 | VPC Default SG 컴플라이언스 위반 | Terraform 외 기본 VPC self-referencing 잔존 | aws_default_security_group으로 Terraform 편입 |
-| 6 | KMS MalformedPolicyDocumentException | IAM 사용자 ARN 오타 | waf/main.tf Principal ARN 수정 |
-| 7 | kubectl not found | Docker Desktop symlink이 /usr/local/bin/kubectl 점유 | sudo install로 바이너리 직접 교체 |
-| 8 | HPA TARGETS `<unknown>` | Metrics Server 미설치 | components.yaml 적용 |
-| 9 | Cluster Autoscaler CrashLoopBackOff | IMDSv2 hop limit으로 IMDS 접근 불가 | IRSA(OIDC 기반 STS) 방식으로 전환 |
-| 10 | Lambda@Edge 삭제 실패 | CloudFront 복제본 존재 중 삭제 시도 | CloudFront 연결 해제 후 수동 삭제 |
 
 ---
 
