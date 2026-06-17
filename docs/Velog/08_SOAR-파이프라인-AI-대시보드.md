@@ -1,6 +1,6 @@
 # 이벤트 기반 인프라를 활용한 실시간 위협 탐지 및 SOAR 자동 차단 파이프라인
 
-> 이 글은 **AWS Cloud Infrastructure Platform 구축기** 시리즈의 마지막, 8편입니다.
+> 이 글은 **AWS Cloud Infrastructure Platform 구축기** 시리즈의 마지막 편인 8편입니다.
 > S3 이벤트를 트리거로 Lambda · Athena · WAF를 연결한 이벤트 기반 SOAR 파이프라인을 완성하고, Grafana 운영 대시보드까지 구축한 과정을 다룹니다.
 >
 > 이전 글: [7편 — WAF 로그 데이터 기반의 이상 탐지 엔진 설계 및 Isolation Forest 모델링](https://velog.io/@yapp/WAF%EA%B0%80-%EB%86%93%EC%B9%9C-%EA%B2%83%EC%9D%84-AI%EA%B0%80-%EC%9E%A1%EB%8A%94-%EB%B2%95-Isolation-Forest-Shannon-Entropy-%EA%B7%B8%EB%A6%AC%EA%B3%A0-%EC%A0%95%EC%A7%81%ED%95%9C-%ED%95%9C%EA%B3%84)

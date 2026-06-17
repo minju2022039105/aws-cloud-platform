@@ -231,7 +231,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "waf_logs_encrypti
 
 `bucket_key_enabled = true`가 중요합니다. 이 설정이 없으면 S3 객체를 읽고 쓸 때마다 KMS API를 직접 호출합니다. WAF 로그처럼 빈번하게 쌓이는 데이터에서는 KMS 호출 비용이 생각 외로 커집니다. Bucket Key를 활성화하면 버킷 레벨에서 데이터 키를 캐싱해 KMS 호출 횟수를 대폭 줄입니다.
 
-이전에 리소스마다 개별 KMS 키를 만들었다가 하루 $30 비용 폭탄을 맞은 경험에서 나온 설정입니다. 자세한 내용은 5편 트러블슈팅에서 다룹니다.
+이전에 리소스마다 개별 KMS 키를 만들었다가 하루 $30 비용 폭탄을 맞은 경험에서 나온 설정입니다. 자세한 내용은 3편에서 다룹니다.
 
 ---
 
